@@ -1,0 +1,31 @@
+[project]
+name = "aspire-valet"
+version = "0.1.0"
+description = "ASPIRE-style agentic code-as-policy on valet-sim: coding agents write pick-and-place programs from per-primitive traces and keep a verified skill library."
+requires-python = ">=3.12"
+dependencies = [
+    "valet-sim",
+    "numpy>=2",
+    "pillow>=11",
+    "anthropic>=2.11",
+    "typesafe-sdk>=0.7.5",
+]
+
+[project.scripts]
+aspire = "aspire.cli:main"
+
+[tool.uv.sources]
+valet-sim = { path = "../../sim", editable = true }
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aspire"]

@@ -1,6 +1,6 @@
-"""The Physical Agent loop: the instruction once, then each turn the scene and wrist views and the arm state; the
-model writes brief reasoning and makes one `execute_absolute_eef_sequence` call. History stays in context. The
-episode ends when the model replies without a call, or at the turn budget.
+"""The Physical Agent loop: the instruction once, then each turn the wrist view (and the scene view when asked)
+and the arm state; the model writes brief reasoning and makes one end-effector sequence call. History stays in
+context. The episode ends when the model replies without a call, or at the turn budget.
 
 Code only executes and records. The truth is logged after each call for grading and analysis; it never reaches
 the model."""
@@ -14,14 +14,17 @@ from pathlib import Path
 
 from .demo import INSTRUCTION, Demo
 from .scene import grade, observation_blocks, observe, open_episode
-from .tool import TOOL
+from .tool import NAMES, tool
 
-SYSTEM = (
-    "You control a simulated SO-101 robot arm on a table. Each turn you see the scene camera, the wrist camera on "
-    "the gripper, and the arm's state. Write a short paragraph of reasoning, then make one "
-    "execute_absolute_eef_sequence call. Its result only says which targets ran; judge what happened from the "
-    "next views. When the task is done, reply without a call."
-)
+SEES = {"wrist": "the wrist camera on the gripper", "both": "the scene camera, the wrist camera on the gripper,"}
+
+
+def system(views: str = "wrist", frame: str = "base") -> str:
+    return (
+        f"You control a simulated SO-101 robot arm on a table. Each turn you see {SEES[views]} and the arm's state. "
+        f"Write a short paragraph of reasoning, then make one {NAMES[frame]} call. Its result only says which "
+        "targets ran; judge what happened from the next views. When the task is done, reply without a call."
+    )
 
 # $ per million tokens: input, output, cache read, 5-minute cache write.
 PRICES = {
@@ -59,6 +62,8 @@ class Config:
     effort: str = "medium"
     turns: int = 15
     max_tokens: int = 16000
+    views: str = "wrist"
+    frame: str = "base"
 
 
 @dataclass
@@ -72,22 +77,23 @@ class Episode:
     result: dict = field(default_factory=dict)
 
 
-def first_message(obs, demo: Demo | None) -> list[dict]:
-    blocks: list[dict] = list(demo.blocks()) if demo else []
+def first_message(obs, demo: Demo | None, cfg: Config) -> list[dict]:
+    blocks: list[dict] = list(demo.blocks(cfg.views, cfg.frame)) if demo else []
     blocks.append({"type": "text", "text": f"Instruction: {INSTRUCTION}"})
-    blocks += observation_blocks(obs, "Current observation:")
+    blocks += observation_blocks(obs, "Current observation:", cfg.views)
     return blocks
 
 
 def run_episode(client, seed: int, cfg: Config, demo: Demo | None = None, out: Path | None = None) -> Episode:
-    sim, arm, _ = open_episode(seed)
+    sim, arm, _ = open_episode(seed, cfg.frame)
     ep = Episode(seed)
     log = _Log(out)
     t0 = time.time()
     obs = observe(arm)
     log.frames(0, obs)
-    messages: list[dict] = [{"role": "user", "content": first_message(obs, demo)}]
-    tool = {**TOOL, "strict": True}
+    messages: list[dict] = [{"role": "user", "content": first_message(obs, demo, cfg)}]
+    tools = [{**tool(cfg.frame), "strict": True}]
+    prompt = system(cfg.views, cfg.frame)
     while True:
         if ep.turns >= cfg.turns:
             ep.ended = "turn budget"
@@ -96,8 +102,8 @@ def run_episode(client, seed: int, cfg: Config, demo: Demo | None = None, out: P
         resp = client.messages.create(
             model=cfg.model,
             max_tokens=cfg.max_tokens,
-            system=SYSTEM,
-            tools=[tool],
+            system=prompt,
+            tools=tools,
             tool_choice={"type": "auto", "disable_parallel_tool_use": True},
             thinking={"type": "adaptive", "display": "summarized"},
             output_config={"effort": cfg.effort},
@@ -123,15 +129,16 @@ def run_episode(client, seed: int, cfg: Config, demo: Demo | None = None, out: P
             break
         call = calls[0]
         actions = call.input.get("actions", []) if isinstance(call.input, dict) else []
+        start = arm.point()
         done = arm.execute(actions)
         ep.sim_s += done.sim_s
         obs = observe(arm)
         log.frames(ep.turns, obs)
-        log.event({**event, "actions": actions, "result": done.text, "ran": done.ran, "state": obs.state,
-                   "truth": sim.truth()})
+        log.event({**event, "actions": actions, "start": [round(float(v), 4) for v in start], "result": done.text,
+                   "ran": done.ran, "state": obs.state, "truth": sim.truth()})
         messages.append({"role": "user", "content": [
             {"type": "tool_result", "tool_use_id": call.id, "content": done.text},
-            *observation_blocks(obs, "Current observation:"),
+            *observation_blocks(obs, "Current observation:", cfg.views),
         ]})
     sim.step(0.5)
     ep.wall_s = time.time() - t0

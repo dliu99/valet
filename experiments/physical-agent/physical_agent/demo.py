@@ -19,7 +19,7 @@ from valet_sim.ik import Unreachable
 from valet_sim.task import BENCHMARK_SEEDS
 
 from .scene import Observation, grade, observation_blocks, observe, open_episode
-from .tool import Arm
+from .tool import NAMES, Arm, to_gripper
 
 INSTRUCTION = "Pick up the white box and set it down on the blue square."
 DISTRACTOR_INSTRUCTION = "Pick up the white box and set it back down where it was."
@@ -34,14 +34,20 @@ class Demo:
     seed: int
     instruction: str
     turns: list[tuple[Observation, list[dict]]] = field(default_factory=list)
+    starts: list[np.ndarray] = field(default_factory=list)
     result: dict = field(default_factory=dict)
 
-    def blocks(self) -> list[dict]:
+    def actions(self, k: int, frame: str = "base") -> list[dict]:
+        """Call k's targets as the agent's tool takes them."""
+        actions = self.turns[k][1]
+        return actions if frame == "base" else [to_gripper(a, self.starts[k]) for a in actions]
+
+    def blocks(self, views: str = "wrist", frame: str = "base") -> list[dict]:
         out: list[dict] = [{"type": "text", "text": f"Demonstration on another episode. Instruction: {self.instruction}"}]
-        for k, (obs, actions) in enumerate(self.turns, 1):
-            out += observation_blocks(obs, f"Demonstration observation {k}:")
-            out.append({"type": "text", "text": "Demonstration call: execute_absolute_eef_sequence("
-                        + json.dumps({"actions": actions}) + ")"})
+        for k, (obs, _) in enumerate(self.turns):
+            out += observation_blocks(obs, f"Demonstration observation {k + 1}:", views)
+            out.append({"type": "text", "text": f"Demonstration call: {NAMES[frame]}("
+                        + json.dumps({"actions": self.actions(k, frame)}) + ")"})
         out.append({"type": "text", "text": "End of demonstration."})
         return out
 
@@ -85,6 +91,7 @@ def run_expert(seed: int, kind: str = "task") -> Demo:
     demo = Demo(kind, seed, INSTRUCTION if kind == "task" else DISTRACTOR_INSTRUCTION)
     for actions in plan:
         demo.turns.append((observe(arm), actions))
+        demo.starts.append(arm.point())
         arm.execute(actions)
     sim.step(0.5)
     demo.result = grade(sim)

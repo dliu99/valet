@@ -7,7 +7,7 @@ import pytest
 from physical_agent.agent import Config, Usage, run_episode
 from physical_agent.demo import DEMO_SEED, demo_seed, record
 from physical_agent.scene import open_episode
-from physical_agent.tool import MAX_TARGETS
+from physical_agent.tool import MAX_TARGETS, to_base, to_gripper
 
 
 def target(x, y, z, pitch=60.0, roll=-90.0, gripper=60.0, steps=10):
@@ -46,8 +46,29 @@ def test_demos_come_from_outside_the_benchmark_and_succeed():
     demo = record(DEMO_SEED)
     assert demo.result["placed"] and abs(demo.turns[0][1][-1]["roll_deg"] + 90) <= 20
     assert len(demo.turns) == 3 and all(len(actions) <= MAX_TARGETS for _, actions in demo.turns)
-    images = [b for b in demo.blocks() if b["type"] == "image"]
-    assert len(images) == 6
+    assert sum(b["type"] == "image" for b in demo.blocks("both")) == 6
+    assert sum(b["type"] == "image" for b in demo.blocks("wrist")) == 3
+    relative = demo.actions(0, "gripper")
+    assert set(relative[0]) == {"forward", "left", "up", "roll_deg", "pitch_deg", "gripper", "control_steps"}
+    back = to_base(relative[-1], demo.starts[0])
+    assert np.hypot(back["x"] - demo.turns[0][1][-1]["x"], back["y"] - demo.turns[0][1][-1]["y"]) < 0.002
+
+
+def test_gripper_frame_targets_are_offsets_along_the_arms_heading():
+    start = np.array([0.0388 + 0.2, 0.2, 0.1])  # 45 degrees left of straight ahead, from the pan axis
+    b = to_base({"forward": 0.1, "left": 0.0, "up": -0.05, "roll_deg": -90, "pitch_deg": 90, "gripper": 50,
+                 "control_steps": 5}, start)
+    assert b["x"] == pytest.approx(start[0] + 0.1 / np.sqrt(2)) and b["y"] == pytest.approx(0.2 + 0.1 / np.sqrt(2))
+    assert b["z"] == pytest.approx(0.05)
+    assert to_gripper(b, start)["forward"] == pytest.approx(0.1, abs=1e-3)
+    sim, arm, _ = open_episode(0, "gripper")
+    p0 = arm.point()
+    done = arm.execute([{"forward": 0.02, "left": 0.03, "up": -0.04, "roll_deg": -90, "pitch_deg": 70, "gripper": 50,
+                         "control_steps": 5}])
+    assert done.ran == 1
+    moved = to_gripper({**arm.eef(), "control_steps": 5}, p0)
+    assert moved["forward"] == pytest.approx(0.02, abs=0.01) and moved["left"] == pytest.approx(0.03, abs=0.01)
+    assert moved["up"] == pytest.approx(-0.04, abs=0.01)
 
 
 class FakeUsage:
@@ -84,7 +105,8 @@ def test_the_loop_executes_one_call_per_turn_and_ends_when_the_model_stops_calli
     second = client.requests[1]["messages"]
     result = second[-1]["content"][0]
     assert result["type"] == "tool_result" and result["content"] == "executed 1 target"
-    assert sum(b["type"] == "image" for b in second[-1]["content"]) == 2
+    assert sum(b["type"] == "image" for b in second[-1]["content"]) == 1  # wrist only by default
+    assert "scene camera" not in client.requests[0]["system"]
     sent = json.dumps(client.requests)
     assert "truth" not in sent and "lifted_m" not in sent and "tilt_deg" not in sent
     assert len((tmp_path / "events.jsonl").read_text().splitlines()) == 2
@@ -99,3 +121,10 @@ def test_the_turn_budget_ends_the_episode(tmp_path):
 def test_dollars_follow_the_price_table():
     u = Usage(input=1_000_000, output=100_000, cache_read=1_000_000, cache_write=0)
     assert u.dollars("claude-opus-5-5") == pytest.approx(4.0 + 2.0 + 0.2)
+
+
+def test_the_scene_view_is_sent_only_when_asked(tmp_path):
+    client = FakeClient([[SimpleNamespace(type="text", text="Done.")]])
+    run_episode(client, 0, Config(turns=2, views="both"))
+    first = client.requests[0]["messages"][0]["content"]
+    assert sum(b["type"] == "image" for b in first) == 2 and "scene camera" in client.requests[0]["system"]

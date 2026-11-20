@@ -20,18 +20,30 @@ OPEN = 30.0
 
 
 def load(run: str) -> tuple[dict, list[dict]]:
-    d = json.loads((RUNS / run / "summary.json").read_text())
+    """A run's settings and summary, rebuilt from its seeds' results (a run may have been extended or merged)."""
+    from .run import summarize
+
+    rows = [json.loads(f.read_text()) for f in sorted((RUNS / run).glob("seed-*/result.json"))]
+    if not rows:
+        raise SystemExit(f"{run}: no results")
+    r0 = rows[0]
+    summary = {"model": r0["model"], "condition": r0["condition"], "views": r0.get("views", "both"),
+               "frame": r0.get("frame", "base"), "demo_seed": r0.get("demo_seed"), **summarize(rows)}
     episodes = []
-    for row in d["rows"]:
+    for row in rows:
         path = RUNS / run / f"seed-{row['seed']:02d}" / "events.jsonl"
-        events = [json.loads(line) for line in path.read_text().splitlines()]
-        episodes.append({**row, "events": events})
-    return d["summary"], episodes
+        episodes.append({**row, "events": [json.loads(line) for line in path.read_text().splitlines()]})
+    return summary, episodes
 
 
-def grasps(events: list[dict]) -> list[dict]:
+def grasps(events: list[dict], seed: int) -> list[dict]:
     """Each closing of the gripper starts an attempt that lasts until it is opened again; it held if the box was
-    lifted or held at the end of any call in between."""
+    lifted or held at the end of any call in between. `miss_m` is how far the closing point was, in xy, from the
+    box's centre at the start of that call."""
+    from valet_sim.task import episode
+
+    b = episode(seed).box
+    box_xy = (b.x, b.y)
     attempts: list[dict] = []
     grip = 60.0
     current = None
@@ -43,7 +55,8 @@ def grasps(events: list[dict]) -> list[dict]:
         for a in ran:
             g = float(a["gripper"])
             if current is None and g <= CLOSED and grip > CLOSED:
-                current = {"turn": e["turn"], "held": False}
+                miss = ((a["x"] - box_xy[0]) ** 2 + (a["y"] - box_xy[1]) ** 2) ** 0.5
+                current = {"turn": e["turn"], "held": False, "miss_m": round(miss, 4)}
                 attempts.append(current)
             elif current is not None and g >= OPEN:
                 current["released_turn"] = e["turn"]
@@ -55,11 +68,12 @@ def grasps(events: list[dict]) -> list[dict]:
                 if att.get("released_turn", e["turn"]) >= e["turn"] >= att["turn"] and (truth.get("held") or lifted > lifted_before + 0.01):
                     att["held"] = True
             lifted_before = max(lifted_before, lifted)
+            box_xy = (truth["box"]["x"], truth["box"]["y"])
     return attempts
 
 
 def recovery(ep: dict) -> dict:
-    atts = grasps(ep["events"])
+    atts = grasps(ep["events"], ep["seed"])
     failed = [a for a in atts if not a["held"]]
     first_fail = failed[0]["turn"] if failed else None
     retried = bool(first_fail) and any(a["turn"] > first_fail for a in atts)
@@ -67,13 +81,14 @@ def recovery(ep: dict) -> dict:
     ik_fail = sum("failed" in (e.get("result") or "") for e in ep["events"])
     tipped = any((e.get("truth") or {}).get("box", {}).get("tilt_deg", 0) > 15 for e in ep["events"])
     return {"attempts": len(atts), "failed": len(failed), "retried": retried, "recovered": recovered,
+            "first_miss_m": atts[0]["miss_m"] if atts else None, "misses_m": [a["miss_m"] for a in atts],
             "ik_failures": ik_fail, "tipped": tipped, "false_done": ep["ended"] == "done" and not ep["placed"]}
 
 
 def table(runs: list[str]) -> str:
-    head = ("| run | model | condition | placed | lifted | median turns | median s (wall / sim) | median tokens | "
-            "$ / episode | grasp attempts | failed grasps | episodes with a failed grasp: retried / recovered / placed | "
-            "said done but not placed | turn budget hit |")
+    head = ("| run | model | views | frame | condition | placed | lifted | median turns | median s (wall / sim) | "
+            "median tokens | $ / episode | grasps (held) | episodes with a failed grasp: retried / recovered / placed | "
+            "said done but not placed | turn budget hit | median miss at first grasp (cm) |")
     lines = [head, "|" + "---|" * (head.count("|") - 1)]
     for run in runs:
         s, eps = load(run)
@@ -81,13 +96,20 @@ def table(runs: list[str]) -> str:
         with_fail = [(e, r) for e, r in zip(eps, recs) if r["failed"]]
         n = s["n"]
         lines.append(
-            f"| {run} | {s['model']} | {s['condition']} | {s['placed']}/{n} | {s['lifted']}/{n} | {s['median_turns']} | "
+            f"| {run} | {s['model'].removeprefix('claude-')} | {s.get('views', 'both')} | {s.get('frame', 'base')} | "
+            f"{s['condition']}{'' if s.get('demo_seed') in (None, 104) else ' (seed ' + str(s['demo_seed']) + ')'} | "
+            f"{s['placed']}/{n} | {s['lifted']}/{n} | {s['median_turns']} | "
             f"{s['median_wall_s']:.0f} / {s['median_sim_s']:.0f} | {s['median_tokens']:.0f} | {s['mean_dollars']:.2f} | "
-            f"{sum(r['attempts'] for r in recs)} | {sum(r['failed'] for r in recs)} | "
+            f"{sum(r['attempts'] for r in recs)} ({sum(r['attempts'] - r['failed'] for r in recs)}) | "
             f"{len(with_fail)}: {sum(r['retried'] for _, r in with_fail)} / {sum(r['recovered'] for _, r in with_fail)} / "
             f"{sum(e['placed'] for e, _ in with_fail)} | {sum(r['false_done'] for r in recs)} | "
-            f"{s['ended'].get('turn budget', 0)} |")
+            f"{s['ended'].get('turn budget', 0)} | {_median_cm([r['first_miss_m'] for r in recs])} |")
     return "\n".join(lines)
+
+
+def _median_cm(xs: list) -> str:
+    xs = [x for x in xs if x is not None]
+    return f"{100 * statistics.median(xs):.1f}" if xs else "-"
 
 
 def episodes(run: str) -> str:
@@ -98,7 +120,8 @@ def episodes(run: str) -> str:
         verdict = "placed" if e["placed"] else "lifted" if e["lifted"] else "failed"
         out.append(f"{run} seed {e['seed']:2}: {verdict:6} off {e['off_target_m']:.3f} m, tilt {e['tilt_deg']}, "
                    f"released {e['released']}, turns {e['turns']} ({e['ended']}), grasps {r['attempts']} "
-                   f"(failed {r['failed']}, recovered {r['recovered']}), ik failures {r['ik_failures']}, "
+                   f"(failed {r['failed']}, recovered {r['recovered']}, misses cm {[round(100 * m, 1) for m in r['misses_m']]}), "
+                   f"ik failures {r['ik_failures']}, "
                    f"tipped {r['tipped']}, ${e['dollars']:.2f}")
     return "\n".join(out)
 

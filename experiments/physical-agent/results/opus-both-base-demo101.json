@@ -1,0 +1,237 @@
+{
+ "summary": {
+  "model": "claude-opus-5-5",
+  "condition": "demo",
+  "views": "both",
+  "frame": "base",
+  "demo_seed": 101,
+  "n": 5,
+  "placed": 1,
+  "lifted": 2,
+  "median_turns": 15,
+  "median_wall_s": 128.5,
+  "median_sim_s": 61.7,
+  "median_tokens": 236970,
+  "mean_dollars": 0.302,
+  "total_dollars": 1.51,
+  "ended": {
+   "done": 2,
+   "turn budget": 3
+  }
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "condition": "demo",
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.206,
+   "tilt_deg": 90.0,
+   "resting": false,
+   "released": true,
+   "turns": 15,
+   "ended": "turn budget",
+   "wall_s": 128.5,
+   "sim_s": 61.7,
+   "usage": {
+    "input": 60,
+    "output": 11390,
+    "cache_read": 217946,
+    "cache_write": 26941
+   },
+   "tokens": 256337,
+   "dollars": 0.4063,
+   "grasps": {
+    "attempts": 6,
+    "failed": 6,
+    "retried": true,
+    "recovered": false,
+    "first_miss_m": 0.0416,
+    "misses_m": [
+     0.0416,
+     0.0726,
+     0.0941,
+     0.135,
+     0.1303,
+     0.1259
+    ],
+    "demo_pose": 0,
+    "rolled": 6,
+    "ik_failures": 3,
+    "tipped": true,
+    "false_done": false
+   }
+  },
+  {
+   "seed": 1,
+   "condition": "demo",
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.2249,
+   "tilt_deg": 90.0,
+   "resting": false,
+   "released": true,
+   "turns": 15,
+   "ended": "turn budget",
+   "wall_s": 131.0,
+   "sim_s": 83.4,
+   "usage": {
+    "input": 60,
+    "output": 10825,
+    "cache_read": 199776,
+    "cache_write": 26309
+   },
+   "tokens": 236970,
+   "dollars": 0.3882,
+   "grasps": {
+    "attempts": 3,
+    "failed": 3,
+    "retried": true,
+    "recovered": false,
+    "first_miss_m": 0.0242,
+    "misses_m": [
+     0.0242,
+     0.0155,
+     0.0677
+    ],
+    "demo_pose": 0,
+    "rolled": 3,
+    "ik_failures": 2,
+    "tipped": true,
+    "false_done": false
+   }
+  },
+  {
+   "seed": 2,
+   "condition": "demo",
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": true,
+   "off_target_m": 0.0138,
+   "tilt_deg": 90.0,
+   "resting": false,
+   "released": true,
+   "turns": 10,
+   "ended": "done",
+   "wall_s": 84.4,
+   "sim_s": 40.8,
+   "usage": {
+    "input": 40,
+    "output": 6614,
+    "cache_read": 100669,
+    "cache_write": 18520
+   },
+   "tokens": 125843,
+   "dollars": 0.2452,
+   "grasps": {
+    "attempts": 2,
+    "failed": 1,
+    "retried": true,
+    "recovered": true,
+    "first_miss_m": 0.0078,
+    "misses_m": [
+     0.0078,
+     0.0279
+    ],
+    "demo_pose": 0,
+    "rolled": 2,
+    "ik_failures": 2,
+    "tipped": true,
+    "false_done": true
+   }
+  },
+  {
+   "seed": 3,
+   "condition": "demo",
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0109,
+   "tilt_deg": 0.0,
+   "resting": true,
+   "released": true,
+   "turns": 3,
+   "ended": "done",
+   "wall_s": 18.1,
+   "sim_s": 17.3,
+   "usage": {
+    "input": 12,
+    "output": 1434,
+    "cache_read": 11794,
+    "cache_write": 7945
+   },
+   "tokens": 21185,
+   "dollars": 0.0708,
+   "grasps": {
+    "attempts": 1,
+    "failed": 0,
+    "retried": false,
+    "recovered": false,
+    "first_miss_m": 0.0218,
+    "misses_m": [
+     0.0218
+    ],
+    "demo_pose": 0,
+    "rolled": 1,
+    "ik_failures": 0,
+    "tipped": false,
+    "false_done": false
+   }
+  },
+  {
+   "seed": 4,
+   "condition": "demo",
+   "model": "claude-opus-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.1225,
+   "tilt_deg": 90.0,
+   "resting": false,
+   "released": true,
+   "turns": 15,
+   "ended": "turn budget",
+   "wall_s": 136.8,
+   "sim_s": 75.3,
+   "usage": {
+    "input": 60,
+    "output": 11466,
+    "cache_read": 203807,
+    "cache_write": 26074
+   },
+   "tokens": 241407,
+   "dollars": 0.4007,
+   "grasps": {
+    "attempts": 6,
+    "failed": 6,
+    "retried": true,
+    "recovered": false,
+    "first_miss_m": 0.0466,
+    "misses_m": [
+     0.0466,
+     0.0904,
+     0.0327,
+     0.0389,
+     0.0496,
+     0.0453
+    ],
+    "demo_pose": 0,
+    "rolled": 6,
+    "ik_failures": 1,
+    "tipped": true,
+    "false_done": false
+   }
+  }
+ ]
+}

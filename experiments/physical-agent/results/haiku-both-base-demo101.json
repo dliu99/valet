@@ -1,0 +1,235 @@
+{
+ "summary": {
+  "model": "claude-haiku-5-5",
+  "condition": "demo",
+  "views": "both",
+  "frame": "base",
+  "demo_seed": 101,
+  "n": 5,
+  "placed": 1,
+  "lifted": 2,
+  "median_turns": 12,
+  "median_wall_s": 60.5,
+  "median_sim_s": 44.0,
+  "median_tokens": 192573,
+  "mean_dollars": 0.008,
+  "total_dollars": 0.04,
+  "ended": {
+   "done": 4,
+   "turn budget": 1
+  }
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "condition": "demo",
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.2173,
+   "tilt_deg": 22.8,
+   "resting": true,
+   "released": false,
+   "turns": 7,
+   "ended": "done",
+   "wall_s": 32.3,
+   "sim_s": 9.0,
+   "usage": {
+    "input": 28,
+    "output": 5269,
+    "cache_read": 58939,
+    "cache_write": 14480
+   },
+   "tokens": 78716,
+   "dollars": 0.005,
+   "grasps": {
+    "attempts": 0,
+    "failed": 0,
+    "retried": false,
+    "recovered": false,
+    "first_miss_m": null,
+    "misses_m": [],
+    "demo_pose": 0,
+    "rolled": 0,
+    "ik_failures": 2,
+    "tipped": true,
+    "false_done": true
+   }
+  },
+  {
+   "seed": 1,
+   "condition": "demo",
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.3033,
+   "tilt_deg": 90.0,
+   "resting": false,
+   "released": true,
+   "turns": 14,
+   "ended": "done",
+   "wall_s": 60.5,
+   "sim_s": 44.0,
+   "usage": {
+    "input": 56,
+    "output": 9634,
+    "cache_read": 197196,
+    "cache_write": 24424
+   },
+   "tokens": 231310,
+   "dollars": 0.0098,
+   "grasps": {
+    "attempts": 2,
+    "failed": 2,
+    "retried": true,
+    "recovered": false,
+    "first_miss_m": 0.0721,
+    "misses_m": [
+     0.0721,
+     0.0484
+    ],
+    "demo_pose": 0,
+    "rolled": 2,
+    "ik_failures": 3,
+    "tipped": true,
+    "false_done": true
+   }
+  },
+  {
+   "seed": 2,
+   "condition": "demo",
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": true,
+   "off_target_m": 0.0748,
+   "tilt_deg": 0.0,
+   "resting": true,
+   "released": true,
+   "turns": 15,
+   "ended": "turn budget",
+   "wall_s": 70.3,
+   "sim_s": 54.2,
+   "usage": {
+    "input": 60,
+    "output": 12515,
+    "cache_read": 212794,
+    "cache_write": 27515
+   },
+   "tokens": 252884,
+   "dollars": 0.0118,
+   "grasps": {
+    "attempts": 7,
+    "failed": 6,
+    "retried": true,
+    "recovered": false,
+    "first_miss_m": 0.0233,
+    "misses_m": [
+     0.0233,
+     0.0407,
+     0.1106,
+     0.0926,
+     0.1427,
+     0.0971,
+     0.1214
+    ],
+    "demo_pose": 0,
+    "rolled": 7,
+    "ik_failures": 1,
+    "tipped": true,
+    "false_done": false
+   }
+  },
+  {
+   "seed": 3,
+   "condition": "demo",
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0146,
+   "tilt_deg": 0.0,
+   "resting": true,
+   "released": true,
+   "turns": 3,
+   "ended": "done",
+   "wall_s": 14.8,
+   "sim_s": 19.7,
+   "usage": {
+    "input": 12,
+    "output": 2415,
+    "cache_read": 12723,
+    "cache_write": 8828
+   },
+   "tokens": 23978,
+   "dollars": 0.0024,
+   "grasps": {
+    "attempts": 1,
+    "failed": 0,
+    "retried": false,
+    "recovered": false,
+    "first_miss_m": 0.0195,
+    "misses_m": [
+     0.0195
+    ],
+    "demo_pose": 0,
+    "rolled": 1,
+    "ik_failures": 0,
+    "tipped": false,
+    "false_done": false
+   }
+  },
+  {
+   "seed": 4,
+   "condition": "demo",
+   "model": "claude-haiku-5-5",
+   "effort": "medium",
+   "demo_seed": 101,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.1127,
+   "tilt_deg": 90.0,
+   "resting": false,
+   "released": true,
+   "turns": 12,
+   "ended": "done",
+   "wall_s": 66.6,
+   "sim_s": 62.9,
+   "usage": {
+    "input": 48,
+    "output": 11719,
+    "cache_read": 156350,
+    "cache_write": 24456
+   },
+   "tokens": 192573,
+   "dollars": 0.0105,
+   "grasps": {
+    "attempts": 7,
+    "failed": 7,
+    "retried": true,
+    "recovered": false,
+    "first_miss_m": 0.0769,
+    "misses_m": [
+     0.0769,
+     0.0628,
+     0.0746,
+     0.0551,
+     0.0514,
+     0.0334,
+     0.0331
+    ],
+    "demo_pose": 0,
+    "rolled": 7,
+    "ik_failures": 2,
+    "tipped": true,
+    "false_done": true
+   }
+  }
+ ]
+}

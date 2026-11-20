@@ -1,0 +1,42 @@
+{"t": 0.0, "kind": "chose", "step": 0, "choice": "place", "p": 0.47, "probs": {"look_workspace": 0.25, "look_box": 0.02, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.0, "carry": 0.17, "place": 0.54, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 0, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 1, "skill": "place", "p": 0.09, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 1, "choice": "place", "p": 0.65, "probs": {"look_workspace": 0.17, "look_box": 0.01, "look_square": 0.01, "grasp_near_top": 0.0, "grasp_middle": 0.0, "carry": 0.12, "place": 0.69, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 1, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 2, "skill": "place", "p": 0.05, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 2, "choice": "place", "p": 0.44, "probs": {"look_workspace": 0.34, "look_box": 0.03, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.09, "place": 0.51, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 2, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 3, "skill": "place", "p": 0.07, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 3, "choice": "place", "p": 0.57, "probs": {"look_workspace": 0.22, "look_box": 0.01, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.12, "place": 0.62, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 3, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 4, "skill": "place", "p": 0.03, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 4, "choice": "place", "p": 0.74, "probs": {"look_workspace": 0.14, "look_box": 0.01, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.0, "carry": 0.06, "place": 0.77, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 4, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 5, "skill": "place", "p": 0.04, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 5, "choice": "place", "p": 0.6, "probs": {"look_workspace": 0.18, "look_box": 0.02, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.12, "place": 0.65, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 5, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 6, "skill": "place", "p": 0.04, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 6, "choice": "place", "p": 0.6, "probs": {"look_workspace": 0.22, "look_box": 0.02, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.08, "place": 0.65, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 6, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 7, "skill": "place", "p": 0.04, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 7, "choice": "place", "p": 0.44, "probs": {"look_workspace": 0.33, "look_box": 0.04, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.09, "place": 0.51, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 7, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 8, "skill": "place", "p": 0.05, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 8, "choice": "place", "p": 0.52, "probs": {"look_workspace": 0.28, "look_box": 0.03, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.08, "place": 0.58, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 8, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 9, "skill": "place", "p": 0.06, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 9, "choice": "place", "p": 0.55, "probs": {"look_workspace": 0.22, "look_box": 0.02, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.12, "place": 0.61, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 9, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 10, "skill": "place", "p": 0.05, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 10, "choice": "place", "p": 0.83, "probs": {"look_workspace": 0.07, "look_box": 0.01, "look_square": 0.01, "grasp_near_top": 0.0, "grasp_middle": 0.0, "carry": 0.06, "place": 0.85, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 10, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 11, "skill": "place", "p": 0.05, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 11, "choice": "place", "p": 0.63, "probs": {"look_workspace": 0.18, "look_box": 0.02, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.09, "place": 0.68, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 11, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 12, "skill": "place", "p": 0.06, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 12, "choice": "place", "p": 0.67, "probs": {"look_workspace": 0.16, "look_box": 0.02, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.0, "carry": 0.09, "place": 0.71, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 12, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.0, "kind": "judged", "step": 13, "skill": "place", "p": 0.04, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 13, "choice": "place", "p": 0.5, "probs": {"look_workspace": 0.28, "look_box": 0.03, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.1, "place": 0.56, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 13, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 1.0, "kind": "summary", "seed": 15, "config": "final-jev-noclaude", "placed": false, "lifted": false, "off_target_m": 0.1301, "tilt_deg": 0.0, "resting": true, "released": true, "finished": false, "sim_s": 1.0, "fast_s": 2.6, "slow_s": 0.0, "seconds": 3.6, "wall_s": 3.2, "fast_calls": 27, "slow_calls": 0, "usd": 0.0015, "calls": {"jev:choose": 14, "jev:judge": 13}}

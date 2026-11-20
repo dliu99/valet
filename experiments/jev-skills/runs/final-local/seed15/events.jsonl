@@ -1,0 +1,42 @@
+{"t": 0.0, "kind": "goal", "goal": "Grasp the white box with the gripper, lift it, and place it upright on the blue square, then release it. Finished when the white box is standing upright on the blue square and the gripper has let go."}
+{"t": 0.0, "kind": "chose", "step": 0, "choice": "grasp_near_top", "p": 0.179, "probs": {"look_workspace": 0.154, "look_box": 0.077, "look_square": 0.135, "grasp_near_top": 0.282, "grasp_middle": 0.203, "carry": 0.022, "place": 0.096, "done": 0.03}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 0, "skill": "grasp_near_top", "ok": false, "report": "not run: the box's height and turn are not measured yet; look at the box from above first"}
+{"t": 0.0, "kind": "judged", "step": 1, "skill": "grasp_near_top", "p": 0.531, "verdict": "unsure", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 1, "choice": "grasp_middle", "p": 0.099, "probs": {"look_workspace": 0.098, "look_box": 0.157, "look_square": 0.084, "grasp_near_top": 0.205, "grasp_middle": 0.211, "carry": 0.029, "place": 0.186, "done": 0.029}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "ran", "step": 1, "skill": "grasp_middle", "ok": false, "report": "not run: the box's height and turn are not measured yet; look at the box from above first"}
+{"t": 0.0, "kind": "judged", "step": 2, "skill": "grasp_middle", "p": 0.398, "verdict": "unsure", "code_ok": false, "truth": false}
+{"t": 0.0, "kind": "chose", "step": 2, "choice": "look_box", "p": 0.111, "probs": {"look_workspace": 0.197, "look_box": 0.222, "look_square": 0.098, "grasp_near_top": 0.182, "grasp_middle": 0.137, "carry": 0.026, "place": 0.108, "done": 0.031}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.0, "kind": "replan", "step": 2, "jev_choice": "look_box", "next": "look_workspace", "advice": "The white box and blue square are not located yet, so look at the workspace first to find both before attempting any grasp; the last two grasp attempts failed because the box was never measured."}
+{"t": 0.11, "kind": "box_estimate", "xy": [0.29, -0.0555], "h": null, "tri": null, "rect": null, "views": 1}
+{"t": 0.11, "kind": "square_estimate", "xy": [0.2317, 0.0607]}
+{"t": 0.11, "kind": "ran", "step": 2, "skill": "look_workspace", "ok": true, "report": "found the white box; found the blue square"}
+{"t": 0.11, "kind": "judged", "step": 3, "skill": "look_workspace", "p": 0.841, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 0.11, "kind": "chose", "step": 3, "choice": "look_box", "p": 0.542, "probs": {"look_workspace": 0.032, "look_box": 0.6, "look_square": 0.031, "grasp_near_top": 0.111, "grasp_middle": 0.122, "carry": 0.023, "place": 0.063, "done": 0.018}, "right": ["look_box"]}
+{"t": 1.17, "kind": "box_estimate", "xy": [0.2894, -0.0556], "h": 0.07783947158554154, "tri": [0.29, -0.0548, 0.0778], "rect": {"area": 0.0024480069792203983, "yaw": 60.0, "da": 0.04846456995606248, "db": 0.05051127001518302, "x": 0.2894004024916635, "y": -0.055567214915713134}, "views": 2}
+{"t": 1.56, "kind": "box_estimate", "xy": [0.293, -0.048], "h": 0.07706587103380864, "tri": [0.2903, -0.0547, 0.0771], "rect": {"area": 0.0033332395287001683, "yaw": 64.0, "da": 0.06572077474783913, "db": 0.05071820199152116, "x": 0.29301077978559176, "y": -0.04803795064834386}, "views": 3}
+{"t": 1.56, "kind": "ran", "step": 3, "skill": "look_box", "ok": true, "report": "measured the box from above: top 7.7 cm high, top face 6.6 x 5.1 cm, turned 64 deg", "attempts": 1}
+{"t": 1.56, "kind": "judged", "step": 4, "skill": "look_box", "p": 0.285, "verdict": "no", "code_ok": true, "truth": true}
+{"t": 1.56, "kind": "chose", "step": 4, "choice": "grasp_middle", "p": 0.372, "probs": {"look_workspace": 0.022, "look_box": 0.037, "look_square": 0.042, "grasp_near_top": 0.369, "grasp_middle": 0.45, "carry": 0.019, "place": 0.044, "done": 0.017}, "right": ["grasp_near_top"]}
+{"t": 3.15, "kind": "grasp_descend", "g": [0.2774, -0.0404], "gz": 0.0385, "roll": -15.299058774891506, "status": "reached", "z": 0.0393, "pitch": 89.3}
+{"t": 6.45, "kind": "ran", "step": 4, "skill": "grasp_middle", "ok": true, "report": "holding the box, lifted 6 cm (reading 28), gripped 3.8 cm below its top"}
+{"t": 6.45, "kind": "judged", "step": 5, "skill": "grasp_middle", "p": 0.831, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 6.45, "kind": "chose", "step": 5, "choice": "place", "p": 0.571, "probs": {"look_workspace": 0.019, "look_box": 0.015, "look_square": 0.065, "grasp_near_top": 0.029, "grasp_middle": 0.019, "carry": 0.206, "place": 0.625, "done": 0.022}, "right": ["carry"]}
+{"t": 6.45, "kind": "ran", "step": 5, "skill": "place", "ok": false, "report": "not run: the box is 11 cm from above the square; carry it first"}
+{"t": 6.45, "kind": "judged", "step": 6, "skill": "place", "p": 0.465, "verdict": "unsure", "code_ok": false, "truth": false}
+{"t": 6.45, "kind": "chose", "step": 6, "choice": "place", "p": 0.662, "probs": {"look_workspace": 0.018, "look_box": 0.014, "look_square": 0.037, "grasp_near_top": 0.022, "grasp_middle": 0.018, "carry": 0.166, "place": 0.704, "done": 0.02}, "right": ["carry"]}
+{"t": 6.45, "kind": "ran", "step": 6, "skill": "place", "ok": false, "report": "not run: the box is 11 cm from above the square; carry it first"}
+{"t": 6.45, "kind": "judged", "step": 7, "skill": "place", "p": 0.244, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 6.45, "kind": "chose", "step": 7, "choice": "place", "p": 0.652, "probs": {"look_workspace": 0.018, "look_box": 0.014, "look_square": 0.029, "grasp_near_top": 0.034, "grasp_middle": 0.017, "carry": 0.173, "place": 0.696, "done": 0.018}, "right": ["carry"]}
+{"t": 6.45, "kind": "replan", "step": 7, "jev_choice": "place", "next": "carry", "advice": "The box is held in the jaws (reading 28) but the jaws are not yet above the blue square, which is 11 cm away, so carry the box over the square before placing; do not run place until the jaws are above the square."}
+{"t": 6.95, "kind": "ran", "step": 7, "skill": "carry", "ok": true, "report": "holding the box above the square (0.2 cm from the drop point); square re-check: only part of the square is visible (5.5 cm of 7)"}
+{"t": 6.95, "kind": "judged", "step": 8, "skill": "carry", "p": 0.771, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 6.95, "kind": "chose", "step": 8, "choice": "place", "p": 0.525, "probs": {"look_workspace": 0.014, "look_box": 0.012, "look_square": 0.039, "grasp_near_top": 0.017, "grasp_middle": 0.012, "carry": 0.304, "place": 0.584, "done": 0.017}, "right": ["place"]}
+{"t": 9.65, "kind": "ran", "step": 8, "skill": "place", "ok": true, "report": "released the box; box top seen 1.0 cm from the square's centre"}
+{"t": 9.65, "kind": "judged", "step": 9, "skill": "place", "p": 0.859, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 9.65, "kind": "chose", "step": 9, "choice": "grasp_near_top", "p": 0.362, "probs": {"look_workspace": 0.024, "look_box": 0.036, "look_square": 0.04, "grasp_near_top": 0.442, "grasp_middle": 0.242, "carry": 0.024, "place": 0.043, "done": 0.149}, "right": ["done"]}
+{"t": 10.45, "kind": "grasp_descend", "g": [0.2774, -0.0404], "gz": 0.0521, "roll": -15.299058774891506, "status": "reached", "z": 0.052, "pitch": 89.7}
+{"t": 14.15, "kind": "ran", "step": 9, "skill": "grasp_near_top", "ok": false, "report": "the jaws closed on nothing: the box was not between them"}
+{"t": 14.15, "kind": "judged", "step": 10, "skill": "grasp_near_top", "p": 0.217, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 14.15, "kind": "chose", "step": 10, "choice": "done", "p": 0.135, "probs": {"look_workspace": 0.037, "look_box": 0.053, "look_square": 0.187, "grasp_near_top": 0.222, "grasp_middle": 0.18, "carry": 0.034, "place": 0.044, "done": 0.243}, "right": ["done"]}
+{"t": 14.15, "kind": "final_check", "step": 10, "p": 0.697, "truth": true, "code_ok": true}
+{"t": 15.15, "kind": "summary", "seed": 15, "config": "final-local", "placed": true, "lifted": true, "off_target_m": 0.0123, "tilt_deg": 0.0, "resting": true, "released": true, "finished": true, "sim_s": 15.1, "fast_s": 72.4, "slow_s": 4.0, "seconds": 91.6, "wall_s": 78.2, "fast_calls": 27, "slow_calls": 3, "usd": 0.00044, "calls": {"claude:goal": 1, "local:choose": 11, "local:judge": 11, "claude:replan": 2, "local:look_workspace": 1, "local:look_box": 2, "local:carry": 1, "local:place_check": 1}}

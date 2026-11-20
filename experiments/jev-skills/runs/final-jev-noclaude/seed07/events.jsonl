@@ -1,0 +1,23 @@
+{"t": 0.0, "kind": "chose", "step": 0, "choice": "look_workspace", "p": 0.94, "probs": {"look_workspace": 0.95, "look_box": 0.05, "look_square": 0.0, "grasp_near_top": 0.0, "grasp_middle": 0.0, "carry": 0.0, "place": 0.0, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.11, "kind": "box_estimate", "xy": [0.281, 0.0963], "h": null, "tri": null, "rect": null, "views": 1}
+{"t": 0.11, "kind": "square_estimate", "xy": [0.2391, -0.1659]}
+{"t": 0.11, "kind": "ran", "step": 0, "skill": "look_workspace", "ok": true, "report": "found the white box; found the blue square"}
+{"t": 0.11, "kind": "judged", "step": 1, "skill": "look_workspace", "p": 0.87, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 0.11, "kind": "chose", "step": 1, "choice": "look_box", "p": 0.94, "probs": {"look_workspace": 0.0, "look_box": 0.95, "look_square": 0.0, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.02, "place": 0.01, "done": 0.0}, "right": ["look_box"]}
+{"t": 1.12, "kind": "box_estimate", "xy": [0.2825, 0.0989], "h": 0.06958890891182108, "tri": [0.2824, 0.0998, 0.0696], "rect": {"area": 0.0023782722477337895, "yaw": 74.0, "da": 0.04812463887313351, "db": 0.04941901494582446, "x": 0.2824877775207783, "y": 0.09886946527060875}, "views": 2}
+{"t": 1.5, "kind": "box_estimate", "xy": [0.273, 0.102], "h": 0.07018605331356956, "tri": [0.2823, 0.0995, 0.0702], "rect": {"area": 0.00330710001254959, "yaw": 73.0, "da": 0.04870769109009418, "db": 0.06789687498084188, "x": 0.2730303207493254, "y": 0.10198295866051649}, "views": 3}
+{"t": 1.5, "kind": "ran", "step": 1, "skill": "look_box", "ok": true, "report": "measured the box from above: top 7.0 cm high, top face 4.9 x 6.8 cm, turned 73 deg", "attempts": 1}
+{"t": 1.5, "kind": "judged", "step": 2, "skill": "look_box", "p": 0.3, "verdict": "no", "code_ok": true, "truth": true}
+{"t": 1.5, "kind": "chose", "step": 2, "choice": "grasp_near_top", "p": 0.62, "probs": {"look_workspace": 0.0, "look_box": 0.0, "look_square": 0.01, "grasp_near_top": 0.67, "grasp_middle": 0.21, "carry": 0.09, "place": 0.02, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 3.26, "kind": "grasp_descend", "g": [0.2778, 0.1176], "gz": 0.0452, "roll": -130.52811924427778, "status": "stopped", "z": 0.0402, "pitch": 88.8}
+{"t": 5.52, "kind": "ran", "step": 2, "skill": "grasp_near_top", "ok": true, "report": "holding the box, lifted 6 cm (reading 26), gripped 3.0 cm below its top"}
+{"t": 5.52, "kind": "judged", "step": 3, "skill": "grasp_near_top", "p": 0.94, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 5.52, "kind": "chose", "step": 3, "choice": "carry", "p": 0.79, "probs": {"look_workspace": 0.0, "look_box": 0.0, "look_square": 0.02, "grasp_near_top": 0.0, "grasp_middle": 0.0, "carry": 0.82, "place": 0.16, "done": 0.0}, "right": ["carry"]}
+{"t": 7.06, "kind": "ran", "step": 3, "skill": "carry", "ok": true, "report": "holding the box above the square (0.1 cm from the drop point); square re-check: only part of the square is visible (0.3 cm of 7)"}
+{"t": 7.06, "kind": "judged", "step": 4, "skill": "carry", "p": 0.92, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 7.06, "kind": "chose", "step": 4, "choice": "place", "p": 0.97, "probs": {"look_workspace": 0.0, "look_box": 0.0, "look_square": 0.03, "grasp_near_top": 0.0, "grasp_middle": 0.0, "carry": 0.0, "place": 0.97, "done": 0.0}, "right": ["place"]}
+{"t": 9.85, "kind": "ran", "step": 4, "skill": "place", "ok": true, "report": "released the box; box top seen 1.1 cm from the square's centre"}
+{"t": 9.85, "kind": "judged", "step": 5, "skill": "place", "p": 0.63, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 9.85, "kind": "chose", "step": 5, "choice": "done", "p": 0.87, "probs": {"look_workspace": 0.0, "look_box": 0.0, "look_square": 0.0, "grasp_near_top": 0.05, "grasp_middle": 0.03, "carry": 0.01, "place": 0.02, "done": 0.89}, "right": ["done"]}
+{"t": 9.85, "kind": "final_check", "step": 5, "p": 0.67, "truth": true, "code_ok": true}
+{"t": 10.85, "kind": "summary", "seed": 7, "config": "final-jev-noclaude", "placed": true, "lifted": true, "off_target_m": 0.0094, "tilt_deg": 0.0, "resting": true, "released": true, "finished": true, "sim_s": 10.8, "fast_s": 1.6, "slow_s": 0.0, "seconds": 12.5, "wall_s": 3.0, "fast_calls": 17, "slow_calls": 0, "usd": 0.00087, "calls": {"jev:choose": 6, "jev:look_workspace": 1, "jev:judge": 6, "jev:look_box": 2, "jev:carry": 1, "jev:place_check": 1}}

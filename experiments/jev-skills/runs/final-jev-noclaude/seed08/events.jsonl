@@ -1,0 +1,54 @@
+{"t": 0.0, "kind": "chose", "step": 0, "choice": "look_workspace", "p": 0.68, "probs": {"look_workspace": 0.72, "look_box": 0.05, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.01, "carry": 0.06, "place": 0.14, "done": 0.0}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.11, "kind": "square_estimate", "xy": [0.2259, 0.0877]}
+{"t": 0.11, "kind": "ran", "step": 0, "skill": "look_workspace", "ok": false, "report": "white box not found (Jev boxed the box but too few box pixels inside (0)); found the blue square"}
+{"t": 0.11, "kind": "judged", "step": 1, "skill": "look_workspace", "p": 0.83, "verdict": "yes", "code_ok": false, "truth": true}
+{"t": 0.11, "kind": "chose", "step": 1, "choice": "place", "p": 0.37, "probs": {"look_workspace": 0.14, "look_box": 0.09, "look_square": 0.0, "grasp_near_top": 0.03, "grasp_middle": 0.02, "carry": 0.27, "place": 0.45, "done": 0.0}, "right": ["look_box", "look_workspace"]}
+{"t": 0.11, "kind": "ran", "step": 1, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.11, "kind": "judged", "step": 2, "skill": "place", "p": 0.02, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.11, "kind": "chose", "step": 2, "choice": "look_workspace", "p": 0.26, "probs": {"look_workspace": 0.35, "look_box": 0.22, "look_square": 0.0, "grasp_near_top": 0.05, "grasp_middle": 0.03, "carry": 0.14, "place": 0.21, "done": 0.0}, "right": ["look_box", "look_workspace"]}
+{"t": 0.21, "kind": "square_estimate", "xy": [0.2258, 0.0876]}
+{"t": 0.21, "kind": "ran", "step": 2, "skill": "look_workspace", "ok": false, "report": "white box not found (Jev boxed the box but too few box pixels inside (1)); found the blue square"}
+{"t": 0.21, "kind": "judged", "step": 3, "skill": "look_workspace", "p": 0.85, "verdict": "yes", "code_ok": false, "truth": true}
+{"t": 0.21, "kind": "chose", "step": 3, "choice": "place", "p": 0.36, "probs": {"look_workspace": 0.13, "look_box": 0.06, "look_square": 0.0, "grasp_near_top": 0.03, "grasp_middle": 0.03, "carry": 0.31, "place": 0.44, "done": 0.0}, "right": ["look_box", "look_workspace"]}
+{"t": 0.21, "kind": "ran", "step": 3, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.21, "kind": "judged", "step": 4, "skill": "place", "p": 0.02, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.21, "kind": "chose", "step": 4, "choice": "look_workspace", "p": 0.31, "probs": {"look_workspace": 0.4, "look_box": 0.21, "look_square": 0.0, "grasp_near_top": 0.07, "grasp_middle": 0.06, "carry": 0.13, "place": 0.13, "done": 0.0}, "right": ["look_box", "look_workspace"]}
+{"t": 0.31, "kind": "square_estimate", "xy": [0.2256, 0.0873]}
+{"t": 0.31, "kind": "ran", "step": 4, "skill": "look_workspace", "ok": false, "report": "white box not found (Jev boxed the box but too few box pixels inside (0)); found the blue square"}
+{"t": 0.31, "kind": "judged", "step": 5, "skill": "look_workspace", "p": 0.9, "verdict": "yes", "code_ok": false, "truth": true}
+{"t": 0.31, "kind": "chose", "step": 5, "choice": "look_workspace", "p": 0.33, "probs": {"look_workspace": 0.41, "look_box": 0.16, "look_square": 0.0, "grasp_near_top": 0.05, "grasp_middle": 0.06, "carry": 0.14, "place": 0.17, "done": 0.01}, "right": ["look_box", "look_workspace"]}
+{"t": 0.41, "kind": "square_estimate", "xy": [0.2255, 0.0877]}
+{"t": 0.41, "kind": "ran", "step": 5, "skill": "look_workspace", "ok": false, "report": "white box not found (Jev boxed the box but too few box pixels inside (0)); found the blue square"}
+{"t": 0.41, "kind": "judged", "step": 6, "skill": "look_workspace", "p": 0.88, "verdict": "yes", "code_ok": false, "truth": true}
+{"t": 0.41, "kind": "chose", "step": 6, "choice": "look_workspace", "p": 0.59, "probs": {"look_workspace": 0.64, "look_box": 0.16, "look_square": 0.0, "grasp_near_top": 0.02, "grasp_middle": 0.03, "carry": 0.06, "place": 0.09, "done": 0.0}, "right": ["look_box", "look_workspace"]}
+{"t": 0.51, "kind": "box_estimate", "xy": [0.2574, 0.0098], "h": null, "tri": null, "rect": null, "views": 1}
+{"t": 0.51, "kind": "square_estimate", "xy": [0.2259, 0.0875]}
+{"t": 0.51, "kind": "ran", "step": 6, "skill": "look_workspace", "ok": true, "report": "found the white box; found the blue square"}
+{"t": 0.51, "kind": "judged", "step": 7, "skill": "look_workspace", "p": 0.89, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 0.51, "kind": "chose", "step": 7, "choice": "place", "p": 0.41, "probs": {"look_workspace": 0.04, "look_box": 0.18, "look_square": 0.02, "grasp_near_top": 0.03, "grasp_middle": 0.01, "carry": 0.24, "place": 0.48, "done": 0.0}, "right": ["look_box"]}
+{"t": 0.51, "kind": "ran", "step": 7, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 0.51, "kind": "judged", "step": 8, "skill": "place", "p": 0.02, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 0.51, "kind": "chose", "step": 8, "choice": "look_box", "p": 0.45, "probs": {"look_workspace": 0.04, "look_box": 0.52, "look_square": 0.01, "grasp_near_top": 0.08, "grasp_middle": 0.03, "carry": 0.13, "place": 0.19, "done": 0.0}, "right": ["look_box"]}
+{"t": 1.56, "kind": "box_estimate", "xy": [0.3056, -0.0703], "h": null, "tri": null, "rect": {"area": 0.0022830366094381883, "yaw": 18.0, "da": 0.04750730900255065, "db": 0.048056533981236715, "x": 0.30554999038420705, "y": -0.07030142087798834}, "views": 2}
+{"t": 2.11, "kind": "box_estimate", "xy": [0.3004, -0.0618], "h": null, "tri": [0.2572, -0.0288, 0.206], "rect": null, "views": 3}
+{"t": 2.38, "kind": "box_estimate", "xy": [0.3033, -0.0644], "h": null, "tri": [0.2719, -0.045, 0.1581], "rect": {"area": 0.0022782828726892255, "yaw": 17.0, "da": 0.04727168253377689, "db": 0.04819551051649856, "x": 0.30241927133374946, "y": -0.06491518723156128}, "views": 4}
+{"t": 2.71, "kind": "box_estimate", "xy": [0.3013, -0.0702], "h": null, "tri": [0.2783, -0.0447, 0.1481], "rect": {"area": 0.0033247243172332287, "yaw": 19.0, "da": 0.04776596333973626, "db": 0.06960446486938969, "x": 0.2973747457093151, "y": -0.060659421397169774}, "views": 5}
+{"t": 2.71, "kind": "ran", "step": 8, "skill": "look_box", "ok": false, "report": "could not measure the box from above"}
+{"t": 2.71, "kind": "judged", "step": 9, "skill": "look_box", "p": 0.42, "verdict": "unsure", "code_ok": false, "truth": true}
+{"t": 2.71, "kind": "chose", "step": 9, "choice": "place", "p": 0.57, "probs": {"look_workspace": 0.01, "look_box": 0.06, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.0, "carry": 0.29, "place": 0.62, "done": 0.0}, "right": ["look_box"]}
+{"t": 2.71, "kind": "ran", "step": 9, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 2.71, "kind": "judged", "step": 10, "skill": "place", "p": 0.04, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 2.71, "kind": "chose", "step": 10, "choice": "carry", "p": 0.31, "probs": {"look_workspace": 0.04, "look_box": 0.28, "look_square": 0.0, "grasp_near_top": 0.04, "grasp_middle": 0.01, "carry": 0.4, "place": 0.23, "done": 0.0}, "right": ["look_box"]}
+{"t": 2.71, "kind": "ran", "step": 10, "skill": "carry", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 2.71, "kind": "judged", "step": 11, "skill": "carry", "p": 0.28, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 2.71, "kind": "chose", "step": 11, "choice": "look_box", "p": 0.37, "probs": {"look_workspace": 0.02, "look_box": 0.45, "look_square": 0.01, "grasp_near_top": 0.02, "grasp_middle": 0.01, "carry": 0.26, "place": 0.23, "done": 0.0}, "right": ["look_box"]}
+{"t": 3.15, "kind": "box_estimate", "xy": [0.3034, -0.0639], "h": null, "tri": [0.284, -0.0515, 0.1269], "rect": {"area": 0.0022796019078556193, "yaw": 18.0, "da": 0.047367932108899446, "db": 0.04812542592348737, "x": 0.3025545339486874, "y": -0.06431232598089025}, "views": 6}
+{"t": 4.31, "kind": "box_estimate", "xy": [0.3007, -0.0716], "h": null, "tri": [0.2863, -0.0516, 0.1241], "rect": {"area": 0.0033577115911685436, "yaw": 19.0, "da": 0.04810281084884602, "db": 0.06980281467790972, "x": 0.29682547545090354, "y": -0.061645624437781654}, "views": 7}
+{"t": 4.31, "kind": "ran", "step": 11, "skill": "look_box", "ok": false, "report": "could not measure the box from above (Jev boxed the box but too few box pixels inside (0))"}
+{"t": 4.31, "kind": "judged", "step": 12, "skill": "look_box", "p": 0.38, "verdict": "unsure", "code_ok": false, "truth": true}
+{"t": 4.31, "kind": "chose", "step": 12, "choice": "place", "p": 0.29, "probs": {"look_workspace": 0.02, "look_box": 0.31, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.0, "carry": 0.27, "place": 0.38, "done": 0.0}, "right": ["look_box"]}
+{"t": 4.31, "kind": "ran", "step": 12, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 4.31, "kind": "judged", "step": 13, "skill": "place", "p": 0.09, "verdict": "no", "code_ok": false, "truth": false}
+{"t": 4.31, "kind": "chose", "step": 13, "choice": "place", "p": 0.61, "probs": {"look_workspace": 0.01, "look_box": 0.15, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.0, "carry": 0.16, "place": 0.66, "done": 0.0}, "right": ["look_box"]}
+{"t": 4.31, "kind": "ran", "step": 13, "skill": "place", "ok": false, "report": "not run: the jaws are not holding the box"}
+{"t": 5.31, "kind": "summary", "seed": 8, "config": "final-jev-noclaude", "placed": false, "lifted": false, "off_target_m": 0.1716, "tilt_deg": 0.0, "resting": true, "released": true, "finished": false, "sim_s": 5.3, "fast_s": 3.8, "slow_s": 0.0, "seconds": 9.2, "wall_s": 6.1, "fast_calls": 40, "slow_calls": 0, "usd": 0.00205, "calls": {"jev:choose": 14, "jev:look_workspace": 5, "jev:judge": 13, "jev:look_box": 8}}

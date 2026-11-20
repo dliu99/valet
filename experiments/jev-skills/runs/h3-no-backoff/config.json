@@ -1,0 +1,28 @@
+{
+ "name": "h3-no-backoff",
+ "decider": "jev",
+ "claude": true,
+ "max_decisions": 14,
+ "max_slow": 5,
+ "max_sim_s": 150.0,
+ "judge_sees_report": true,
+ "skills": [
+  "look_workspace",
+  "look_box",
+  "look_square",
+  "grasp_near_top",
+  "grasp_middle",
+  "carry",
+  "place"
+ ],
+ "params": {
+  "grip_below_top_m": 0.025,
+  "grip_middle_frac": 0.5,
+  "release_above_m": 0.012,
+  "place_view_z_m": 0.05,
+  "centre_tol_m": 0.012,
+  "look_back_m": 0.06,
+  "place_look_back": false
+ },
+ "chooser": "jev"
+}

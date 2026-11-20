@@ -116,3 +116,21 @@ def test_moves_keep_the_gripper_setting(arm):
     arm.open(30)
     arm.move_to([0.22, 0.05, 0.12], 70)
     assert abs(arm.state()["joints"]["gripper"] - 30) < 2
+
+
+def test_jev_verify_sends_claude_back_once_on_no(arm):
+    jev = StubJev(0.2)
+    res, client, events = run(arm, [
+        ([NS(type="text", text="done")], "end_turn"),
+        ([call("a", "look")], "tool_use"),
+        ([NS(type="text", text="done now")], "end_turn"),
+        ([NS(type="text", text="really done")], "end_turn"),
+    ], Config(jev_verify=True), jev)
+    assert res["final_text"] == "really done" and res["claude_calls"] == 4 and res["jev_calls"] == 2
+    assert "answered no" in client.requests[1]["messages"][-1]["content"]
+    assert [e["kind"] for e in events if e["type"] == "jev"] == ["verify", "verify"]
+
+
+def test_jev_verify_yes_ends_the_episode(arm):
+    res, _, _ = run(arm, [([NS(type="text", text="done")], "end_turn")], Config(jev_verify=True), StubJev(0.9))
+    assert res["end"] == "end_turn" and res["claude_calls"] == 1 and res["jev_calls"] == 1

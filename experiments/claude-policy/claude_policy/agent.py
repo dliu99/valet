@@ -12,13 +12,23 @@ from typing import Any, Callable, Protocol
 
 from .arm import Arm, Unreachable
 
-GOAL = "Pick up the white box and set it down upright on the blue square, then let go and move the jaws clear of it."
+GOALS = {
+    "on": "Pick up the white box and set it down upright on the blue square, then let go and move the jaws clear of it.",
+    "centred": "Pick up the white box and set it down upright, centred on the blue square, then let go and move the jaws "
+               "clear of it.",
+}
 
 SYSTEM = (
     "You control a robot arm through tools: an SO-101 with five joints, a two-jaw gripper and a camera on the wrist. "
     "You plan and judge everything yourself. Tool calls in one turn run in order; a failed call skips the rest. "
     "When the goal is met, or you are sure it can't be, answer in one sentence without calling tools."
 )
+
+VERIFY_QUESTION = ("Is the white box standing upright on the blue square (not lying on its side), with the robot's jaws "
+                   "clear of it?")
+VERIFY_NO = ("A quick automatic check of the wrist frame answered no to \"{q}\" (p_yes={p:.2f}). It can be wrong. Check, "
+             "and finish the goal if it is not met.")
+MAX_VERIFIES = 2
 
 # $ per million tokens: input, 5-minute cache write, cache read, output.
 PRICES = {
@@ -36,9 +46,11 @@ class Config:
     effort: str = "medium"
     max_side: int = 640
     cams: tuple[str, ...] = ("wrist",)  # the real arm has only the wrist camera; "side" is for comparison
-    jev_checks: bool = False
+    jev_checks: bool = False  # move and gripper calls may carry a yes/no check that Claude writes
+    jev_verify: bool = False  # when Claude says it is done, Jev checks the result between turns
     overlay: bool = False
     near_clip_m: float | None = None
+    goal: str = "on"
     max_turns: int = 40
     max_cost_usd: float = 2.0
 
@@ -194,14 +206,14 @@ class Tools:
         text = json.dumps(out)
         question = args.get("check") if self.cfg.jev_checks else None
         if question and self.checker:
-            p, info = self._check(question)
+            p, info = self.ask_jev(question, kind="check")
             verdict = "yes" if p >= 0.5 else "no"
             text += f"\ncheck {json.dumps(question)}: {verdict} (p_yes={p:.2f})"
             if verdict == "no":
                 return text + "\nThe rest of this turn's calls were skipped.", False, True
         return text, False, False
 
-    def _check(self, question: str) -> tuple[float, dict]:
+    def ask_jev(self, question: str, kind: str) -> tuple[float, dict]:
         frames = self.arm.frames(self.cfg.cams, max_side=640, overlay=False)  # Jev takes 280-1568 px a side
         for cam, jpeg in frames.items():
             self.save_frame(f"check-{cam}", jpeg)
@@ -211,7 +223,7 @@ class Tools:
         self.tally.jev_calls += 1
         self.tally.jev_input_tokens += int(info.get("input_tokens") or 0)
         self.tally.jev_s += dt
-        self.record({"type": "jev", "question": question, "p_yes": round(p, 4), "seconds": round(dt, 2), **info})
+        self.record({"type": "jev", "kind": kind, "question": question, "p_yes": round(p, 4), "seconds": round(dt, 2), **info})
         return p, info
 
 
@@ -234,9 +246,10 @@ def run_episode(arm: Arm, client: Any, cfg: Config, record: Callable[[dict], Non
                 save_frame: Callable[[str, bytes], None], checker: Checker | None = None) -> dict:
     tally = Tally()
     t = Tools(arm, cfg, checker, record, save_frame, tally)
-    messages: list[dict] = [{"role": "user", "content": [{"type": "text", "text": GOAL}, *t.look()]}]
+    messages: list[dict] = [{"role": "user", "content": [{"type": "text", "text": GOALS[cfg.goal]}, *t.look()]}]
     end = "turn limit"
     final_text = ""
+    verifies = 0
     for turn in range(cfg.max_turns):
         t0 = time.monotonic()
         resp = client.beta.messages.create(**request(cfg, messages))
@@ -252,6 +265,12 @@ def run_episode(arm: Arm, client: Any, cfg: Config, record: Callable[[dict], Non
         if resp.stop_reason != "tool_use" or not calls:
             end = resp.stop_reason
             final_text = text
+            if cfg.jev_verify and checker and resp.stop_reason == "end_turn" and verifies < MAX_VERIFIES:
+                verifies += 1
+                p, _ = t.ask_jev(VERIFY_QUESTION, kind="verify")
+                if p < 0.5:
+                    messages.append({"role": "user", "content": VERIFY_NO.format(q=VERIFY_QUESTION, p=p)})
+                    continue
             break
         results, stopped = [], None
         for c in calls:

@@ -1,0 +1,23 @@
+verify     7/20 right, 6 false yes, 7 false no
+upright    13/20 right, 1 false yes, 6 false no
+on_square  17/20 right, 3 false yes, 0 false no
+{'seed': 0, 'verify': (0.19, False), 'upright': (0.45, True), 'on_square': (0.13, False)}
+{'seed': 1, 'verify': (0.34, True), 'upright': (0.6, True), 'on_square': (0.68, True)}
+{'seed': 2, 'verify': (0.48, True), 'upright': (0.43, True), 'on_square': (0.74, True)}
+{'seed': 3, 'verify': (0.56, False), 'upright': (0.45, False), 'on_square': (0.84, True)}
+{'seed': 4, 'verify': (0.28, True), 'upright': (0.44, True), 'on_square': (0.72, True)}
+{'seed': 5, 'verify': (0.67, False), 'upright': (0.44, False), 'on_square': (0.8, True)}
+{'seed': 6, 'verify': (0.53, True), 'upright': (0.63, True), 'on_square': (0.7, True)}
+{'seed': 7, 'verify': (0.5, True), 'upright': (0.48, True), 'on_square': (0.72, True)}
+{'seed': 8, 'verify': (0.57, False), 'upright': (0.53, True), 'on_square': (0.7, False)}
+{'seed': 9, 'verify': (0.5, False), 'upright': (0.45, False), 'on_square': (0.81, True)}
+{'seed': 10, 'verify': (0.35, True), 'upright': (0.4, True), 'on_square': (0.63, True)}
+{'seed': 11, 'verify': (0.48, True), 'upright': (0.57, True), 'on_square': (0.61, True)}
+{'seed': 12, 'verify': (0.52, True), 'upright': (0.54, True), 'on_square': (0.78, True)}
+{'seed': 13, 'verify': (0.44, True), 'upright': (0.51, True), 'on_square': (0.54, True)}
+{'seed': 14, 'verify': (0.51, False), 'upright': (0.38, False), 'on_square': (0.78, True)}
+{'seed': 15, 'verify': (0.67, False), 'upright': (0.6, False), 'on_square': (0.85, False)}
+{'seed': 16, 'verify': (0.06, False), 'upright': (0.32, False), 'on_square': (0.71, True)}
+{'seed': 17, 'verify': (0.48, True), 'upright': (0.45, True), 'on_square': (0.75, True)}
+{'seed': 18, 'verify': (0.53, True), 'upright': (0.54, True), 'on_square': (0.9, True)}
+{'seed': 19, 'verify': (0.4, False), 'upright': (0.52, True), 'on_square': (0.74, False)}

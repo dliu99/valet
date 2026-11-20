@@ -70,6 +70,7 @@ def run_seed(seed: int, cfg: Config, out: Path) -> dict:
         res = {"end": f"error: {type(e).__name__}: {e}"}
     wall = time.monotonic() - t0
     sim.step(0.5)  # let the scene settle before grading
+    (d / "final-wrist.jpg").write_bytes(arm.frames(("wrist",), overlay=False)["wrist"])  # for scoring Jev offline
     result = {"seed": seed, **score(sim.truth()), "wall_s": round(wall, 1), **res}
     record({"type": "result", **result})
     events.close()

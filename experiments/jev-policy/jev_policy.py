@@ -11,7 +11,9 @@ import json
 import os
 import statistics
 import time
-from concurrent.futures import ProcessPoolExecutor
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -31,7 +33,11 @@ JEV_USD_PER_TOKEN = 0.042 / 1e6
 CLAUDE_MODEL = "claude-opus-5-5"
 CLAUDE_USD_PER_TOKEN = (4.0 / 1e6, 20.0 / 1e6)
 
-TASK = "Pick up the white box and set it down on the blue square, then let go of it."
+TASKS = {
+    "plain": "Pick up the white box and set it down on the blue square, then let go of it.",
+    "upright": "Pick up the white box and set it down upright on the blue square, then let go of it.",
+}
+TASK = TASKS["plain"]
 
 SEE = "`wrist` is the camera on the arm's jaws; the red dot in `wrist` is on the table straight below the jaws."
 MOVES = {
@@ -176,15 +182,15 @@ class GoalWriter:
 
     SYSTEM = (
         "You set the goal for a robot arm. A fast vision model looks through the camera on the arm's jaws and picks "
-        f"one small move at a time toward your goal; it sees nothing else. The task: {TASK} "
+        "one small move at a time toward your goal; it sees nothing else. The task: {task} "
         "Reply with the goal only, one short sentence the vision model can check against the wrist camera. "
         "The red dot in the wrist camera is on the table straight below the jaws."
     )
 
-    def __init__(self, spend: Spend, note: str = ""):
+    def __init__(self, spend: Spend, task: str = TASK):
         import anthropic
 
-        self.system = self.SYSTEM + note
+        self.system = self.SYSTEM.format(task=task)
         self.spend = spend
         self.client = anthropic.Anthropic()
 
@@ -336,6 +342,7 @@ class Config:
     claude: bool = True
     gripper_loops: bool = True
     memory: bool = False
+    task: str = "plain"
 
 
 def run_episode(seed: int, cfg: Config, out: Path) -> dict:
@@ -345,7 +352,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
     arm = Arm(sim)
     spend = Spend()
     jev = Jev(spend)
-    writer = GoalWriter(spend) if cfg.claude else None
+    writer = GoalWriter(spend, TASKS[cfg.task]) if cfg.claude else None
     memory = Memory() if cfg.memory else None
     questions = questions_for(cfg.side)
     out.mkdir(parents=True, exist_ok=True)
@@ -359,7 +366,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         return f
 
     f = frames()
-    goal = writer.write(f"Arm: {json.dumps(arm.reading())}. Write the first goal.", f) if writer else TASK
+    goal = writer.write(f"Arm: {json.dumps(arm.reading())}. Write the first goal.", f) if writer else TASKS[cfg.task]
     goals = [goal]
     history: list[dict] = []
     end = "max ticks"
@@ -503,19 +510,44 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--repeats", type=int, default=1)
     p.add_argument("--max-goals", type=int, default=Config.max_goals)
     p.add_argument("--no-gripper-loops", action="store_true", help="gripper moves always count as progress")
+    p.add_argument("--task", choices=sorted(TASKS), default="plain", help="the task sentence Claude (or Jev alone) gets")
     p.add_argument("--tag", default="run")
+    p.add_argument("--resume", type=Path, help="finish the episodes of an earlier run directory, with its config")
+    p.add_argument("--episode", type=int, help=argparse.SUPPRESS)
+    p.add_argument("--out", type=Path, help=argparse.SUPPRESS)
     a = p.parse_args(argv)
     load_env()
-    cfg = Config(max_ticks=a.max_ticks, max_goals=a.max_goals, side=a.side, verify_done=a.verify_done, claude=not a.no_claude,
-                 memory=a.memory, gripper_loops=not a.no_gripper_loops)
-    run_dir = HERE / "runs" / f"{time.strftime('%Y%m%d-%H%M%S')}-{a.tag}"
+    if a.episode is not None:
+        cfg = Config(**{k: v for k, v in json.loads((a.out.parent / "config.json").read_text()).items() if not k.startswith("_")})
+        run_episode(a.episode, cfg, a.out)
+        return 0
+    if a.resume:
+        run_dir = a.resume.resolve()
+        plan = json.loads((run_dir / "config.json").read_text())
+        a.seeds, a.repeats, a.tag = plan.pop("_seeds"), plan.pop("_repeats"), plan.pop("_tag")
+        cfg = Config(**plan)
+    else:
+        cfg = Config(max_ticks=a.max_ticks, max_goals=a.max_goals, side=a.side, verify_done=a.verify_done, claude=not a.no_claude,
+                     memory=a.memory, gripper_loops=not a.no_gripper_loops, task=a.task)
+        run_dir = HERE / "runs" / f"{time.strftime('%Y%m%d-%H%M%S')}-{a.tag}"
+        run_dir.mkdir(parents=True)
+        (run_dir / "config.json").write_text(json.dumps({**vars(cfg), "_seeds": a.seeds, "_repeats": a.repeats, "_tag": a.tag}))
+    episodes = [run_dir / (f"seed{seed:02d}" + (f"-r{k}" if a.repeats > 1 else "")) for k in range(a.repeats) for seed in a.seeds]
+
+    def one(out: Path) -> dict:
+        """Each episode in its own process, so a crash in the renderer costs one retry, not the run."""
+        for _ in range(3):
+            if (out / "result.json").is_file():
+                break
+            out.mkdir(parents=True, exist_ok=True)
+            with (out / "stdout.log").open("w") as log:
+                subprocess.run([sys.executable, __file__, "--episode", out.name.split("-")[0][4:], "--out", str(out)], stdout=log, stderr=subprocess.STDOUT)
+        return json.loads((out / "result.json").read_text())
+
     results = []
-    with ProcessPoolExecutor(a.jobs) as pool:
-        futures = [pool.submit(run_episode, seed, cfg, run_dir / (f"seed{seed:02d}" + (f"-r{k}" if a.repeats > 1 else "")))
-                   for k in range(a.repeats) for seed in a.seeds]
-    for fut in futures:
-        r = fut.result()
-        results.append(r)
+    with ThreadPoolExecutor(a.jobs) as pool:
+        results = list(pool.map(one, episodes))
+    for r in results:
         seed = r["seed"]
         print(f"seed {seed}: placed={r['placed']} lifted={r['lifted']} touched={r['touched']} closest={r['closest_cm']}cm off={r['off_target_m']} end={r['end']} ticks={r['ticks']} "
               f"episode={r['episode_s']}s usd={r['usd']['total']}", flush=True)

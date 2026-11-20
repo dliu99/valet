@@ -25,8 +25,8 @@ def table(run: Path) -> None:
     print(json.dumps(data["summary"], indent=1))
 
 
-def strip(run: Path, seed: int, ticks: list[int], out: Path) -> None:
-    ep = run / f"seed{seed:02d}"
+def strip(run: Path, seed: int, ticks: list[int], out: Path, rep: str = "") -> None:
+    ep = run / (f"seed{seed:02d}" + (f"-{rep}" if rep else ""))
     rows = {json.loads(l)["tick"]: json.loads(l) for l in (ep / "ticks.jsonl").read_text().splitlines() if '"move"' in l and '"rewrite"' not in l}
     w, h = 320, 180
     sheet = Image.new("RGB", (w * len(ticks), h + 34), "white")
@@ -47,9 +47,10 @@ def main() -> None:
     p.add_argument("--seed", type=int)
     p.add_argument("--strip", type=int, nargs="*")
     p.add_argument("--out", type=Path)
+    p.add_argument("--rep", default="", help="r0, r1 for runs with --repeats")
     a = p.parse_args()
     if a.strip:
-        strip(a.run, a.seed, a.strip, a.out)
+        strip(a.run, a.seed, a.strip, a.out, a.rep)
     else:
         table(a.run)
 

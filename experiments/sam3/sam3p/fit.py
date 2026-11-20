@@ -163,6 +163,37 @@ def fit_box(cam: Camera, joints: dict[str, float], mask: np.ndarray, ignore: np.
     return BoxFit(float(x), float(y), _wrap45(float(yaw)), float(side), float(h), 1.0 - float(best.fun))
 
 
+def fit_box_views(cam: Camera, views: list[tuple[dict[str, float], np.ndarray, np.ndarray | None]]) -> BoxFit | None:
+    """One resting box fitted to masks from several camera poses at once (mean soft IoU). Two looks from
+    different directions fix side and height, which one look from above cannot."""
+    views = [v for v in views if v[1].sum() >= 30]
+    if not views:
+        return None
+    sils = [Silhouette(cam, j, m, ign) for j, m, ign in views]
+    j, m, _ = views[-1]
+    start = plane_centroid(cam, j, m, 0.0375)
+    if start is None:
+        return None
+
+    def cost(v):
+        x, y, yaw, side, h = v
+        if not (SIDE_M[0] <= side <= SIDE_M[1] and HEIGHT_M[0] <= h <= HEIGHT_M[1]):
+            return 1.0 + abs(side - np.clip(side, *SIDE_M)) * 100 + abs(h - np.clip(h, *HEIGHT_M)) * 100
+        pts = cuboid_points(x, y, yaw, side, h)
+        return 1.0 - float(np.mean([s.iou(pts) for s in sils]))
+
+    steps = np.diag([0.01, 0.01, 15, 0.006, 0.015])
+    best = None
+    for yaw0 in (-30.0, 0.0, 30.0):
+        v0 = np.array([start[0], start[1], yaw0, 0.0475, 0.075])
+        r = minimize(cost, v0, method="Nelder-Mead", options={"initial_simplex": np.vstack([v0, v0 + steps]), "xatol": 1e-4,
+                                                              "fatol": 1e-4, "maxiter": 800})
+        if best is None or r.fun < best.fun:
+            best = r
+    x, y, yaw, side, h = best.x
+    return BoxFit(float(x), float(y), _wrap45(float(yaw)), float(side), float(h), 1.0 - float(best.fun))
+
+
 def fit_square(cam: Camera, joints: dict[str, float], mask: np.ndarray, size: float, ignore: np.ndarray | None = None) -> SquareFit | None:
     """The flat square of known `size` on the table whose outline best matches `mask`."""
     if mask.sum() < 30:

@@ -27,6 +27,7 @@ CONFIGS = {
     "pregrasp": Config(name="sam3-504-pregrasp", pre_grasp_look=True),
     "roll": Config(name="sam3-504-roll", align_roll=True),
     "nooffset": Config(name="sam3-504-nooffset", place_offset=False),
+    "twoview": Config(name="sam3-504-twoview", two_view=True),
 }
 
 
@@ -46,13 +47,18 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--record", action="store_true", help="append to the shared scoreboard")
     p.add_argument("--tag", default="")
     p.add_argument("--oracle", action="store_true", help="true masks instead of SAM 3 (debugging; never recorded)")
+    p.add_argument("--prompt", default="white box", help="SAM 3's words for the box")
+    p.add_argument("--merge", action="store_true", help="join touching box instances (a shaded face can come back alone)")
+    p.add_argument("--fallback", default=None, help="a second wording for the box when the first finds nothing")
     a = p.parse_args(argv)
     cfg = Config()
     for part in a.config.split("+"):
         c = CONFIGS[part]
-        cfg = replace(cfg, **{k: getattr(c, k) for k in ("pre_grasp_look", "align_roll", "place_offset", "grasp_tries", "place_tries")
+        cfg = replace(cfg, **{k: getattr(c, k) for k in ("pre_grasp_look", "align_roll", "place_offset", "two_view", "grasp_tries", "place_tries")
                               if getattr(c, k) != getattr(Config(), k)})
-    cfg = replace(cfg, name=f"sam3-{a.res}" + "".join(f"-{x}" for x in a.config.split("+") if x != "base") + (f"-{a.tag}" if a.tag else ""))
+    cfg = replace(cfg, name=f"sam3-{a.res}" + "".join(f"-{x}" for x in a.config.split("+") if x != "base")
+                  + ("" if a.prompt == "white box" else "-" + a.prompt.replace(" ", "")) + ("-merge" if a.merge else "") + (f"-or{a.fallback.replace(' ', '')}" if a.fallback else "")
+                  + (f"-{a.tag}" if a.tag else ""))
 
     if a.oracle:
         from .render import OracleSegmenter
@@ -64,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
         from .seg import Segmenter
 
         seg = Segmenter(resolution=a.res)
-    perception = Perception(seg)
+    perception = Perception(seg, box_prompt=a.prompt, merge=a.merge, fallback=a.fallback)
     log_dir = RESULTS / "runs" / cfg.name
     log_dir.mkdir(parents=True, exist_ok=True)
     placed = lifted = 0
@@ -96,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
         s = score(sim.truth())
         placed += s["placed"]
         lifted += s["lifted"]
-        n_seg = len(seg.calls)
+        n_seg = sum(1 for c in seg.calls if c.get("new_frame", True))  # one fast call per frame segmented
         seg_s = [c["s"] for c in seg.calls]
         row = {"seed": seed, **s, **out, "wall_s": round(wall, 1), "sam_calls": n_seg,
                "sam_s_median": round(statistics.median(seg_s), 3) if seg_s else None, "graded": graded,

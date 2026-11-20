@@ -16,7 +16,7 @@ from valet_sim.ik import IK, Unreachable
 from valet_sim.sim import Sim
 
 from .camera import Camera
-from .fit import BoxFit, SquareFit
+from .fit import BoxFit, SquareFit, fit_box_views
 from .perceive import Perception, View
 from .reach import close, look_from_above, move, set_gripper, solve
 
@@ -44,6 +44,7 @@ class Config:
     pre_grasp_look: bool = False  # one more look from 15 cm before descending
     align_roll: bool = False  # turn the wrist so the jaws close square to the box's faces
     place_offset: bool = True  # put the box (pushed against the fixed jaw) on the square, not the grasp point
+    two_view: bool = False  # fit the box to the survey and the look from above together
 
 
 @dataclass
@@ -65,6 +66,7 @@ class SamPolicy:
         self.est = Estimate()
         self.events: list[dict] = []
         self.looks = 0
+        self.survey_view: View | None = None
 
     # --- sensing ---------------------------------------------------------------------------------------------
 
@@ -107,7 +109,8 @@ class SamPolicy:
 
     def survey(self) -> bool:
         v = self.look("survey")
-        self.take_box(v, oblique=True)
+        if self.take_box(v, oblique=True):
+            self.survey_view = v
         self.take_square(v)
         for xy in SURVEY_SPOTS:
             if self.est.box is not None and self.est.square is not None:
@@ -132,6 +135,15 @@ class SamPolicy:
         v = self.look(tag)
         if not self.take_box(v, oblique=False):
             return False
+        if self.cfg.two_view and self.survey_view is not None and v.box_inst is not None:
+            sv = self.survey_view
+            both = fit_box_views(self.cam, [(sv.joints, sv.box_inst.mask, sv.ignore), (v.joints, v.box_inst.mask, v.ignore)])
+            self.log("two-view", box=None if both is None else [round(both.x, 4), round(both.y, 4), round(both.side, 4), round(both.h, 4), round(both.iou, 3)])
+            if both is not None and both.iou >= 0.8:
+                self.est.box, self.est.hw = both, (both.side, both.h)
+                if self.witness:
+                    self.witness(f"{tag}-two-view", {"box": [both.x, both.y], "square": None})
+            self.survey_view = None  # the box may move from here on
         if self.est.hw is None:  # never seen obliquely: take this look's own size
             self.est.hw = (v.box.side, v.box.h)
         if v.square is not None:

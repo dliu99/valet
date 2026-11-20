@@ -8,10 +8,19 @@ import argparse
 import json
 
 import numpy as np
-
-from jev_policy import NEAR_CLIP_M, Arm, Jev, Spend, jpeg, load_env, questions_for, step_vector
 from valet_sim.sim import Sim, SimSpec, with_box
 from valet_sim.task import episode
+
+from jev_policy import (
+    NEAR_CLIP_M,
+    Arm,
+    Jev,
+    Spend,
+    jpeg,
+    load_env,
+    questions_for,
+    step_vector,
+)
 
 GOALS = {"box": "Move the open jaws over the white box.", "square": "Carry the box over the blue square."}
 

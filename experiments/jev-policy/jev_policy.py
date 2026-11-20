@@ -10,17 +10,16 @@ import io
 import json
 import os
 import statistics
-import time
 import subprocess
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import httpx
 import mujoco
 import numpy as np
-
 from valet_sim.ik import IK, Unreachable
 from valet_sim.scene import MOTORS, WRIST_CAMERA
 from valet_sim.sim import Sim, SimSpec, with_box
@@ -33,11 +32,7 @@ JEV_USD_PER_TOKEN = 0.042 / 1e6
 CLAUDE_MODEL = "claude-opus-5-5"
 CLAUDE_USD_PER_TOKEN = (4.0 / 1e6, 20.0 / 1e6)
 
-TASKS = {
-    "plain": "Pick up the white box and set it down on the blue square, then let go of it.",
-    "upright": "Pick up the white box and set it down upright on the blue square, then let go of it.",
-}
-TASK = TASKS["plain"]
+TASK = "Pick up the white box and set it down on the blue square, then let go of it."
 
 SEE = "`wrist` is the camera on the arm's jaws; the red dot in `wrist` is on the table straight below the jaws."
 MOVES = {
@@ -182,15 +177,14 @@ class GoalWriter:
 
     SYSTEM = (
         "You set the goal for a robot arm. A fast vision model looks through the camera on the arm's jaws and picks "
-        "one small move at a time toward your goal; it sees nothing else. The task: {task} "
+        f"one small move at a time toward your goal; it sees nothing else. The task: {TASK} "
         "Reply with the goal only, one short sentence the vision model can check against the wrist camera. "
         "The red dot in the wrist camera is on the table straight below the jaws."
     )
 
-    def __init__(self, spend: Spend, task: str = TASK):
+    def __init__(self, spend: Spend):
         import anthropic
 
-        self.system = self.SYSTEM.format(task=task)
         self.spend = spend
         self.client = anthropic.Anthropic()
 
@@ -201,7 +195,7 @@ class GoalWriter:
             content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(data).decode()}})
         content.append({"type": "text", "text": ask})
         t0 = time.monotonic()
-        r = self.client.messages.create(model=CLAUDE_MODEL, max_tokens=2000, system=self.system,
+        r = self.client.messages.create(model=CLAUDE_MODEL, max_tokens=2000, system=self.SYSTEM,
                                         output_config={"effort": "low"}, messages=[{"role": "user", "content": content}])
         self.spend.claude_calls += 1
         self.spend.claude_in += r.usage.input_tokens
@@ -322,7 +316,7 @@ class Arm:
 
     def reading(self) -> dict:
         st = self.sim.state()
-        g, goal = st["joints"]["gripper"], st["goals"]["gripper"]
+        g = st["joints"]["gripper"]
         jaws = "closed on something" if self.closed and g > 5 else "closed on nothing" if self.closed else "open"
         return {"joints_deg": {j: round(v, 1) for j, v in st["joints"].items()},
                 "jaws_height_cm": round(st["grasp_point"][2] * 100, 1), "jaws": jaws}
@@ -338,11 +332,7 @@ class Config:
     max_goals: int = 12
     stall_ticks: int = 6
     side: bool = False
-    verify_done: bool = False
     claude: bool = True
-    gripper_loops: bool = True
-    memory: bool = False
-    task: str = "plain"
 
 
 def run_episode(seed: int, cfg: Config, out: Path) -> dict:
@@ -352,8 +342,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
     arm = Arm(sim)
     spend = Spend()
     jev = Jev(spend)
-    writer = GoalWriter(spend, TASKS[cfg.task]) if cfg.claude else None
-    memory = Memory() if cfg.memory else None
+    writer = GoalWriter(spend) if cfg.claude else None
     questions = questions_for(cfg.side)
     out.mkdir(parents=True, exist_ok=True)
     log = (out / "ticks.jsonl").open("w")
@@ -366,7 +355,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         return f
 
     f = frames()
-    goal = writer.write(f"Arm: {json.dumps(arm.reading())}. Write the first goal.", f) if writer else TASKS[cfg.task]
+    goal = writer.write(f"Arm: {json.dumps(arm.reading())}. Write the first goal.", f) if writer else TASK
     goals = [goal]
     history: list[dict] = []
     end = "max ticks"
@@ -375,23 +364,14 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         (out / f"t{tick:03d}.jpg").write_bytes(f["wrist"])
         reading = arm.reading()
         last = history[-1] if history else None
-        dot = np.array([*sim.state()["grasp_point"][:2], 0.0])
         state = {"goal": goal, "arm": reading, "last_move": last and {k: last[k] for k in ("move", "amount", "result")}}
-        if memory and memory.at:
-            state["last_seen_cm_from_red_dot"] = memory.cm_from(dot)
-        images = f
-        answers = jev.ask(state, images, questions)
+        answers = jev.ask(state, f, questions)
         move = answers["move:next"]["choice"]
         amount, result = None, None
-        if memory:
-            memory.see(answers, dot, arm.axes())
         if move in ("to_box", "to_square"):
             obj = move[3:]
             view = "_side" if cfg.side and answers[f"where_side:{obj}"]["confidence"] > answers[f"where:{obj}"]["confidence"] else ""
             delta = step_vector(answers, obj, arm.side_axes() if view else arm.axes(), view)
-            if memory and obj in memory.at and answers[f"where:{obj}"]["confidence"] < CONFIDENT and not view:
-                delta = memory.at[obj] - dot
-                delta *= min(1.0, 0.08 / max(float(np.linalg.norm(delta)), 1e-6))
             amount = round(float(np.linalg.norm(delta)) * 100, 1)
             result = arm.shift(delta)
         elif move in ("lower", "raise"):
@@ -412,7 +392,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         why = None
         if move == "done":
             why = "done"
-        elif stalled(history, cfg.stall_ticks, gripper_counts=not cfg.gripper_loops):
+        elif stalled(history, cfg.stall_ticks):
             why = "stall"
         if why and not writer:
             if why == "done":
@@ -427,9 +407,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
             moves = ", ".join(f"{h['move']} {h['amount'] or ''}".strip() + ("" if h["result"] in (None, "moved", "opened", "closed") else f" ({h['result']})") for h in history[-cfg.stall_ticks:])
             if why == "done":
                 ask = (f"The vision model says this goal is met: \"{goal}\". Arm: {json.dumps(arm.reading())}. "
-                       + ("Check the cameras. If the box rests on the blue square and the jaws are off it, reply DONE. "
-                          "If this goal is not met yet, write it again, sharper. Otherwise write the next goal." if cfg.verify_done else
-                          "If the box is resting on the blue square and the jaws are off it, reply DONE. Otherwise write the next goal."))
+                       "If the box is resting on the blue square and the jaws are off it, reply DONE. Otherwise write the next goal.")
             else:
                 ask = (f"The vision model is stuck on the goal \"{goal}\". Its last moves: {moves}. Arm: {json.dumps(arm.reading())}. "
                        "Write a goal that gets it moving again.")
@@ -456,34 +434,11 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
     return result
 
 
-CONFIDENT = 0.5
-
-
-class Memory:
-    """Where the wrist camera last placed the box and the square on the table, from Jev's confident answers. It lets
-    the arm carry the box toward a square that the box in its jaws now hides."""
-
-    def __init__(self):
-        self.at: dict[str, np.ndarray] = {}
-
-    def see(self, answers: dict, dot: np.ndarray, axes: dict[str, np.ndarray]) -> None:
-        for obj in OBJECTS:
-            a = answers[f"where:{obj}"]
-            if a["confidence"] < CONFIDENT:
-                continue
-            seen = dot + (0 if a["choice"] == "here" else axes[a["choice"]] * expected(answers[f"far:{obj}"], CM) / 100)
-            self.at[obj] = seen if obj not in self.at else (self.at[obj] + seen) / 2
-
-    def cm_from(self, dot: np.ndarray) -> dict:
-        return {OBJECTS[k]: round(float(np.linalg.norm((v - dot)[:2])) * 100, 1) for k, v in self.at.items()}
-
-
-def stalled(history: list[dict], n: int, gripper_counts: bool = True) -> bool:
-    """No progress: the jaws are back within 1.5 cm of where they were n ticks ago, and in the same state."""
+def stalled(history: list[dict], n: int) -> bool:
+    """No progress: the jaws are back within 1.5 cm of where they were n ticks ago, and in the same state (opening and
+    closing in place is a stall too)."""
     recent = history[-n:]
     if len(recent) < n or any(h["move"] == "new goal" for h in recent):
-        return False
-    if gripper_counts and any(h["move"] in ("open", "close") for h in recent):
         return False
     if recent[-1]["arm"]["jaws"] != recent[0]["arm"]["jaws"]:
         return False
@@ -503,14 +458,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     p.add_argument("--max-ticks", type=int, default=Config.max_ticks)
     p.add_argument("--side", action="store_true", help="also send Jev the side camera, with the same red dot")
-    p.add_argument("--verify-done", action="store_true", help="Claude checks a done claim before moving on")
     p.add_argument("--no-claude", action="store_true", help="Jev alone: the goal is the task sentence, and Jev's done ends the episode")
-    p.add_argument("--memory", action="store_true", help="remember where the wrist camera last saw the box and the square")
     p.add_argument("--jobs", type=int, default=5)
     p.add_argument("--repeats", type=int, default=1)
     p.add_argument("--max-goals", type=int, default=Config.max_goals)
-    p.add_argument("--no-gripper-loops", action="store_true", help="gripper moves always count as progress")
-    p.add_argument("--task", choices=sorted(TASKS), default="plain", help="the task sentence Claude (or Jev alone) gets")
     p.add_argument("--tag", default="run")
     p.add_argument("--resume", type=Path, help="finish the episodes of an earlier run directory, with its config")
     p.add_argument("--episode", type=int, help=argparse.SUPPRESS)
@@ -527,8 +478,7 @@ def main(argv: list[str] | None = None) -> int:
         a.seeds, a.repeats, a.tag = plan.pop("_seeds"), plan.pop("_repeats"), plan.pop("_tag")
         cfg = Config(**plan)
     else:
-        cfg = Config(max_ticks=a.max_ticks, max_goals=a.max_goals, side=a.side, verify_done=a.verify_done, claude=not a.no_claude,
-                     memory=a.memory, gripper_loops=not a.no_gripper_loops, task=a.task)
+        cfg = Config(max_ticks=a.max_ticks, max_goals=a.max_goals, side=a.side, claude=not a.no_claude)
         run_dir = HERE / "runs" / f"{time.strftime('%Y%m%d-%H%M%S')}-{a.tag}"
         run_dir.mkdir(parents=True)
         (run_dir / "config.json").write_text(json.dumps({**vars(cfg), "_seeds": a.seeds, "_repeats": a.repeats, "_tag": a.tag}))

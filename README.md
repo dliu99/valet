@@ -60,6 +60,14 @@ Every target is checked against the `[workspace]` box before anything moves, and
 `max_relative_target` clips each joint command. Keep a hand near the power switch for the
 first runs.
 
+## Driving the arm by hand
+
+`python -m valet.hardware.direct` moves the arm one guarded command at a time (`state`, `hold`,
+`movej`, `nudge`, `xyz`, `grip`, `relax`) and can save the wrist frame after each. It needs
+Python 3.12 (placo has no wheels for newer ones) and the SO-101 URDF in `SO101/`. On macOS the
+camera only opens from a terminal with camera permission, so run
+`python -m valet.hardware.camfeed --out runs/live/wrist.jpg` there first.
+
 ## Skills
 
 The recipe names a skill per action (`pick_flat`, `place_on_stack`); `[skills]` in the config

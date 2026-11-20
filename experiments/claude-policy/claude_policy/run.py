@@ -54,6 +54,8 @@ def run_seed(seed: int, cfg: Config, out: Path) -> dict:
 
     ep = episode(seed)
     sim = Sim(with_box(SimSpec(), ep.box, ep.target_xy))
+    if cfg.near_clip_m:  # the sim's default near plane (3.2 cm) cuts away a box between the jaws
+        sim.model.vis.map.znear = cfg.near_clip_m / sim.model.stat.extent
     arm = Arm(sim, max_side=cfg.max_side, overlay=cfg.overlay)
     checker = None
     if cfg.jev_checks:
@@ -111,12 +113,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cams", nargs="+", default=list(Config.cams))
     p.add_argument("--jev", action="store_true", help="let move and gripper calls carry a yes/no check answered by Jev")
     p.add_argument("--overlay", action="store_true", help="draw the table grid and grasp point on the frames")
+    p.add_argument("--near-clip", type=float, default=None, help="wrist camera near plane in metres (sim default 0.032)")
     p.add_argument("--max-turns", type=int, default=Config.max_turns)
     p.add_argument("--max-cost", type=float, default=Config.max_cost_usd, help="per-episode cap in dollars")
     p.add_argument("--out", type=Path, default=HERE / "runs")
     a = p.parse_args(argv)
     load_env()
-    cfg = replace(Config(), model=a.model, effort=a.effort, max_side=a.max_side, cams=tuple(a.cams), jev_checks=a.jev, overlay=a.overlay,
+    cfg = replace(Config(), model=a.model, effort=a.effort, max_side=a.max_side, cams=tuple(a.cams), jev_checks=a.jev, overlay=a.overlay, near_clip_m=a.near_clip,
                   max_turns=a.max_turns, max_cost_usd=a.max_cost)
     out = a.out / f"{time.strftime('%Y%m%d-%H%M%S')}-{a.tag}"
     out.mkdir(parents=True)

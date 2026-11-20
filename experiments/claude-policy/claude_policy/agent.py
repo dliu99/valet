@@ -30,47 +30,46 @@ PRICES = {
 }
 
 JOINT_NAMES = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll"]
-CHECK_PROPERTY = {
-    "type": "string",
-    "description": "Optional yes/no question about the wrist frame right after this call, answered in about a second "
-    "by a fast vision model. If the answer is no, the rest of this turn's calls are skipped.",
-}
-
-
 @dataclass(frozen=True)
 class Config:
     model: str = "claude-opus-5-5"
     effort: str = "medium"
     max_side: int = 640
-    cams: tuple[str, ...] = ("wrist", "side")
+    cams: tuple[str, ...] = ("wrist",)  # the real arm has only the wrist camera; "side" is for comparison
     jev_checks: bool = False
     overlay: bool = False
+    near_clip_m: float | None = None
     max_turns: int = 40
     max_cost_usd: float = 2.0
 
 
 class Checker(Protocol):
-    def ask(self, jpeg: bytes, question: str) -> tuple[float, dict]:
-        """Probability of yes, and usage/latency for the record."""
+    def ask(self, frames: dict[str, bytes], question: str) -> tuple[float, dict]:
+        """Probability of yes, and usage for the record."""
         ...
 
 
 def tools(cfg: Config) -> list[dict]:
+    side = "side" in cfg.cams
+    frames = "wrist and side frames" if side else "wrist frame"
     look = {
         "name": "look",
         "description": (
-            "Frames from the wrist camera and a fixed side camera, plus the joint state. Wrist frames are upright: at "
-            "wrist roll -90, image up is away from the base and image right is the arm's right. The side camera is off "
-            "the arm's right, looking across the table; image right is away from the base. State: joint angles in "
-            "degrees; `grasp_point`, the spot between the jaw tips, in metres in the base frame (x forward, y left, "
-            "z up from the table top); servo currents in amps."
-            + (" Both frames carry a red grid on the table top every 5 cm (10 cm in the side frame), labelled x,y in "
-               "cm, a red ring at the grasp point and a red + on the table right below it." if cfg.overlay else "")
+            ("Frames from the wrist camera and a fixed side camera" if side else "A frame from the wrist camera")
+            + ", plus the joint state. Wrist frames are upright: at wrist roll -90, image up is away from the base and "
+            "image right is the arm's right. "
+            + ("The side camera is off the arm's right, looking across the table; image right is away from the base. "
+               if side else "")
+            + "State: joint angles in degrees; `grasp_point`, the spot between the jaw tips, in metres in the base "
+            "frame (x forward, y left, z up from the table top); servo currents in amps."
+            + (" Frames carry a red grid on the table top every 5 cm" + (" (10 cm in the side frame)" if side else "")
+               + ", labelled x,y in cm, a red ring at the grasp point and a red + on the table right below it."
+               if cfg.overlay else "")
         ),
         "input_schema": {
             "type": "object",
-            "properties": {"cams": {"type": "array", "items": {"type": "string", "enum": ["wrist", "side"]},
-                                    "description": "Default: both."}},
+            "properties": {"cams": {"type": "array", "items": {"type": "string", "enum": list(cfg.cams)},
+                                    "description": "Default: all."}} if side else {},
             "additionalProperties": False,
         },
     }
@@ -110,8 +109,11 @@ def tools(cfg: Config) -> list[dict]:
         },
     }
     if cfg.jev_checks:
+        check = {"type": "string", "description": f"Optional yes/no question about the {frames} right after this call, "
+                 "answered in about a second by a fast vision model. If the answer is no, the rest of this turn's calls "
+                 "are skipped."}
         for t in (move, gripper):
-            t["input_schema"]["properties"]["check"] = CHECK_PROPERTY
+            t["input_schema"]["properties"]["check"] = check
     return [look, move, gripper]
 
 
@@ -157,7 +159,7 @@ class Tools:
         self.record, self.save_frame, self.tally = record, save_frame, tally
 
     def look(self, cams: tuple[str, ...] | None = None) -> list[dict]:
-        frames = self.arm.frames(tuple(cams or self.cfg.cams))
+        frames = self.arm.frames(tuple(c for c in (cams or self.cfg.cams) if c in self.cfg.cams) or self.cfg.cams)
         blocks: list[dict] = []
         for cam, jpeg in frames.items():
             self.save_frame(cam, jpeg)
@@ -200,10 +202,11 @@ class Tools:
         return text, False, False
 
     def _check(self, question: str) -> tuple[float, dict]:
-        jpeg = self.arm.frames(("wrist",), max_side=640, overlay=False)["wrist"]  # Jev takes 280-1568 px a side
-        self.save_frame("check", jpeg)
+        frames = self.arm.frames(self.cfg.cams, max_side=640, overlay=False)  # Jev takes 280-1568 px a side
+        for cam, jpeg in frames.items():
+            self.save_frame(f"check-{cam}", jpeg)
         t0 = time.monotonic()
-        p, info = self.checker.ask(jpeg, question)
+        p, info = self.checker.ask(frames, question)
         dt = time.monotonic() - t0
         self.tally.jev_calls += 1
         self.tally.jev_input_tokens += int(info.get("input_tokens") or 0)

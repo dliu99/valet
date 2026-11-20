@@ -1,9 +1,11 @@
-"""Jev (TypeSafe System One) answers one yes/no question about the wrist frame. Needs TYPESAFE_API_KEY."""
+"""Jev (TypeSafe System One) answers one yes/no question about the current camera frames. Needs
+TYPESAFE_API_KEY. Images are a TypeSafe preview feature ("Danger Zone"): fine for a prototype."""
 
 from __future__ import annotations
 
 IMAGES_HEADER = {"TypeSafe-Danger-Zone-Images": "true"}
-FRAME_NOTE = " (`wrist` is a frame from the camera on the robot's gripper, looking out past the jaws.)"
+CAMERAS = {"wrist": "`wrist` is a frame from the camera on the robot arm's gripper, looking out past the jaws",
+           "side": "`side` is from a fixed camera beside the table"}
 
 
 class Jev:
@@ -14,12 +16,12 @@ class Jev:
         self.model = model
         self.timeout = timeout
 
-    def ask(self, jpeg: bytes, question: str) -> tuple[float, dict]:
+    def ask(self, frames: dict[str, bytes], question: str) -> tuple[float, dict]:
         from typesafe_sdk import Image, Noul
 
         r = self.client.system_one(
-            state={"wrist": Image(jpeg)},
-            questions={"q": Noul(instructions=question + FRAME_NOTE)},
+            state={cam: Image(jpeg) for cam, jpeg in frames.items()},
+            questions={"q": Noul(instructions=f"{question} ({'; '.join(CAMERAS[c] for c in frames)}.)")},
             model=self.model,
             timeout=self.timeout,
             extra_headers=IMAGES_HEADER,

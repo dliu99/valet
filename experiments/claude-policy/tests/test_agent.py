@@ -38,8 +38,8 @@ class StubJev:
         self.p = p
         self.questions = []
 
-    def ask(self, jpeg, question):
-        assert jpeg[:2] == b"\xff\xd8"
+    def ask(self, frames, question):
+        assert set(frames) == {"wrist"} and all(j[:2] == b"\xff\xd8" for j in frames.values())
         self.questions.append(question)
         return self.p, {"input_tokens": 10}
 
@@ -59,7 +59,7 @@ def run(arm, turns, cfg=Config(), checker=None):
 
 def test_calls_run_in_order_and_the_loop_ends_on_text(arm):
     res, client, events = run(arm, [
-        ([call("a", "move", xyz=[0.25, 0.0, 0.12], pitch_deg=80), call("b", "gripper", action="close"), call("c", "look", cams=["wrist"])], "tool_use"),
+        ([call("a", "move", xyz=[0.25, 0.0, 0.12], pitch_deg=80), call("b", "gripper", action="close"), call("c", "look")], "tool_use"),
         ([NS(type="text", text="done")], "end_turn"),
     ])
     assert res["end"] == "end_turn" and res["final_text"] == "done"
@@ -69,7 +69,7 @@ def test_calls_run_in_order_and_the_loop_ends_on_text(arm):
     assert not any(r["is_error"] for r in results)
     assert arm.state()["joints"]["gripper"] < 5  # nothing between the jaws, so they shut
     first = client.requests[0]["messages"][0]["content"]
-    assert [b["type"] for b in first] == ["text", "text", "image", "text", "image", "text"]
+    assert [b["type"] for b in first] == ["text", "text", "image", "text"]  # goal, then the wrist frame and state
 
 
 def test_a_failed_move_skips_the_rest_of_the_turn(arm):

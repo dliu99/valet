@@ -45,7 +45,7 @@ class Evolution:
     n_parents: int = 2
     use_skills: bool = True
     write_skills: bool = True
-    skills_per_round: int = 2
+    skills_per_round: int = 3
     actor_tool_calls: int = 10
     verifier_tool_calls: int = 6
     archive: list[Candidate] = field(default_factory=list)
@@ -118,6 +118,11 @@ class Evolution:
 
     def run(self) -> Candidate:
         start = max((c.round for c in self.archive), default=-1) + 1
+        done = {e["round"] for e in self.events if e["kind"] == "skills_done"}
+        for rnd in range(start):
+            if self.write_skills and rnd not in done:
+                self.skills_from(rnd, [c for c in self.archive if c.round == rnd and c.origin == "actor"])
+                self.event("skills_done", round=rnd)
         for rnd in range(start, self.rounds):
             best = self.ranked()[0] if self.archive else None
             if best and best.placed == len(self.seeds):
@@ -129,6 +134,7 @@ class Evolution:
             children = [c for c in outs if c is not None]
             if self.write_skills:
                 self.skills_from(rnd, children)
+                self.event("skills_done", round=rnd)
             best = self.ranked()[0]
             self.event("round_end", round=rnd, best=best.id, placed=best.placed, lifted=best.lifted, fitness=best.fitness)
         return self.ranked()[0]
@@ -177,32 +183,60 @@ class Evolution:
         return self.admit(cid, job["round"], job["parent"], "actor", out["code"], out["notes"], out["usd"])
 
     def skills_from(self, rnd: int, children: list[Candidate]) -> None:
+        """Repairs this round produced: a child that beats its parent across rounds, and, inside each actor's session,
+        a run that fixes scenes the previous run (on the same scenes) failed. The best few go to the skill writer."""
+        fixes = []
         by_id = {c.id: c for c in self.archive}
-        wins = []
         for c in children:
-            p = by_id.get(c.parent) if c.parent else None
-            if p is None or c.fitness <= p.fitness:
-                continue
-            fixed = {s: ("placed" if v["placed"] and not p.per_seed[s]["placed"] else "lifted")
-                     for s, v in c.per_seed.items()
-                     if (v["placed"] and not p.per_seed[s]["placed"]) or (v["lifted"] and not p.per_seed[s]["lifted"])}
-            if fixed:
-                wins.append((len(fixed), c, p, fixed))
-        wins.sort(key=lambda w: -w[0])
-        for _, c, p, fixed in wins[: self.skills_per_round]:
+            if c.parent in by_id:
+                fixes.append(self.fix(c.parent, self.dir / "cands" / c.parent, c.id, self.dir / "cands" / c.id, c.id))
+        for sdir in sorted((self.dir / "sessions").glob(f"r{rnd}a*")):
+            runs = sorted(sdir.glob(f"{sdir.name}-run*"), key=lambda p: int(p.name.rsplit("run", 1)[1]))
+            for a, b in zip(runs, runs[1:]):
+                fixes.append(self.fix(a.name, a, b.name, b, sdir.name))
+        fixes = sorted((f for f in fixes if f), key=lambda f: -(len(f["fixed"]) - len(f["broke"])))
+        chosen, per_source = [], {}
+        for f in fixes:
+            if per_source.get(f["source"], 0) < 2 and len(chosen) < self.skills_per_round:
+                chosen.append(f)
+                per_source[f["source"]] = per_source.get(f["source"], 0) + 1
+        self.event("fixes_found", round=rnd, n=len(fixes),
+                   chosen=[{k: f[k] for k in ("before", "after", "fixed", "broke")} for f in chosen])
+        for i, f in enumerate(chosen):
             try:
-                self.extract_and_verify(rnd, c, p, fixed)
+                self.extract_and_verify(rnd, i, f)
             except ledger.BudgetExceeded as e:
                 self.event("budget", message=str(e))
                 return
 
-    def extract_and_verify(self, rnd: int, child: Candidate, parent: Candidate, fixed: dict) -> None:
-        before, after = self.code(parent.id), self.code(child.id)
+    def fix(self, before: str, before_dir: Path, after: str, after_dir: Path, source: str) -> dict | None:
+        rb, ra = _results(before_dir), _results(after_dir)
+        common = sorted(set(rb) & set(ra))
+        if not common:
+            return None
+        fixed, broke = {}, []
+        for s in common:
+            b, a = rb[s]["score"], ra[s]["score"]
+            if a["placed"] and not b["placed"]:
+                fixed[str(s)] = "placed"
+            elif a["lifted"] and not b["lifted"] and not b["placed"]:
+                fixed[str(s)] = "lifted"
+            elif (b["placed"] and not a["placed"]) or (b["lifted"] and not a["lifted"]):
+                broke.append(s)
+        if not fixed or len(fixed) <= len(broke):
+            return None
+        if engine.fitness([ra[s] for s in common]) <= engine.fitness([rb[s] for s in common]):
+            return None
+        return {"before": before, "before_dir": before_dir, "after": after, "after_dir": after_dir, "fixed": fixed,
+                "broke": broke, "source": source, "seeds": common}
+
+    def extract_and_verify(self, rnd: int, i: int, f: dict) -> None:
+        before, after = (f["before_dir"] / "program.py").read_text(), (f["after_dir"] / "program.py").read_text()
+        fixed = f["fixed"]
         seeds = sorted(fixed, key=int)
-        tr = lambda cid: "\n\n".join(engine.summarize(json.loads((self.dir / "cands" / cid / f"seed_{s}" / "trace.json").read_text()))
-                                     for s in seeds)
+        tr = lambda d: "\n\n".join(engine.summarize(json.loads((d / f"seed_{s}" / "trace.json").read_text())) for s in seeds)
         diff = "".join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), "before.py", "after.py"))
-        existing = "\n\n".join(_strip_front(f.read_text()) for f in self.library()) or "(empty)"
+        existing = "\n\n".join(_strip_front(p.read_text()) for p in self.library()) or "(empty)"
         user = f"""A program failed on some debug scenes; a later version of it fixed them. Write a skill-library entry \
 that would let another programmer, who sees only the failing program, its traces and your entry, make the same repair.
 
@@ -215,7 +249,7 @@ that would let another programmer, who sees only the failing program, its traces
 </before>
 
 <before_traces>
-{tr(parent.id)}
+{tr(f["before_dir"])}
 </before_traces>
 
 <after>
@@ -223,7 +257,7 @@ that would let another programmer, who sees only the failing program, its traces
 </after>
 
 <after_traces>
-{tr(child.id)}
+{tr(f["after_dir"])}
 </after_traces>
 
 <diff>
@@ -247,38 +281,42 @@ entry in this format, under 350 words, with no seed numbers or scene-specific po
                   f"\n\n<api>\n{agents.API_MD}\n</api>")
         entry = agents.call_text(agents.MODEL, "skill_writer", system, user).strip()
         if entry.upper().startswith("NONE") or not entry.startswith("#"):
-            self.event("skill_none", child=child.id, parent=parent.id, fixed=fixed)
+            self.event("skill_none", before=f["before"], after=f["after"], fixed=fixed)
             return
         title = entry.splitlines()[0].lstrip("# ").strip()
-        self.event("skill_candidate", child=child.id, parent=parent.id, fixed=fixed, title=title)
+        self.event("skill_candidate", before=f["before"], after=f["after"], fixed=fixed, title=title)
 
-        vid = f"r{rnd}v{child.id}"
+        before_results = _results(f["before_dir"])
+        vid = f"r{rnd}v{i}"
         user_v = [{"type": "text", "text": f"""<skill>
 {entry}
 </skill>
 
-<program id="{parent.id}">
+<program id="{f["before"]}">
 {before}
 </program>
 
-Its result on the debug scenes (run id "{parent.id}"; view_keyframes works on it):
-{self.eval_text(parent.id)}
+Its result on the debug scenes (run id "{f["before"]}"; view_keyframes works on it):
+{agents.render_eval(engine.totals(list(before_results.values())))}
 
 Repair this program by applying the skill above where its failure signature shows up in the traces. Run it on the \
 debug scenes, then submit."""}]
-        session = agents.Session(vid, "verifier", user_v, self.dir / "sessions" / vid, agents.Runs(self.dir, {parent.id: self.dir / "cands" / parent.id}),
-                                 self.task, self.verifier_tool_calls)
+        session = agents.Session(vid, "verifier", user_v, self.dir / "sessions" / vid,
+                                 agents.Runs(self.dir, {f["before"]: f["before_dir"]}), self.task, self.verifier_tool_calls)
         out = session.run()
         if not out["code"]:
             self.event("skill_rejected", title=title, reason="verifier produced no program")
             return
-        v = self.admit(vid, rnd, parent.id, "verifier", out["code"], out["notes"], out["usd"], skill=title)
+        v = self.admit(vid, rnd, f["before"], "verifier", out["code"], out["notes"], out["usd"], skill=title)
+        vres = _results(self.dir / "cands" / vid)
         reproduced = [s for s, kind in fixed.items() if v.per_seed[s][kind]]
         need = max(1, math.ceil(len(fixed) / 2))
-        ok = len(reproduced) >= need and v.fitness >= parent.fitness
-        record = {"title": title, "child": child.id, "parent": parent.id, "fixed": fixed, "verifier": vid,
-                  "reproduced": reproduced, "verifier_placed": v.placed, "parent_placed": parent.placed,
-                  "verifier_fitness": v.fitness, "parent_fitness": parent.fitness}
+        v_fit = engine.fitness([vres[s] for s in before_results])
+        b_fit = engine.fitness(list(before_results.values()))
+        ok = len(reproduced) >= need and v_fit >= b_fit
+        record = {"title": title, "before": f["before"], "after": f["after"], "fixed": fixed, "verifier": vid,
+                  "reproduced": reproduced, "verifier_placed": v.placed, "before_seeds": sorted(before_results),
+                  "verifier_fitness_on_before_seeds": v_fit, "before_fitness": b_fit}
         if not ok:
             (self.dir / "rejected_skills").mkdir(exist_ok=True)
             (self.dir / "rejected_skills" / f"{vid}.md").write_text(_front(record) + entry + "\n")
@@ -289,6 +327,10 @@ debug scenes, then submit."""}]
         path = SKILLS / f"{n:02d}-{slug}.md"
         path.write_text(_front({"id": f"S{n:02d}", "task": self.task, "run": self.name, "round": rnd, **record}) + entry + "\n")
         self.event("skill_admitted", path=str(path.relative_to(ROOT)), **record)
+
+
+def _results(d: Path) -> dict[int, dict]:
+    return {int(p.parent.name.split("_")[1]): json.loads(p.read_text()) for p in sorted(d.glob("seed_*/trace.json"))}
 
 
 def _front(d: dict) -> str:

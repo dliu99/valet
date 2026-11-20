@@ -123,7 +123,8 @@ def run_episode(spec: EpisodeSpec) -> dict:
     grade = score(sim.truth())
     result = {"seed": spec.seed, "task": spec.task, "score": grade, "error": error, "calls": rec.calls, "log": rec.log,
               "sim_s": round(float(sim.data.time), 1), "wall_s": round(time.time() - t0, 1),
-              "localize_calls": sum(1 for c in rec.calls if c["prim"] == "localize")}
+              "localize_calls": sum(1 for c in rec.calls if c["prim"] == "localize"),
+              "localize_paid": sum(1 for c in rec.calls if c["prim"] == "localize" and not c.get("cached"))}
     if out is not None:
         out.mkdir(parents=True, exist_ok=True)
         rec.save(sim.frame("side"), "final_side.jpg")
@@ -173,7 +174,8 @@ def totals(results: list[dict]) -> dict:
     lifted = sum(r["score"]["lifted"] for r in results)
     return {"placed": placed, "lifted": lifted, "n": len(results), "fitness": fitness(results), "results": results,
             "median_sim_s": sorted(r["sim_s"] for r in results)[len(results) // 2] if results else 0.0,
-            "localize_calls": sum(r["localize_calls"] for r in results)}
+            "localize_calls": sum(r["localize_calls"] for r in results),
+            "localize_paid": sum(r.get("localize_paid", 0) for r in results)}
 
 
 def fitness(results: list[dict]) -> float:

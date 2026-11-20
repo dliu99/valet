@@ -58,14 +58,14 @@ def main(argv: list[str] | None = None) -> int:
                  "localize_calls": r["localize_calls"], "sim_s": r["sim_s"]} for r in ev["results"]]
         report = {"program": str(a.program), "task": a.task, "seeds": list(seeds), "placed": ev["placed"],
                   "lifted": ev["lifted"], "n": ev["n"], "median_sim_s": ev["median_sim_s"],
-                  "localize_calls": ev["localize_calls"], "usd": round(usd, 4), "wall_s": round(time.time() - t0),
+                  "localize_calls": ev["localize_calls"], "localize_paid": ev["localize_paid"], "usd": round(usd, 4), "wall_s": round(time.time() - t0),
                   "rows": rows}
         (a.out / "eval.json").write_text(json.dumps(report, indent=1))
         for r in rows:
             print(f"seed {r['seed']:3}: {'placed' if r['placed'] else 'lifted' if r['lifted'] else 'failed':7} "
                   f"off {r['off_target_m']:.3f} tilt {r['tilt_deg']:5.1f} released {r['released']} {r['error'] or ''}")
         print(f"placed {ev['placed']}/{ev['n']}, lifted {ev['lifted']}/{ev['n']}, median {ev['median_sim_s']} s sim, "
-              f"{ev['localize_calls']} localize calls, ${usd:.3f}")
+              f"{ev['localize_calls']} localize calls ({ev['localize_paid']} not cached), ${usd:.3f} ledger delta")
         return 0
     if a.cmd == "spend":
         s = ledger.summary()

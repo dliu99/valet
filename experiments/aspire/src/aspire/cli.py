@@ -28,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     v.add_argument("--task", default="benchmark", choices=sorted(tasks.EPISODES))
     v.add_argument("--seeds", default="heldout", help="heldout, debug, or a comma list")
     v.add_argument("--out", type=Path, required=True)
+    v.add_argument("--backend", default="claude", choices=["claude", "jev", "h2o"], help="what answers localize")
 
     sub.add_parser("spend", help="API spend so far, by role")
 
@@ -52,11 +53,11 @@ def main(argv: list[str] | None = None) -> int:
                  else [int(s) for s in a.seeds.split(",")])
         before = ledger.spent()
         t0 = time.time()
-        ev = engine.evaluate(a.program.read_text(), seeds, a.task, a.out)
+        ev = engine.evaluate(a.program.read_text(), seeds, a.task, a.out, backend=a.backend)
         usd = ledger.spent() - before
         rows = [{"seed": r["seed"], **r["score"], "error": r["error"], "calls": len(r["calls"]),
                  "localize_calls": r["localize_calls"], "sim_s": r["sim_s"]} for r in ev["results"]]
-        report = {"program": str(a.program), "task": a.task, "seeds": list(seeds), "placed": ev["placed"],
+        report = {"program": str(a.program), "task": a.task, "backend": a.backend, "seeds": list(seeds), "placed": ev["placed"],
                   "lifted": ev["lifted"], "n": ev["n"], "median_sim_s": ev["median_sim_s"],
                   "localize_calls": ev["localize_calls"], "localize_paid": ev["localize_paid"], "usd": round(usd, 4), "wall_s": round(time.time() - t0),
                   "rows": rows}

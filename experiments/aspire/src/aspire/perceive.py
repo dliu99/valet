@@ -20,6 +20,7 @@ from . import ledger
 
 CACHE_DIR = Path(__file__).resolve().parents[2] / "state" / "localize_cache"
 CLAUDE_MODEL = os.environ.get("ASPIRE_LOCALIZE_MODEL", "claude-opus-5-5")
+H2O_URL = os.environ.get("ASPIRE_H2O_URL", "http://127.0.0.1:8741")
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,8 @@ def locate(image: Image.Image, text: str, key: str, backend: str = "jev") -> Fou
         return Found(d["found"], tuple(d["bbox"]) if d["bbox"] else None, d["confidence"], backend, cached=True)
     if backend == "jev":
         out = _jev(image, text)
+    elif backend == "h2o":
+        out = _h2o(image, text)
     elif backend == "claude":
         out = _claude(image, text)
     else:
@@ -58,9 +61,11 @@ def locate(image: Image.Image, text: str, key: str, backend: str = "jev") -> Fou
 
 
 def _jev(image: Image.Image, text: str) -> Found:
+    """A System One Box question to TypeSafe's hosted Jev."""
     from typesafe_sdk import Box, Image as TsImage, TypeSafeClient
 
-    ledger.check(ledger.JEV_USD_PER_CALL)
+    name, usd = "jev", ledger.JEV_USD_PER_CALL
+    ledger.check(usd)
     client = TypeSafeClient()
     try:
         r = client.system_one(
@@ -71,15 +76,38 @@ def _jev(image: Image.Image, text: str) -> Found:
         )
     finally:
         client.close()
-    ledger.record("localize:jev", "jev", ledger.JEV_USD_PER_CALL)
+    ledger.record(f"localize:{name}", name, usd)
     a = r.answers["where"]
     b = a.box
     w, h = image.size
     conf = None if a.confidence is None else float(a.confidence)
     if b is None:
-        return Found(False, None, conf, "jev")
+        return Found(False, None, conf, name)
     bbox = (b.left * w, b.top * h, b.right * w, b.bottom * h)
-    return Found(bool(conf is None or conf >= 0.3) and bbox[2] > bbox[0] and bbox[3] > bbox[1], bbox, conf, "jev")
+    return Found(bool(conf is None or conf >= 0.3) and bbox[2] > bbox[0] and bbox[3] > bbox[1], bbox, conf, name)
+
+
+def _h2o(image: Image.Image, text: str) -> Found:
+    """The same System One Box question to H2O-Lightning-4B served locally (no key, no cost): plain JSON, the frame as
+    a data URI in `state`."""
+    import urllib.request
+
+    body = {"state": {"frame": "data:image/jpeg;base64," + base64.b64encode(jpeg(image)).decode()},
+            "questions": {"where": {"type": "box", "instructions": f"Draw a box around {text} in `frame`."}}}
+    req = urllib.request.Request(H2O_URL.rstrip("/") + "/v1/systemone", json.dumps(body).encode(),
+                                 {"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=600) as r:
+        d = json.loads(r.read())
+    ledger.record("localize:h2o", "h2o-lightning-4b", 0.0)
+    a = d["answers"]["where"] if "answers" in d else d
+    b = a.get("box")
+    conf = a.get("confidence")
+    if not b:
+        return Found(False, None, conf, "h2o")
+    w, h = image.size
+    bbox = (b["left"] * w, b["top"] * h, b["right"] * w, b["bottom"] * h)
+    found = a.get("found", True) and bbox[2] > bbox[0] and bbox[3] > bbox[1]
+    return Found(bool(found), bbox, None if conf is None else float(conf), "h2o")
 
 
 CLAUDE_SCHEMA = {

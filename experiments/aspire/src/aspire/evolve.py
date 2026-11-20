@@ -8,6 +8,7 @@ import difflib
 import json
 import math
 import re
+import shutil
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -118,6 +119,18 @@ class Evolution:
 
     def run(self) -> Candidate:
         start = max((c.round for c in self.archive), default=-1) + 1
+        ended = {e["round"] for e in self.events if e["kind"] == "round_end"}
+        if start > 0 and start - 1 not in ended:  # a round cut off part way: run its missing actors
+            rnd = start - 1
+            have = {c.id for c in self.archive}
+            jobs = [j for j in self.plan(rnd, from_scratch=rnd == 0) if f"r{rnd}a{j['k']}" not in have]
+            self.event("round_resume", round=rnd, missing=[f"r{rnd}a{j['k']}" for j in jobs])
+            for j in jobs:
+                shutil.rmtree(self.dir / "sessions" / f"r{rnd}a{j['k']}", ignore_errors=True)
+            with ThreadPoolExecutor(max(1, len(jobs))) as pool:
+                list(pool.map(self.actor_job, jobs))
+            best = self.ranked()[0]
+            self.event("round_end", round=rnd, best=best.id, placed=best.placed, lifted=best.lifted, fitness=best.fitness)
         done = {e["round"] for e in self.events if e["kind"] == "skills_done"}
         for rnd in range(start):
             if self.write_skills and rnd not in done:
@@ -139,8 +152,8 @@ class Evolution:
             self.event("round_end", round=rnd, best=best.id, placed=best.placed, lifted=best.lifted, fitness=best.fitness)
         return self.ranked()[0]
 
-    def plan(self, rnd: int) -> list[dict]:
-        if not self.archive:
+    def plan(self, rnd: int, from_scratch: bool = False) -> list[dict]:
+        if from_scratch or not self.archive:
             return [{"round": rnd, "k": k, "parent": None, "other": None} for k in range(self.k)]
         top = self.ranked()[: self.n_parents]
         jobs = []

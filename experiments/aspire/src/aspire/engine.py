@@ -10,6 +10,7 @@ import ast
 import builtins
 import json
 import multiprocessing as mp
+import os
 import signal
 import time
 import traceback
@@ -25,7 +26,7 @@ BANNED_NAMES = {"eval", "exec", "compile", "open", "input", "globals", "locals",
                 "delattr", "__import__", "breakpoint", "memoryview", "help", "exit", "quit"}
 BANNED_SUBSTRINGS = ("truth", "valet_sim", "mujoco", "lifted_m", ".load(", ".save(", "tofile", "fromfile")
 SETTLE_AFTER_S = 1.0
-WALL_LIMIT_S = 300
+WALL_LIMIT_S = int(os.environ.get("ASPIRE_WALL_LIMIT_S", "300"))
 
 
 class ProgramRejected(ValueError):
@@ -91,7 +92,6 @@ def run_episode(spec: EpisodeSpec) -> dict:
     rec = Recorder(out, keyframes=spec.keyframes)
     ep = tasks.make(spec.task, spec.seed)
     sim = Sim(with_box(SimSpec(), ep.box, ep.target_xy))
-    sim.model.vis.map.znear = 0.004 / sim.model.stat.extent  # MuJoCo clips the box between the jaws at 3 cm
     error = None
     try:
         check_program(spec.code)
@@ -151,7 +151,7 @@ def _alarm(seconds: int) -> None:
 _POOL: ProcessPoolExecutor | None = None
 
 
-def pool(workers: int = 10) -> ProcessPoolExecutor:
+def pool(workers: int = int(os.environ.get("ASPIRE_WORKERS", "10"))) -> ProcessPoolExecutor:
     global _POOL
     if _POOL is None:
         _POOL = ProcessPoolExecutor(max_workers=workers, mp_context=mp.get_context("spawn"), initializer=ledger.load_env)

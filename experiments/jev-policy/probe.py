@@ -33,6 +33,7 @@ def cases(n_per_seed: int, seeds: range) -> list[dict]:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--n", type=int, default=4)
+    p.add_argument("--view", default="", help="'' for the wrist questions, '_side' for the side ones")
     a = p.parse_args()
     load_env()
     spend = Spend()
@@ -50,9 +51,13 @@ def main() -> None:
         ax = arm.axes()
         comp = {m: float(off @ ax[m]) for m in ("ahead", "back", "left", "right")}
         best = max(comp, key=comp.get)
-        ans = jev.ask({"goal": GOALS[c["obj"]], "arm": arm.reading()}, {"wrist": jpeg(arm.marked_frame())}, questions_for())
-        where = ans[f"where:{c['obj']}"]
-        move = step_vector(ans, c["obj"], ax)
+        ans = jev.ask({"goal": GOALS[c["obj"]], "arm": arm.reading()}, {"wrist": jpeg(arm.marked_frame()), "side": jpeg(arm.marked_frame("side"))}, questions_for(True))
+        if a.view:
+            ax = arm.side_axes()
+            comp = {m: float(off @ ax[m]) for m in ("ahead", "back", "left", "right")}
+            best = max(comp, key=comp.get)
+        where = ans[f"where{a.view}:{c['obj']}"]
+        move = step_vector(ans, c["obj"], ax, a.view)
         rows.append({"seed": c["seed"], "obj": c["obj"], "best": best, "got": where["choice"], "p_best": where["probabilities"][best],
                      "move:next": ans["move:next"]["choice"], "cm_before": round(float(np.linalg.norm(off)) * 100, 1),
                      "cm_after": round(float(np.linalg.norm(off - move)) * 100, 1)})

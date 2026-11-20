@@ -11,6 +11,7 @@ import json
 import os
 import statistics
 import time
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -71,21 +72,28 @@ DEG_LEVELS = [
 OBJECTS = {"box": "the white box", "square": "the blue square"}
 
 
-def questions_for() -> dict:
+SEE_SIDE = "`side` is a fixed camera beside the table; the red dot in `side` is on the table straight below the jaws."
+WHERE_SIDE = {k: v.replace("`wrist`", "`side`") for k, v in WHERE.items()}
+
+
+def questions_for(side: bool = False) -> dict:
     qs = {"move:next": {"type": "choice", "instructions": f"{SEE} Which move brings the arm closer to `goal`?", "criteria": MOVES}}
     for key, name in OBJECTS.items():
         qs[f"where:{key}"] = {"type": "choice", "instructions": f"{SEE} Where is {name} relative to the red dot?", "criteria": WHERE}
         qs[f"far:{key}"] = {"type": "score", "instructions": f"{SEE} How far across the table is {name} from the red dot?", "criteria": CM_LEVELS}
+        if side:
+            qs[f"where_side:{key}"] = {"type": "choice", "instructions": f"{SEE_SIDE} In `side`, where is {name} relative to the red dot?", "criteria": WHERE_SIDE}
+            qs[f"far_side:{key}"] = {"type": "score", "instructions": f"{SEE_SIDE} How far across the table is {name} from the red dot?", "criteria": CM_LEVELS}
     qs["far:height"] = {"type": "score", "instructions": "How far up or down should the jaws move to get where `goal` needs them next?", "criteria": CM_LEVELS}
     qs["far:turn"] = {"type": "score", "instructions": "In `wrist`, how far must the jaws turn to be square with what `goal` needs them to grip?", "criteria": DEG_LEVELS}
     return qs
 
 
-def step_vector(answers: dict, obj: str, axes: dict[str, np.ndarray]) -> np.ndarray:
+def step_vector(answers: dict, obj: str, axes: dict[str, np.ndarray], view: str = "") -> np.ndarray:
     """The expected displacement toward an object: Jev's direction probabilities times its distance, in metres."""
-    p = answers[f"where:{obj}"]["probabilities"]
+    p = answers[f"where{view}:{obj}"]["probabilities"]
     v = sum(p.get(d, 0.0) * axes[d] for d in ("ahead", "back", "left", "right"))
-    return v * expected(answers[f"far:{obj}"], CM) / 100
+    return v * expected(answers[f"far{view}:{obj}"], CM) / 100
 
 
 OPEN_DEG = 70.0
@@ -204,6 +212,7 @@ class Arm:
         self.ik = IK(sim.model)
         self.cam = mujoco.mj_name2id(sim.model, mujoco.mjtObj.mjOBJ_CAMERA, WRIST_CAMERA)
         self.closed = False
+        self.side_cam = mujoco.mj_name2id(sim.model, mujoco.mjtObj.mjOBJ_CAMERA, "side_cam")
 
     def gripper_goal(self) -> float:
         return self.sim.state()["goals"]["gripper"]
@@ -267,27 +276,37 @@ class Arm:
             self.sim.step(0.3)
         return "closed" if close else "opened"
 
-    def pixel(self, world) -> tuple[float, float] | None:
-        """Where a world point lands in the upright wrist frame: pinhole camera, then the frame's barrel distortion."""
+    def pixel(self, world, cam: str = "wrist", clip: bool = True) -> tuple[float, float] | None:
+        """Where a world point lands in a frame: pinhole camera, then (wrist) the frame's barrel distortion."""
+        cid = self.cam if cam == "wrist" else self.side_cam
         self.ik.pose(self.sim.joints())
         mujoco.mj_camlight(self.ik.model, self.ik.data)
-        rot = self.ik.data.cam_xmat[self.cam].reshape(3, 3)
-        pc = rot.T @ (np.asarray(world, float) - self.ik.data.cam_xpos[self.cam])
+        rot = self.ik.data.cam_xmat[cid].reshape(3, 3)
+        pc = rot.T @ (np.asarray(world, float) - self.ik.data.cam_xpos[cid])
         if pc[2] > -1e-3:
             return None
         w, h = self.sim.spec.image_size
-        f = (h / 2) / np.tan(np.radians(self.sim.model.cam_fovy[self.cam]) / 2)
+        f = (h / 2) / np.tan(np.radians(self.sim.model.cam_fovy[cid]) / 2)
         s = np.array([f * pc[0] / -pc[2], -f * pc[1] / -pc[2]]) / (w / 2)
         n = s.copy()
-        for _ in range(20):
+        for _ in range(20 if cam == "wrist" else 0):
             n = s / (1 + self.sim.spec.optics.barrel_k1 * float(n @ n))
         x, y = w / 2 + n[0] * w / 2, h / 2 + n[1] * w / 2
-        return (x, y) if 0 <= x < w and 0 <= y < h else None
+        return (x, y) if not clip or (0 <= x < w and 0 <= y < h) else None
 
-    def marked_frame(self):
-        """The wrist frame with a red dot on the table straight below the jaws."""
-        image = self.sim.frame("wrist")
-        xy = self.pixel([*self.sim.state()["grasp_point"][:2], 0.0])
+    def side_axes(self) -> dict[str, np.ndarray]:
+        """Table directions that move the red dot up, down, left and right in the side frame."""
+        p = np.array([*self.sim.state()["grasp_point"][:2], 0.0])
+        at = lambda d: np.array(self.pixel(p + d, "side", clip=False))
+        jac = np.column_stack([(at([0.01, 0, 0]) - at([0, 0, 0])) / 0.01, (at([0, 0.01, 0]) - at([0, 0, 0])) / 0.01])
+        inv = np.linalg.inv(jac)
+        unit = lambda px: (lambda v: np.array([*v / np.linalg.norm(v), 0.0]))(inv @ px)
+        return {"right": unit([1, 0]), "left": unit([-1, 0]), "ahead": unit([0, -1]), "back": unit([0, 1])}
+
+    def marked_frame(self, cam: str = "wrist"):
+        """The frame with a red dot on the table straight below the jaws."""
+        image = self.sim.frame(cam)
+        xy = self.pixel([*self.sim.state()["grasp_point"][:2], 0.0], cam)
         if xy:
             from PIL import ImageDraw
 
@@ -298,7 +317,7 @@ class Arm:
     def reading(self) -> dict:
         st = self.sim.state()
         g, goal = st["joints"]["gripper"], st["goals"]["gripper"]
-        jaws = "closed on something" if self.closed and g - goal > 2 else "closed on nothing" if self.closed else "open"
+        jaws = "closed on something" if self.closed and g > 5 else "closed on nothing" if self.closed else "open"
         return {"joints_deg": {j: round(v, 1) for j, v in st["joints"].items()},
                 "jaws_height_cm": round(st["grasp_point"][2] * 100, 1), "jaws": jaws}
 
@@ -309,10 +328,13 @@ def expected(answer: dict, values: tuple[float, ...]) -> float:
 
 @dataclass
 class Config:
-    max_ticks: int = 60
+    max_ticks: int = 100
     max_goals: int = 6
     stall_ticks: int = 6
     side: bool = False
+    verify_done: bool = False
+    claude: bool = True
+    memory: bool = False
 
 
 def run_episode(seed: int, cfg: Config, out: Path) -> dict:
@@ -322,19 +344,20 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
     arm = Arm(sim)
     spend = Spend()
     jev = Jev(spend)
-    writer = GoalWriter(spend)
-    questions = questions_for()
+    writer = GoalWriter(spend) if cfg.claude else None
+    memory = Memory() if cfg.memory else None
+    questions = questions_for(cfg.side)
     out.mkdir(parents=True, exist_ok=True)
     log = (out / "ticks.jsonl").open("w")
     t_wall = time.monotonic()
 
     def frames() -> dict[str, bytes]:
         f = {"wrist": jpeg(arm.marked_frame())}
-        f["side"] = jpeg(sim.frame("side"))
+        f["side"] = jpeg(arm.marked_frame("side") if cfg.side else sim.frame("side"))
         return f
 
     f = frames()
-    goal = writer.write(f"Arm: {json.dumps(arm.reading())}. Write the first goal.", f)
+    goal = writer.write(f"Arm: {json.dumps(arm.reading())}. Write the first goal.", f) if writer else TASK
     goals = [goal]
     history: list[dict] = []
     end = "max ticks"
@@ -343,13 +366,23 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         (out / f"t{tick:03d}.jpg").write_bytes(f["wrist"])
         reading = arm.reading()
         last = history[-1] if history else None
+        dot = np.array([*sim.state()["grasp_point"][:2], 0.0])
         state = {"goal": goal, "arm": reading, "last_move": last and {k: last[k] for k in ("move", "amount", "result")}}
+        if memory and memory.at:
+            state["last_seen_cm_from_red_dot"] = memory.cm_from(dot)
         images = {"wrist": f["wrist"]} | ({"side": f["side"]} if cfg.side else {})
         answers = jev.ask(state, images, questions)
         move = answers["move:next"]["choice"]
         amount, result = None, None
+        if memory:
+            memory.see(answers, dot, arm.axes())
         if move in ("to_box", "to_square"):
-            delta = step_vector(answers, move[3:], arm.axes())
+            obj = move[3:]
+            view = "_side" if cfg.side and answers[f"where_side:{obj}"]["confidence"] > answers[f"where:{obj}"]["confidence"] else ""
+            delta = step_vector(answers, obj, arm.side_axes() if view else arm.axes(), view)
+            if memory and obj in memory.at and answers[f"where:{obj}"]["confidence"] < CONFIDENT and not view:
+                delta = memory.at[obj] - dot
+                delta *= min(1.0, 0.08 / max(float(np.linalg.norm(delta)), 1e-6))
             amount = round(float(np.linalg.norm(delta)) * 100, 1)
             result = arm.shift(delta)
         elif move in ("lower", "raise"):
@@ -372,6 +405,11 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
             why = "done"
         elif stalled(history, cfg.stall_ticks):
             why = "stall"
+        if why and not writer:
+            if why == "done":
+                end = "done"
+                break
+            why = None
         if why:
             if len(goals) >= cfg.max_goals:
                 end = "max goals"
@@ -380,7 +418,9 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
             moves = ", ".join(f"{h['move']} {h['amount'] or ''}".strip() + ("" if h["result"] in (None, "moved", "opened", "closed") else f" ({h['result']})") for h in history[-cfg.stall_ticks:])
             if why == "done":
                 ask = (f"The vision model says this goal is met: \"{goal}\". Arm: {json.dumps(arm.reading())}. "
-                       "If the box is resting on the blue square and the jaws are off it, reply DONE. Otherwise write the next goal.")
+                       + ("Check the cameras. If the box rests on the blue square and the jaws are off it, reply DONE. "
+                          "If this goal is not met yet, write it again, sharper. Otherwise write the next goal." if cfg.verify_done else
+                          "If the box is resting on the blue square and the jaws are off it, reply DONE. Otherwise write the next goal."))
             else:
                 ask = (f"The vision model is stuck on the goal \"{goal}\". Its last moves: {moves}. Arm: {json.dumps(arm.reading())}. "
                        "Write a goal that gets it moving again.")
@@ -407,6 +447,28 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
     return result
 
 
+CONFIDENT = 0.5
+
+
+class Memory:
+    """Where the wrist camera last placed the box and the square on the table, from Jev's confident answers. It lets
+    the arm carry the box toward a square that the box in its jaws now hides."""
+
+    def __init__(self):
+        self.at: dict[str, np.ndarray] = {}
+
+    def see(self, answers: dict, dot: np.ndarray, axes: dict[str, np.ndarray]) -> None:
+        for obj in OBJECTS:
+            a = answers[f"where:{obj}"]
+            if a["confidence"] < CONFIDENT:
+                continue
+            seen = dot + (0 if a["choice"] == "here" else axes[a["choice"]] * expected(answers[f"far:{obj}"], CM) / 100)
+            self.at[obj] = seen if obj not in self.at else (self.at[obj] + seen) / 2
+
+    def cm_from(self, dot: np.ndarray) -> dict:
+        return {OBJECTS[k]: round(float(np.linalg.norm((v - dot)[:2])) * 100, 1) for k, v in self.at.items()}
+
+
 def stalled(history: list[dict], n: int) -> bool:
     """No progress: the jaws are back within 1.5 cm of where they were n ticks ago and the gripper did nothing."""
     recent = history[-n:]
@@ -427,16 +489,23 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     p.add_argument("--max-ticks", type=int, default=Config.max_ticks)
-    p.add_argument("--side", action="store_true", help="also send Jev the side camera")
+    p.add_argument("--side", action="store_true", help="also send Jev the side camera, with the same red dot")
+    p.add_argument("--verify-done", action="store_true", help="Claude checks a done claim before moving on")
+    p.add_argument("--no-claude", action="store_true", help="Jev alone: the goal is the task sentence, and Jev's done ends the episode")
+    p.add_argument("--memory", action="store_true", help="remember where the wrist camera last saw the box and the square")
+    p.add_argument("--jobs", type=int, default=5)
     p.add_argument("--tag", default="run")
     a = p.parse_args(argv)
     load_env()
-    cfg = Config(max_ticks=a.max_ticks, side=a.side)
+    cfg = Config(max_ticks=a.max_ticks, side=a.side, verify_done=a.verify_done, claude=not a.no_claude, memory=a.memory)
     run_dir = HERE / "runs" / f"{time.strftime('%Y%m%d-%H%M%S')}-{a.tag}"
     results = []
-    for seed in a.seeds:
-        r = run_episode(seed, cfg, run_dir / f"seed{seed:02d}")
+    with ProcessPoolExecutor(a.jobs) as pool:
+        futures = [pool.submit(run_episode, seed, cfg, run_dir / f"seed{seed:02d}") for seed in a.seeds]
+    for fut in futures:
+        r = fut.result()
         results.append(r)
+        seed = r["seed"]
         print(f"seed {seed}: placed={r['placed']} lifted={r['lifted']} touched={r['touched']} closest={r['closest_cm']}cm off={r['off_target_m']} end={r['end']} ticks={r['ticks']} "
               f"episode={r['episode_s']}s usd={r['usd']['total']}", flush=True)
     n = len(results)

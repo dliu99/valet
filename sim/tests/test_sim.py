@@ -125,3 +125,10 @@ def unused_port():
     port = s.getsockname()[1]
     s.close()
     return port
+
+
+def test_a_held_box_blocks_the_wrist_view_as_a_real_one_does():
+    from valet_sim.scene import NEAR_CLIP_M
+
+    sim = Sim()
+    assert sim.model.vis.map.znear * sim.model.stat.extent == pytest.approx(NEAR_CLIP_M)

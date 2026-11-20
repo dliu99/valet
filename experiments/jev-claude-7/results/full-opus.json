@@ -1,0 +1,777 @@
+{
+ "summary": {
+  "name": "full-opus",
+  "seeds": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ],
+  "model": "claude-opus-5-5",
+  "fast": "jev",
+  "effort": "medium",
+  "lessons": "runs/full-opus/lessons.md",
+  "episodes": 20,
+  "placed": 16,
+  "lifted": 18,
+  "self_placed": 16,
+  "self_agrees": 20,
+  "median_seconds": 34.65,
+  "claude_calls_per_ep": 2.3,
+  "claude_usd_per_ep": 0.1245,
+  "jev_calls_per_ep": 18.3,
+  "jev_usd_per_ep": 0.00077,
+  "replans_per_ep": 0.4,
+  "errors": [
+   16
+  ],
+  "wall_seconds": 852
+ },
+ "results": [
+  {
+   "seed": 0,
+   "placed": false,
+   "lifted": true,
+   "off_target_m": 0.0595,
+   "tilt_deg": 90.0,
+   "released": true,
+   "replans": 2,
+   "seconds": 67.3,
+   "sim_seconds": 34.2,
+   "claude": {
+    "calls": 4,
+    "usd": 0.2238,
+    "in": 23585,
+    "out": 5630,
+    "cache_read": 3710,
+    "s": 61.2
+   },
+   "jev": {
+    "calls": 16,
+    "usd": 0.00067,
+    "tokens": 15908
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.53,
+    "jev_upright": 0.1,
+    "offset_cm": 6.2,
+    "height_cm": 5.0,
+    "first_height_cm": 6.6,
+    "tipped": false,
+    "placed_self": false,
+    "frame": "05-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 1,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0035,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 2,
+   "seconds": 81.7,
+   "sim_seconds": 52.7,
+   "claude": {
+    "calls": 4,
+    "usd": 0.2664,
+    "in": 29012,
+    "out": 7446,
+    "cache_read": 6942,
+    "s": 74.1
+   },
+   "jev": {
+    "calls": 18,
+    "usd": 0.00076,
+    "tokens": 18176
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.43,
+    "jev_upright": 0.19,
+    "offset_cm": 0.6,
+    "height_cm": 6.8,
+    "first_height_cm": 5.6,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 2,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.011,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 2,
+   "seconds": 80.1,
+   "sim_seconds": 49.3,
+   "claude": {
+    "calls": 4,
+    "usd": 0.2629,
+    "in": 30446,
+    "out": 6988,
+    "cache_read": 6942,
+    "s": 70.6
+   },
+   "jev": {
+    "calls": 22,
+    "usd": 0.00093,
+    "tokens": 22129
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.4,
+    "jev_upright": 0.14,
+    "offset_cm": 0.3,
+    "height_cm": 7.0,
+    "first_height_cm": 7.6,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "03-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 3,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0186,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 43.0,
+   "sim_seconds": 22.4,
+   "claude": {
+    "calls": 2,
+    "usd": 0.097,
+    "in": 7276,
+    "out": 3363,
+    "cache_read": 3232,
+    "s": 36.0
+   },
+   "jev": {
+    "calls": 15,
+    "usd": 0.00064,
+    "tokens": 15150
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.47,
+    "jev_upright": 0.2,
+    "offset_cm": 1.4,
+    "height_cm": 6.0,
+    "first_height_cm": 6.3,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 4,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0054,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 39.9,
+   "sim_seconds": 37.3,
+   "claude": {
+    "calls": 2,
+    "usd": 0.101,
+    "in": 8721,
+    "out": 3274,
+    "cache_read": 3232,
+    "s": 33.3
+   },
+   "jev": {
+    "calls": 18,
+    "usd": 0.00076,
+    "tokens": 18178
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.57,
+    "jev_upright": 0.29,
+    "offset_cm": 0.5,
+    "height_cm": 8.9,
+    "first_height_cm": 7.5,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 5,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0108,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 37.0,
+   "sim_seconds": 31.0,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0956,
+    "in": 8848,
+    "out": 2977,
+    "cache_read": 3232,
+    "s": 30.1
+   },
+   "jev": {
+    "calls": 18,
+    "usd": 0.00076,
+    "tokens": 18184
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.51,
+    "jev_upright": 0.14,
+    "offset_cm": 1.1,
+    "height_cm": 7.7,
+    "first_height_cm": 4.6,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 6,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.1592,
+   "tilt_deg": 90.0,
+   "released": true,
+   "replans": 2,
+   "seconds": 99.8,
+   "sim_seconds": 58.1,
+   "claude": {
+    "calls": 4,
+    "usd": 0.3154,
+    "in": 34687,
+    "out": 8764,
+    "cache_read": 6942,
+    "s": 87.7
+   },
+   "jev": {
+    "calls": 30,
+    "usd": 0.00126,
+    "tokens": 30091
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.03,
+    "jev_upright": 0.53,
+    "offset_cm": 15.4,
+    "height_cm": 4.6,
+    "first_height_cm": 7.8,
+    "tipped": true,
+    "placed_self": false,
+    "frame": "04-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 7,
+   "placed": false,
+   "lifted": true,
+   "off_target_m": 0.0458,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 38.8,
+   "sim_seconds": 42.9,
+   "claude": {
+    "calls": 2,
+    "usd": 0.102,
+    "in": 9863,
+    "out": 3093,
+    "cache_read": 3232,
+    "s": 31.1
+   },
+   "jev": {
+    "calls": 19,
+    "usd": 0.00081,
+    "tokens": 19183
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.23,
+    "jev_upright": 0.26,
+    "offset_cm": 3.4,
+    "height_cm": 7.7,
+    "first_height_cm": 7.2,
+    "tipped": false,
+    "placed_self": false,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 8,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0101,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 44.5,
+   "sim_seconds": 38.7,
+   "claude": {
+    "calls": 2,
+    "usd": 0.1174,
+    "in": 11031,
+    "out": 3630,
+    "cache_read": 3232,
+    "s": 36.9
+   },
+   "jev": {
+    "calls": 19,
+    "usd": 0.00081,
+    "tokens": 19173
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.56,
+    "jev_upright": 0.19,
+    "offset_cm": 0.9,
+    "height_cm": 7.0,
+    "first_height_cm": 7.6,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 9,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0088,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 37.0,
+   "sim_seconds": 42.3,
+   "claude": {
+    "calls": 2,
+    "usd": 0.102,
+    "in": 10664,
+    "out": 2934,
+    "cache_read": 3232,
+    "s": 29.9
+   },
+   "jev": {
+    "calls": 18,
+    "usd": 0.00076,
+    "tokens": 18099
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.51,
+    "jev_upright": 0.12,
+    "offset_cm": 0.9,
+    "height_cm": 8.1,
+    "first_height_cm": 7.1,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "03-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 10,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0075,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 32.1,
+   "sim_seconds": 34.6,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0915,
+    "in": 9706,
+    "out": 2602,
+    "cache_read": 3232,
+    "s": 25.4
+   },
+   "jev": {
+    "calls": 17,
+    "usd": 0.00072,
+    "tokens": 17164
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.78,
+    "jev_upright": 0.43,
+    "offset_cm": 1.3,
+    "height_cm": 8.1,
+    "first_height_cm": 4.3,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 11,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.006,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 31.2,
+   "sim_seconds": 35.3,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0951,
+    "in": 10457,
+    "out": 2633,
+    "cache_read": 3232,
+    "s": 24.4
+   },
+   "jev": {
+    "calls": 20,
+    "usd": 0.00085,
+    "tokens": 20198
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.43,
+    "jev_upright": 0.2,
+    "offset_cm": 0.5,
+    "height_cm": 4.6,
+    "first_height_cm": 6.1,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 12,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0062,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 31.0,
+   "sim_seconds": 33.5,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0923,
+    "in": 10372,
+    "out": 2507,
+    "cache_read": 3232,
+    "s": 24.2
+   },
+   "jev": {
+    "calls": 16,
+    "usd": 0.00068,
+    "tokens": 16167
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.45,
+    "jev_upright": 0.29,
+    "offset_cm": 0.6,
+    "height_cm": 6.8,
+    "first_height_cm": 5.8,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 13,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0084,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 27.9,
+   "sim_seconds": 36.3,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0863,
+    "in": 10130,
+    "out": 2255,
+    "cache_read": 3232,
+    "s": 21.7
+   },
+   "jev": {
+    "calls": 18,
+    "usd": 0.00076,
+    "tokens": 18184
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.5,
+    "jev_upright": 0.12,
+    "offset_cm": 0.6,
+    "height_cm": 5.6,
+    "first_height_cm": 5.5,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 14,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.01,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 30.3,
+   "sim_seconds": 39.2,
+   "claude": {
+    "calls": 2,
+    "usd": 0.087,
+    "in": 10167,
+    "out": 2286,
+    "cache_read": 3232,
+    "s": 23.3
+   },
+   "jev": {
+    "calls": 19,
+    "usd": 0.00081,
+    "tokens": 19175
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.58,
+    "jev_upright": 0.22,
+    "offset_cm": 0.8,
+    "height_cm": 7.1,
+    "first_height_cm": 7.5,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 15,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0023,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 32.3,
+   "sim_seconds": 36.1,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0942,
+    "in": 10551,
+    "out": 2569,
+    "cache_read": 3232,
+    "s": 25.2
+   },
+   "jev": {
+    "calls": 17,
+    "usd": 0.00072,
+    "tokens": 17171
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.48,
+    "jev_upright": 0.48,
+    "offset_cm": 0.8,
+    "height_cm": 8.7,
+    "first_height_cm": 6.9,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 16,
+   "placed": false,
+   "lifted": false,
+   "off_target_m": 0.2212,
+   "tilt_deg": 0.0,
+   "released": true,
+   "seconds": 2.5,
+   "sim_seconds": 5.1,
+   "claude": {
+    "calls": 0,
+    "usd": 0.0,
+    "in": 0,
+    "out": 0,
+    "cache_read": 0,
+    "s": 0.0
+   },
+   "jev": {
+    "calls": 6,
+    "usd": 0.00026,
+    "tokens": 6088
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev",
+   "error": "KeyError: 'square'"
+  },
+  {
+   "seed": 17,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0091,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 29.0,
+   "sim_seconds": 30.1,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0838,
+    "in": 9626,
+    "out": 2234,
+    "cache_read": 3232,
+    "s": 21.6
+   },
+   "jev": {
+    "calls": 18,
+    "usd": 0.00076,
+    "tokens": 18184
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.52,
+    "jev_upright": 0.2,
+    "offset_cm": 0.8,
+    "height_cm": 7.2,
+    "first_height_cm": 6.7,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 18,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0024,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 31.2,
+   "sim_seconds": 39.0,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0853,
+    "in": 10113,
+    "out": 2208,
+    "cache_read": 3232,
+    "s": 20.9
+   },
+   "jev": {
+    "calls": 22,
+    "usd": 0.00093,
+    "tokens": 22199
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.46,
+    "jev_upright": 0.35,
+    "offset_cm": 0.4,
+    "height_cm": 8.4,
+    "first_height_cm": 7.6,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  },
+  {
+   "seed": 19,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.005,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 32.1,
+   "sim_seconds": 39.9,
+   "claude": {
+    "calls": 2,
+    "usd": 0.0915,
+    "in": 10363,
+    "out": 2469,
+    "cache_read": 3232,
+    "s": 24.0
+   },
+   "jev": {
+    "calls": 20,
+    "usd": 0.00084,
+    "tokens": 20112
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.35,
+    "jev_upright": 0.06,
+    "offset_cm": 0.4,
+    "height_cm": 5.0,
+    "first_height_cm": 5.9,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "03-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "jev"
+  }
+ ]
+}

@@ -1,0 +1,154 @@
+"""Finding a described thing in one frame: a bounding box in pixels, from Jev (TypeSafe Box question) or Claude.
+
+Answers are cached on disk by (backend, description, hash of the frame), so re-running a program on the same
+scene from the same pose costs nothing; a frame that differs by one pixel is a new question."""
+
+from __future__ import annotations
+
+import base64
+import hashlib
+import io
+import json
+import os
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
+from . import ledger
+
+CACHE_DIR = Path(__file__).resolve().parents[2] / "state" / "localize_cache"
+CLAUDE_MODEL = os.environ.get("ASPIRE_LOCALIZE_MODEL", "claude-opus-5-5")
+H2O_URL = os.environ.get("ASPIRE_H2O_URL", "http://127.0.0.1:8741")
+
+
+@dataclass(frozen=True)
+class Found:
+    found: bool
+    bbox: tuple[float, float, float, float] | None  # left, top, right, bottom in pixels
+    confidence: float | None
+    backend: str
+    cached: bool = False
+
+
+def frame_key(raw: np.ndarray) -> str:
+    return hashlib.sha256(raw.tobytes()).hexdigest()[:24]
+
+
+def jpeg(image: Image.Image, quality: int = 90) -> bytes:
+    buf = io.BytesIO()
+    image.save(buf, "JPEG", quality=quality)
+    return buf.getvalue()
+
+
+def locate(image: Image.Image, text: str, key: str, backend: str = "jev") -> Found:
+    path = CACHE_DIR / backend / hashlib.sha256(f"{text}\n{key}".encode()).hexdigest()[:32]
+    if path.exists():
+        d = json.loads(path.read_text())
+        bbox = tuple(d["bbox"]) if d["bbox"] else None
+        found = d["found"] if backend == "claude" else _has_area(bbox)
+        return Found(found, bbox, d["confidence"], backend, cached=True)
+    if backend == "jev":
+        out = _jev(image, text)
+    elif backend == "h2o":
+        out = _h2o(image, text)
+    elif backend == "claude":
+        out = _claude(image, text)
+    else:
+        raise ValueError(f"unknown localize backend {backend!r}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({**asdict(out), "text": text}))
+    return out
+
+
+def _jev(image: Image.Image, text: str) -> Found:
+    """A System One Box question to TypeSafe's hosted Jev."""
+    from typesafe_sdk import Box, Image as TsImage, TypeSafeClient
+
+    name, usd = "jev", ledger.JEV_USD_PER_CALL
+    ledger.check(usd)
+    client = TypeSafeClient()
+    try:
+        r = client.system_one(
+            state={"frame": TsImage(jpeg(image))},
+            questions={"where": Box(instructions=f"Draw a box around {text} in `frame`.")},
+            timeout=30.0,
+            extra_headers={"TypeSafe-Danger-Zone-Images": "true"},
+        )
+    finally:
+        client.close()
+    ledger.record(f"localize:{name}", name, usd)
+    a = r.answers["where"]
+    b = a.box
+    w, h = image.size
+    conf = None if a.confidence is None else float(a.confidence)
+    if b is None:
+        return Found(False, None, conf, name)
+    bbox = (b.left * w, b.top * h, b.right * w, b.bottom * h)
+    return Found(_has_area(bbox), bbox, conf, name)
+
+
+def _has_area(bbox) -> bool:
+    """A System One Box answer counts as found when it is a box at all; its confidence goes to the program to weigh.
+    (A 0.3 confidence cutoff here dropped real boxes Jev answered at 0.27-0.28.)"""
+    return bbox is not None and bbox[2] - bbox[0] > 1 and bbox[3] - bbox[1] > 1
+
+
+def _h2o(image: Image.Image, text: str) -> Found:
+    """The same System One Box question to H2O-Lightning-4B served locally (no key, no cost): plain JSON, the frame as
+    a data URI in `state`."""
+    import urllib.request
+
+    body = {"state": {"frame": "data:image/jpeg;base64," + base64.b64encode(jpeg(image)).decode()},
+            "questions": {"where": {"type": "box", "instructions": f"Draw a box around {text} in `frame`."}}}
+    req = urllib.request.Request(H2O_URL.rstrip("/") + "/v1/systemone", json.dumps(body).encode(),
+                                 {"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=600) as r:
+        d = json.loads(r.read())
+    ledger.record("localize:h2o", "h2o-lightning-4b", 0.0)
+    a = d["answers"]["where"] if "answers" in d else d
+    b = a.get("box")
+    conf = a.get("confidence")
+    if not b:
+        return Found(False, None, conf, "h2o")
+    w, h = image.size
+    bbox = (b["left"] * w, b["top"] * h, b["right"] * w, b["bottom"] * h)
+    return Found(_has_area(bbox), bbox, None if conf is None else float(conf), "h2o")
+
+
+CLAUDE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "found": {"type": "boolean"},
+        "left": {"type": "integer"},
+        "top": {"type": "integer"},
+        "right": {"type": "integer"},
+        "bottom": {"type": "integer"},
+    },
+    "required": ["found", "left", "top", "right", "bottom"],
+    "additionalProperties": False,
+}
+
+
+def _claude(image: Image.Image, text: str) -> Found:
+    import anthropic
+
+    ledger.check(0.02)
+    w, h = image.size
+    client = anthropic.Anthropic()
+    r = client.messages.create(
+        model=CLAUDE_MODEL,
+        max_tokens=4000,
+        output_config={"effort": "low", "format": {"type": "json_schema", "schema": CLAUDE_SCHEMA}},
+        messages=[{"role": "user", "content": [
+            {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(jpeg(image)).decode()}},
+            {"type": "text", "text": f"This image is {w} x {h} pixels. Give the tight bounding box of {text}, in pixels "
+                                     f"(left, top, right, bottom; origin at the top left). If it is not visible, set found to false."},
+        ]}],
+    )
+    ledger.record_claude("localize:claude", CLAUDE_MODEL, r.usage)
+    d = json.loads(next(b.text for b in r.content if b.type == "text"))
+    if not d["found"]:
+        return Found(False, None, None, "claude")
+    return Found(True, (float(d["left"]), float(d["top"]), float(d["right"]), float(d["bottom"])), None, "claude")

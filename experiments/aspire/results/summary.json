@@ -1,0 +1,1342 @@
+{
+ "runs": {
+  "main": {
+   "candidates": [
+    {
+     "id": "r0a0",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 9,
+     "lifted": 9,
+     "fitness": 9.0,
+     "usd": 0.72,
+     "skill": null
+    },
+    {
+     "id": "r0a2",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 9,
+     "lifted": 10,
+     "fitness": 9.395,
+     "usd": 1.3873,
+     "skill": null
+    },
+    {
+     "id": "r0a1",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 5,
+     "lifted": 8,
+     "fitness": 6.078,
+     "usd": 1.4162,
+     "skill": null
+    },
+    {
+     "id": "r0v0",
+     "round": 0,
+     "parent": "r0a2-run2",
+     "origin": "verifier",
+     "placed": 9,
+     "lifted": 9,
+     "fitness": 9.0,
+     "usd": 0.6386,
+     "skill": "Triangulate the top-face centroid for box height, not the bbox centre"
+    },
+    {
+     "id": "r0v2",
+     "round": 0,
+     "parent": "r0a2-run3",
+     "origin": "verifier",
+     "placed": 8,
+     "lifted": 8,
+     "fitness": 8.0,
+     "usd": 0.2955,
+     "skill": "Distrust a square re-localized while the box is in the jaws"
+    },
+    {
+     "id": "r1a1",
+     "round": 1,
+     "parent": "r0a0",
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.3819,
+     "skill": null
+    },
+    {
+     "id": "r1a0",
+     "round": 1,
+     "parent": "r0a2",
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.6955,
+     "skill": null
+    },
+    {
+     "id": "r1a2",
+     "round": 1,
+     "parent": "r0a2",
+     "origin": "actor",
+     "placed": 9,
+     "lifted": 10,
+     "fitness": 9.396,
+     "usd": 1.0483,
+     "skill": null
+    },
+    {
+     "id": "r1v0",
+     "round": 1,
+     "parent": "r1a0-run2",
+     "origin": "verifier",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.3099,
+     "skill": "Descend to grasp at vertical pitch, not at the hover's fallback pitch"
+    },
+    {
+     "id": "r1v1",
+     "round": 1,
+     "parent": "r0a2",
+     "origin": "verifier",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.3008,
+     "skill": "Re-measure the box after a blocked grasp descent, before retrying at another roll"
+    }
+   ],
+   "sessions": [
+    {
+     "name": "r0a0",
+     "role": "actor",
+     "usd": 0.72,
+     "turns": 8,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0a1",
+     "role": "actor",
+     "usd": 1.4162,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0a2",
+     "role": "actor",
+     "usd": 1.3873,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0v0",
+     "role": "verifier",
+     "usd": 0.6386,
+     "turns": 4,
+     "tool_calls": 5,
+     "submitted": true
+    },
+    {
+     "name": "r0v2",
+     "role": "verifier",
+     "usd": 0.2955,
+     "turns": 3,
+     "tool_calls": 3,
+     "submitted": true
+    },
+    {
+     "name": "r1a0",
+     "role": "actor",
+     "usd": 0.6955,
+     "turns": 6,
+     "tool_calls": 6,
+     "submitted": true
+    },
+    {
+     "name": "r1a1",
+     "role": "actor",
+     "usd": 0.3819,
+     "turns": 4,
+     "tool_calls": 4,
+     "submitted": true
+    },
+    {
+     "name": "r1a2",
+     "role": "actor",
+     "usd": 1.0483,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r1v0",
+     "role": "verifier",
+     "usd": 0.3099,
+     "turns": 2,
+     "tool_calls": 2,
+     "submitted": true
+    },
+    {
+     "name": "r1v1",
+     "role": "verifier",
+     "usd": 0.3008,
+     "turns": 2,
+     "tool_calls": 2,
+     "submitted": true
+    }
+   ],
+   "events": [
+    {
+     "t": 1795206185,
+     "kind": "round_start",
+     "spent_usd": 0.59,
+     "round": 0
+    },
+    {
+     "t": 1795206669,
+     "kind": "round_end",
+     "spent_usd": 4.73,
+     "round": 0,
+     "best": "r0a2",
+     "placed": 9,
+     "lifted": 10,
+     "fitness": 9.395
+    },
+    {
+     "t": 1795206669,
+     "kind": "round_start",
+     "spent_usd": 4.73,
+     "round": 1
+    },
+    {
+     "t": 1795206772,
+     "kind": "fixes_found",
+     "spent_usd": 5.13,
+     "round": 0,
+     "n": 8,
+     "chosen": [
+      {
+       "before": "r0a2-run2",
+       "after": "r0a2-run3",
+       "fixed": {
+        "100": "placed",
+        "101": "placed",
+        "102": "lifted",
+        "103": "placed",
+        "104": "lifted",
+        "105": "placed",
+        "106": "placed"
+       },
+       "broke": [
+        108
+       ]
+      },
+      {
+       "before": "r0a1-run2",
+       "after": "r0a1-run3",
+       "fixed": {
+        "100": "placed",
+        "104": "placed",
+        "105": "placed",
+        "106": "lifted",
+        "107": "lifted",
+        "108": "placed"
+       },
+       "broke": [
+        109
+       ]
+      },
+      {
+       "before": "r0a2-run3",
+       "after": "r0a2-run4",
+       "fixed": {
+        "102": "placed",
+        "104": "placed",
+        "108": "placed",
+        "109": "placed"
+       },
+       "broke": []
+      }
+     ]
+    },
+    {
+     "t": 1795206793,
+     "kind": "skill_candidate",
+     "spent_usd": 5.37,
+     "before": "r0a2-run2",
+     "after": "r0a2-run3",
+     "fixed": {
+      "100": "placed",
+      "101": "placed",
+      "102": "lifted",
+      "103": "placed",
+      "104": "lifted",
+      "105": "placed",
+      "106": "placed"
+     },
+     "title": "Triangulate the top-face centroid for box height, not the bbox centre"
+    },
+    {
+     "t": 1795206926,
+     "kind": "skill_admitted",
+     "spent_usd": 6.17,
+     "path": "skills/01-triangulate-the-top-face-centroid-for-box-height.md",
+     "title": "Triangulate the top-face centroid for box height, not the bbox centre",
+     "before": "r0a2-run2",
+     "after": "r0a2-run3",
+     "fixed": {
+      "100": "placed",
+      "101": "placed",
+      "102": "lifted",
+      "103": "placed",
+      "104": "lifted",
+      "105": "placed",
+      "106": "placed"
+     },
+     "verifier": "r0v0",
+     "reproduced": [
+      "100",
+      "101",
+      "102",
+      "103",
+      "104",
+      "106"
+     ],
+     "verifier_placed": 9,
+     "before_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109
+     ],
+     "verifier_fitness_on_before_seeds": 9.0,
+     "before_fitness": 1.0
+    },
+    {
+     "t": 1795206936,
+     "kind": "skill_none",
+     "spent_usd": 6.31,
+     "before": "r0a1-run2",
+     "after": "r0a1-run3",
+     "fixed": {
+      "100": "placed",
+      "104": "placed",
+      "105": "placed",
+      "106": "lifted",
+      "107": "lifted",
+      "108": "placed"
+     }
+    },
+    {
+     "t": 1795206956,
+     "kind": "skill_candidate",
+     "spent_usd": 6.47,
+     "before": "r0a2-run3",
+     "after": "r0a2-run4",
+     "fixed": {
+      "102": "placed",
+      "104": "placed",
+      "108": "placed",
+      "109": "placed"
+     },
+     "title": "Distrust a square re-localized while the box is in the jaws"
+    },
+    {
+     "t": 1795207018,
+     "kind": "skill_admitted",
+     "spent_usd": 6.76,
+     "path": "skills/02-distrust-a-square-re-localized-while-the-box-is-.md",
+     "title": "Distrust a square re-localized while the box is in the jaws",
+     "before": "r0a2-run3",
+     "after": "r0a2-run4",
+     "fixed": {
+      "102": "placed",
+      "104": "placed",
+      "108": "placed",
+      "109": "placed"
+     },
+     "verifier": "r0v2",
+     "reproduced": [
+      "102",
+      "104",
+      "108"
+     ],
+     "verifier_placed": 8,
+     "before_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109
+     ],
+     "verifier_fitness_on_before_seeds": 8.0,
+     "before_fitness": 6.137
+    },
+    {
+     "t": 1795207018,
+     "kind": "skills_done",
+     "spent_usd": 6.76,
+     "round": 0
+    },
+    {
+     "t": 1795207018,
+     "kind": "round_start",
+     "spent_usd": 6.76,
+     "round": 1
+    },
+    {
+     "t": 1795207325,
+     "kind": "fixes_found",
+     "spent_usd": 9.0,
+     "round": 1,
+     "n": 3,
+     "chosen": [
+      {
+       "before": "r1a0-run2",
+       "after": "r1a0-run3",
+       "fixed": {
+        "100": "placed",
+        "108": "placed"
+       },
+       "broke": []
+      },
+      {
+       "before": "r0a2",
+       "after": "r1a0",
+       "fixed": {
+        "107": "placed"
+       },
+       "broke": []
+      },
+      {
+       "before": "r0a0",
+       "after": "r1a1",
+       "fixed": {
+        "109": "placed"
+       },
+       "broke": []
+      }
+     ]
+    },
+    {
+     "t": 1795207343,
+     "kind": "skill_candidate",
+     "spent_usd": 9.14,
+     "before": "r1a0-run2",
+     "after": "r1a0-run3",
+     "fixed": {
+      "100": "placed",
+      "108": "placed"
+     },
+     "title": "Descend to grasp at vertical pitch, not at the hover's fallback pitch"
+    },
+    {
+     "t": 1795207432,
+     "kind": "skill_admitted",
+     "spent_usd": 9.49,
+     "path": "skills/03-descend-to-grasp-at-vertical-pitch-not-at-the-ho.md",
+     "title": "Descend to grasp at vertical pitch, not at the hover's fallback pitch",
+     "before": "r1a0-run2",
+     "after": "r1a0-run3",
+     "fixed": {
+      "100": "placed",
+      "108": "placed"
+     },
+     "verifier": "r1v0",
+     "reproduced": [
+      "100",
+      "108"
+     ],
+     "verifier_placed": 10,
+     "before_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109
+     ],
+     "verifier_fitness_on_before_seeds": 10.0,
+     "before_fitness": 8.757
+    },
+    {
+     "t": 1795207452,
+     "kind": "skill_candidate",
+     "spent_usd": 9.62,
+     "before": "r0a2",
+     "after": "r1a0",
+     "fixed": {
+      "107": "placed"
+     },
+     "title": "Re-measure the box after a blocked grasp descent, before retrying at another roll"
+    },
+    {
+     "t": 1795207538,
+     "kind": "skill_admitted",
+     "spent_usd": 9.94,
+     "path": "skills/04-re-measure-the-box-after-a-blocked-grasp-descent.md",
+     "title": "Re-measure the box after a blocked grasp descent, before retrying at another roll",
+     "before": "r0a2",
+     "after": "r1a0",
+     "fixed": {
+      "107": "placed"
+     },
+     "verifier": "r1v1",
+     "reproduced": [
+      "107"
+     ],
+     "verifier_placed": 10,
+     "before_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109
+     ],
+     "verifier_fitness_on_before_seeds": 10.0,
+     "before_fitness": 9.395
+    },
+    {
+     "t": 1795207544,
+     "kind": "skill_none",
+     "spent_usd": 10.02,
+     "before": "r0a0",
+     "after": "r1a1",
+     "fixed": {
+      "109": "placed"
+     }
+    },
+    {
+     "t": 1795207544,
+     "kind": "skills_done",
+     "spent_usd": 10.02,
+     "round": 1
+    },
+    {
+     "t": 1795207544,
+     "kind": "round_end",
+     "spent_usd": 10.02,
+     "round": 1,
+     "best": "r1a0",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0
+    }
+   ]
+  },
+  "variant-skills": {
+   "candidates": [
+    {
+     "id": "r0a1",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.8795,
+     "skill": null
+    },
+    {
+     "id": "r0a0",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.8741,
+     "skill": null
+    },
+    {
+     "id": "r0a2",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 1.1717,
+     "skill": null
+    }
+   ],
+   "sessions": [
+    {
+     "name": "r0a0",
+     "role": "actor",
+     "usd": 0.8741,
+     "turns": 6,
+     "tool_calls": 7,
+     "submitted": true
+    },
+    {
+     "name": "r0a1",
+     "role": "actor",
+     "usd": 0.8795,
+     "turns": 7,
+     "tool_calls": 7,
+     "submitted": true
+    },
+    {
+     "name": "r0a2",
+     "role": "actor",
+     "usd": 1.1717,
+     "turns": 8,
+     "tool_calls": 8,
+     "submitted": true
+    }
+   ],
+   "events": [
+    {
+     "t": 1795207645,
+     "kind": "round_start",
+     "spent_usd": 10.72,
+     "round": 0
+    },
+    {
+     "t": 1795208025,
+     "kind": "round_end",
+     "spent_usd": 17.92,
+     "round": 0,
+     "best": "r0a0",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0
+    }
+   ]
+  },
+  "variant-skills-b": {
+   "candidates": [
+    {
+     "id": "r0a1",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.6597,
+     "skill": null
+    },
+    {
+     "id": "r0a0",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 0.8061,
+     "skill": null
+    },
+    {
+     "id": "r0a2",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 9,
+     "lifted": 9,
+     "fitness": 9.0,
+     "usd": 1.1278,
+     "skill": null
+    }
+   ],
+   "sessions": [
+    {
+     "name": "r0a0",
+     "role": "actor",
+     "usd": 0.8061,
+     "turns": 6,
+     "tool_calls": 6,
+     "submitted": true
+    },
+    {
+     "name": "r0a1",
+     "role": "actor",
+     "usd": 0.6597,
+     "turns": 5,
+     "tool_calls": 6,
+     "submitted": true
+    },
+    {
+     "name": "r0a2",
+     "role": "actor",
+     "usd": 1.1278,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    }
+   ],
+   "events": [
+    {
+     "t": 1795208083,
+     "kind": "round_start",
+     "spent_usd": 18.48,
+     "round": 0
+    },
+    {
+     "t": 1795212268,
+     "kind": "round_resume",
+     "spent_usd": 25.89,
+     "round": 0,
+     "missing": [
+      "r0a0",
+      "r0a2"
+     ]
+    },
+    {
+     "t": 1795212561,
+     "kind": "round_end",
+     "spent_usd": 29.36,
+     "round": 0,
+     "best": "r0a0",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0
+    }
+   ]
+  },
+  "variant-noskills": {
+   "candidates": [
+    {
+     "id": "r0a0",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 5,
+     "lifted": 6,
+     "fitness": 5.395,
+     "usd": 0.7734,
+     "skill": null
+    },
+    {
+     "id": "r0a1",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0,
+     "usd": 1.0284,
+     "skill": null
+    },
+    {
+     "id": "r0a2",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 4,
+     "lifted": 4,
+     "fitness": 4.0,
+     "usd": 1.6347,
+     "skill": null
+    }
+   ],
+   "sessions": [
+    {
+     "name": "r0a0",
+     "role": "actor",
+     "usd": 0.7734,
+     "turns": 7,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0a1",
+     "role": "actor",
+     "usd": 1.0284,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0a2",
+     "role": "actor",
+     "usd": 1.6347,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    }
+   ],
+   "events": [
+    {
+     "t": 1795207645,
+     "kind": "round_start",
+     "spent_usd": 10.72,
+     "round": 0
+    },
+    {
+     "t": 1795208074,
+     "kind": "round_end",
+     "spent_usd": 18.48,
+     "round": 0,
+     "best": "r0a1",
+     "placed": 10,
+     "lifted": 10,
+     "fitness": 10.0
+    }
+   ]
+  },
+  "variant-noskills-b": {
+   "candidates": [
+    {
+     "id": "r0a0",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 8,
+     "lifted": 8,
+     "fitness": 8.0,
+     "usd": 0.9869,
+     "skill": null
+    },
+    {
+     "id": "r0a1",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 0,
+     "lifted": 1,
+     "fitness": 0.377,
+     "usd": 1.0614,
+     "skill": null
+    },
+    {
+     "id": "r0a2",
+     "round": 0,
+     "parent": null,
+     "origin": "actor",
+     "placed": 6,
+     "lifted": 10,
+     "fitness": 7.517,
+     "usd": 1.2582,
+     "skill": null
+    }
+   ],
+   "sessions": [
+    {
+     "name": "r0a0",
+     "role": "actor",
+     "usd": 0.9869,
+     "turns": 8,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0a1",
+     "role": "actor",
+     "usd": 1.0614,
+     "turns": 8,
+     "tool_calls": 9,
+     "submitted": true
+    },
+    {
+     "name": "r0a2",
+     "role": "actor",
+     "usd": 1.2582,
+     "turns": 9,
+     "tool_calls": 9,
+     "submitted": true
+    }
+   ],
+   "events": [
+    {
+     "t": 1795208083,
+     "kind": "round_start",
+     "spent_usd": 18.48,
+     "round": 0
+    },
+    {
+     "t": 1795212268,
+     "kind": "round_resume",
+     "spent_usd": 25.89,
+     "round": 0,
+     "missing": [
+      "r0a2"
+     ]
+    },
+    {
+     "t": 1795212613,
+     "kind": "round_end",
+     "spent_usd": 29.49,
+     "round": 0,
+     "best": "r0a0",
+     "placed": 8,
+     "lifted": 8,
+     "fitness": 8.0
+    }
+   ]
+  }
+ },
+ "evals": {
+  "benchmark_final_heldout": {
+   "program": "programs/benchmark_final.py",
+   "task": "benchmark",
+   "placed": 19,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 10.9,
+   "localize_calls": 85,
+   "localize_paid": null,
+   "usd": 0.2735,
+   "unplaced": [
+    7
+   ]
+  },
+  "benchmark_final_heldout_after_merge": {
+   "program": "programs/benchmark_final.py",
+   "task": "benchmark",
+   "placed": 19,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 10.9,
+   "localize_calls": 85,
+   "localize_paid": 0,
+   "usd": 0.0,
+   "unplaced": [
+    7
+   ]
+  },
+  "benchmark_final_heldout_jev": {
+   "program": "programs/benchmark_final.py",
+   "task": "benchmark",
+   "placed": 15,
+   "lifted": 16,
+   "n": 20,
+   "median_sim_s": 10.6,
+   "localize_calls": 82,
+   "localize_paid": 82,
+   "usd": 0.164,
+   "unplaced": [
+    0,
+    1,
+    10,
+    17,
+    18
+   ]
+  },
+  "benchmark_final_heldout_jev_found_fix": {
+   "program": "programs/benchmark_final.py",
+   "task": "benchmark",
+   "placed": 17,
+   "lifted": 19,
+   "n": 20,
+   "median_sim_s": 10.6,
+   "localize_calls": 88,
+   "localize_paid": 6,
+   "usd": 0.012,
+   "unplaced": [
+    0,
+    17,
+    18
+   ]
+  },
+  "benchmark_final_heldout_h2o": {
+   "program": "programs/benchmark_final.py",
+   "task": "benchmark",
+   "placed": 20,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 10.4,
+   "localize_calls": 85,
+   "localize_paid": 85,
+   "usd": 0.0,
+   "unplaced": []
+  },
+  "zeroshot_variant_debug": {
+   "program": "programs/benchmark_final.py",
+   "task": "variant",
+   "placed": 7,
+   "lifted": 9,
+   "n": 10,
+   "median_sim_s": 10.7,
+   "localize_calls": 42,
+   "localize_paid": null,
+   "usd": 0.1352,
+   "unplaced": [
+    201,
+    202,
+    206
+   ]
+  },
+  "zeroshot_variant_heldout": {
+   "program": "programs/benchmark_final.py",
+   "task": "variant",
+   "placed": 18,
+   "lifted": 19,
+   "n": 20,
+   "median_sim_s": 10.5,
+   "localize_calls": 89,
+   "localize_paid": null,
+   "usd": 0.2864,
+   "unplaced": [
+    317,
+    318
+   ]
+  },
+  "variant_skills_final_heldout": {
+   "program": "programs/variant_skills_final.py",
+   "task": "variant",
+   "placed": 19,
+   "lifted": 19,
+   "n": 20,
+   "median_sim_s": 10.2,
+   "localize_calls": 80,
+   "localize_paid": 80,
+   "usd": 1.3507,
+   "unplaced": [
+    314
+   ]
+  },
+  "variant_noskills_final_heldout": {
+   "program": "programs/variant_noskills_final.py",
+   "task": "variant",
+   "placed": 20,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 10.9,
+   "localize_calls": 80,
+   "localize_paid": 80,
+   "usd": 1.4115,
+   "unplaced": []
+  },
+  "diagnostic_r0a0_heldout": {
+   "program": "state/main/cands/r0a0/program.py",
+   "task": "benchmark",
+   "placed": 18,
+   "lifted": 19,
+   "n": 20,
+   "median_sim_s": 10.0,
+   "localize_calls": 60,
+   "localize_paid": null,
+   "usd": 0.3479,
+   "unplaced": [
+    6,
+    18
+   ]
+  },
+  "diagnostic_r0a2_heldout": {
+   "program": "state/main/cands/r0a2/program.py",
+   "task": "benchmark",
+   "placed": 19,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 10.9,
+   "localize_calls": 80,
+   "localize_paid": null,
+   "usd": 0.6435,
+   "unplaced": [
+    7
+   ]
+  },
+  "diagnostic_r1a1_heldout": {
+   "program": "state/main/cands/r1a1/program.py",
+   "task": "benchmark",
+   "placed": 17,
+   "lifted": 19,
+   "n": 20,
+   "median_sim_s": 10.0,
+   "localize_calls": 60,
+   "localize_paid": null,
+   "usd": 0.3401,
+   "unplaced": [
+    3,
+    6,
+    18
+   ]
+  },
+  "diagnostic_r1v0_heldout": {
+   "program": "state/main/cands/r1v0/program.py",
+   "task": "benchmark",
+   "placed": 20,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 11.1,
+   "localize_calls": 86,
+   "localize_paid": null,
+   "usd": 0.6627,
+   "unplaced": []
+  },
+  "diagnostic_r1v1_heldout": {
+   "program": "state/main/cands/r1v1/program.py",
+   "task": "benchmark",
+   "placed": 19,
+   "lifted": 20,
+   "n": 20,
+   "median_sim_s": 10.9,
+   "localize_calls": 85,
+   "localize_paid": null,
+   "usd": 0.9802,
+   "unplaced": [
+    7
+   ]
+  }
+ },
+ "skills": [
+  {
+   "file": "01-triangulate-the-top-face-centroid-for-box-height.md",
+   "id": "S01",
+   "task": "benchmark",
+   "run": "main",
+   "round": 0,
+   "title": "Triangulate the top-face centroid for box height, not the bbox centre",
+   "before": "r0a2-run2",
+   "after": "r0a2-run3",
+   "fixed": {
+    "100": "placed",
+    "101": "placed",
+    "102": "lifted",
+    "103": "placed",
+    "104": "lifted",
+    "105": "placed",
+    "106": "placed"
+   },
+   "verifier": "r0v0",
+   "reproduced": [
+    "100",
+    "101",
+    "102",
+    "103",
+    "104",
+    "106"
+   ],
+   "verifier_placed": 9,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 9.0,
+   "before_fitness": 1.0
+  },
+  {
+   "file": "02-distrust-a-square-re-localized-while-the-box-is-.md",
+   "id": "S02",
+   "task": "benchmark",
+   "run": "main",
+   "round": 0,
+   "title": "Distrust a square re-localized while the box is in the jaws",
+   "before": "r0a2-run3",
+   "after": "r0a2-run4",
+   "fixed": {
+    "102": "placed",
+    "104": "placed",
+    "108": "placed",
+    "109": "placed"
+   },
+   "verifier": "r0v2",
+   "reproduced": [
+    "102",
+    "104",
+    "108"
+   ],
+   "verifier_placed": 8,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 8.0,
+   "before_fitness": 6.137
+  },
+  {
+   "file": "03-descend-to-grasp-at-vertical-pitch-not-at-the-ho.md",
+   "id": "S03",
+   "task": "benchmark",
+   "run": "main",
+   "round": 1,
+   "title": "Descend to grasp at vertical pitch, not at the hover's fallback pitch",
+   "before": "r1a0-run2",
+   "after": "r1a0-run3",
+   "fixed": {
+    "100": "placed",
+    "108": "placed"
+   },
+   "verifier": "r1v0",
+   "reproduced": [
+    "100",
+    "108"
+   ],
+   "verifier_placed": 10,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 10.0,
+   "before_fitness": 8.757
+  },
+  {
+   "file": "04-re-measure-the-box-after-a-blocked-grasp-descent.md",
+   "id": "S04",
+   "task": "benchmark",
+   "run": "main",
+   "round": 1,
+   "title": "Re-measure the box after a blocked grasp descent, before retrying at another roll",
+   "before": "r0a2",
+   "after": "r1a0",
+   "fixed": {
+    "107": "placed"
+   },
+   "verifier": "r1v1",
+   "reproduced": [
+    "107"
+   ],
+   "verifier_placed": 10,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 10.0,
+   "before_fitness": 9.395
+  }
+ ],
+ "spend": {
+  "total_usd": 29.663,
+  "by_role": {
+   "localize:jev": {
+    "calls": 98,
+    "usd": 0.19600000000000015,
+    "input": 0,
+    "output": 0,
+    "cache_read": 0,
+    "cache_write": 0
+   },
+   "localize:claude": {
+    "calls": 1573,
+    "usd": 5.015413000000029,
+    "input": 1029387,
+    "output": 47310,
+    "cache_read": 0,
+    "cache_write": 0
+   },
+   "actor": {
+    "calls": 172,
+    "usd": 22.013476000000004,
+    "input": 424,
+    "output": 565374,
+    "cache_read": 6993974,
+    "cache_write": 1861099
+   },
+   "skill_writer": {
+    "calls": 6,
+    "usd": 0.8929439999999998,
+    "input": 178661,
+    "output": 8915,
+    "cache_read": 0,
+    "cache_write": 0
+   },
+   "verifier": {
+    "calls": 11,
+    "usd": 1.544781,
+    "input": 32,
+    "output": 40945,
+    "cache_read": 217914,
+    "cache_write": 136434
+   },
+   "localize:h2o": {
+    "calls": 87,
+    "usd": 0.0,
+    "input": 0,
+    "output": 0,
+    "cache_read": 0,
+    "cache_write": 0
+   }
+  },
+  "tokens": {
+   "input": 1208504,
+   "output": 662544,
+   "cache_read": 7211888,
+   "cache_write": 1997533
+  }
+ },
+ "expert": [
+  {
+   "task": "benchmark",
+   "seeds": "debug",
+   "placed": 6,
+   "lifted": 8,
+   "n": 10
+  },
+  {
+   "task": "benchmark",
+   "seeds": "heldout",
+   "placed": 13,
+   "lifted": 15,
+   "n": 20
+  },
+  {
+   "task": "variant",
+   "seeds": "debug",
+   "placed": 4,
+   "lifted": 5,
+   "n": 10
+  },
+  {
+   "task": "variant",
+   "seeds": "heldout",
+   "placed": 10,
+   "lifted": 13,
+   "n": 20
+  }
+ ]
+}

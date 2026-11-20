@@ -1,0 +1,310 @@
+{
+ "archive": [
+  {
+   "id": "r0a0",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 5,
+   "lifted": 6,
+   "fitness": 5.395,
+   "per_seed": {
+    "200": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0057,
+     "error": null,
+     "localize_calls": 5
+    },
+    "201": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0076,
+     "error": null,
+     "localize_calls": 5
+    },
+    "202": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0109,
+     "error": null,
+     "localize_calls": 5
+    },
+    "203": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2643,
+     "error": null,
+     "localize_calls": 5
+    },
+    "204": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1936,
+     "error": null,
+     "localize_calls": 5
+    },
+    "205": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.024,
+     "error": null,
+     "localize_calls": 5
+    },
+    "206": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1224,
+     "error": null,
+     "localize_calls": 5
+    },
+    "207": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0172,
+     "error": null,
+     "localize_calls": 5
+    },
+    "208": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0134,
+     "error": null,
+     "localize_calls": 5
+    },
+    "209": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2849,
+     "error": null,
+     "localize_calls": 5
+    }
+   },
+   "notes": "Run 1 (0/10): a straight-down grip (pitch 90) was out of reach at most poses, and the box's position, rotation and size were not measured. Fixes: moves fall back through other pitches. The box is measured from two overhead views: the bright top-face pixels are matched between views to get the height, and projected onto the table to get centre, rotation and short side. The wrist roll is set so the jaws close across the short side, and the aim point is offset so the fixed jaw clears the box. The square's centre comes from its blue pixels projected onto the table. Run 2 (6/10): the tall (~9 cm) boxes failed because the grip aimed 3 cm above the table, so the jaws landed on the box top. The grip height is now min(h/2, h-0.022). The pitch search starts near pitches that usually work, to stay within the 60-call budget (scenes now use 22-30 calls). Run 3: 9/10 placed, errors 0.6-2.7 cm against the 3 cm limit. Untested final change: the descent stops at h+1 cm before going to grip height, to keep the path closer to vertical. Not fixed: seed 206, a tall box at about 30 degrees (roll -33). The fixed jaw sits over the box and tips it on the way down; the new stop probably does not fix this.",
+   "usd": 0.7734,
+   "skill": null
+  },
+  {
+   "id": "r0a1",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "per_seed": {
+    "200": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0077,
+     "error": null,
+     "localize_calls": 4
+    },
+    "201": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0208,
+     "error": null,
+     "localize_calls": 4
+    },
+    "202": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0104,
+     "error": null,
+     "localize_calls": 4
+    },
+    "203": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0253,
+     "error": null,
+     "localize_calls": 4
+    },
+    "204": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0113,
+     "error": null,
+     "localize_calls": 4
+    },
+    "205": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0074,
+     "error": null,
+     "localize_calls": 4
+    },
+    "206": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0054,
+     "error": null,
+     "localize_calls": 4
+    },
+    "207": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0055,
+     "error": null,
+     "localize_calls": 4
+    },
+    "208": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0028,
+     "error": null,
+     "localize_calls": 4
+    },
+    "209": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0064,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "Same program as run r0a1-run5, which placed 10/10 debug scenes. Fixes in order: (1) poses with jaws pointing straight down were unreachable for most targets, so every move now tries pitches 90, 80, ... 30 and uses the first one that is reachable. (2) The boxes are tall and narrow (about 3 cm wide, about 9 cm tall), so the bbox centre's table point was off by centimetres (run 2: the jaws came down beside the box). Now the box's bright top face is found in two views and triangulated, which gives the box's height and the face's centre. (3) Run 3, seeds 200/203/208: the jaws hit or tipped the box. Fixes: box angle from a minimum-area rectangle around the top-face pixels, choosing the jaw angle (wrist roll) nearest -90 when the two widths are similar; shift the grasp point so the box sits between the jaws, not right at the fixed jaw; one retry if the gripper closes fully. (4) Run 4, seeds 203/208: the square was misplaced because its bbox was cut off at the image edge. Now the square is located from the first survey view and refined from above it, keeping a reading only if its bbox is clear of the image edges. I also tried shifting the drop point to allow for the box resting against the fixed jaw (run 6); it still placed 10/10 but the average error got slightly worse, so I left it out.",
+   "usd": 1.0284,
+   "skill": null
+  },
+  {
+   "id": "r0a2",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 4,
+   "lifted": 4,
+   "fitness": 4.0,
+   "per_seed": {
+    "200": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0056,
+     "error": null,
+     "localize_calls": 4
+    },
+    "201": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1307,
+     "error": null,
+     "localize_calls": 4
+    },
+    "202": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0072,
+     "error": null,
+     "localize_calls": 4
+    },
+    "203": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2374,
+     "error": null,
+     "localize_calls": 4
+    },
+    "204": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1901,
+     "error": null,
+     "localize_calls": 4
+    },
+    "205": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.236,
+     "error": null,
+     "localize_calls": 4
+    },
+    "206": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0092,
+     "error": null,
+     "localize_calls": 4
+    },
+    "207": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2452,
+     "error": null,
+     "localize_calls": 4
+    },
+    "208": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.011,
+     "error": null,
+     "localize_calls": 4
+    },
+    "209": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2209,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "I'm submitting the version from run 1 because it scored best: 4 of 10 placed (seeds 200, 202, 206, 208). The four later versions each lifted the box in 8 or 9 scenes but placed at most 1. I ran out of tool calls before I could combine their fixes with run 1's grasp height. This exact code was tested in run 1.\n\nHow it works: it finds the box and square from the start pose, takes two views from above the box to estimate its height from how the bbox grows, and segments the white pixels to get the box's orientation and short side. It turns the wrist so the jaws close across the short side and moves the grasp point toward the fixed jaw so that jaw clears the box. It grasps at half the box height, lifts, lowers onto the square with the expected box-centre offset taken into account, and releases.\n\nKnown failures in run 1:\n- The survey and look poses it asks for (grasp point at z 0.24\u20130.30) are unreachable, so every pitch fallback fails and those moves cost wasted calls. The 0.24 view never happens, so both height views come from the same pose and the height estimate is unreliable. When it comes out too large (seeds 203, 204, 205, 207, 209), the jaws stop on top of the box at z\u22480.06 instead of going down around it.\n- Seed 201: a tall box (about 8 cm). The descent stopped at z 0.039 short of its 0.02 goal and the jaws closed on nothing.\n\nWhat the later runs showed, for whoever continues this:\n1. The start pose already sees both the box and the square, so the survey moves aren't needed.\n2. Grasping low (grasp point at z 0.015\u20130.025) lifts reliably, but the box pivots in the jaws and is set down on its side (tilt 90\u00b0). This is why runs 2\u20135 placed almost nothing. The grasp has to be near the box's mid-height.\n3. Probing the box top with closed jaws to measure height was unreliable. Starting high at pitch 70, the descent swings sideways and stops on the box edge or slides past it.\n4. My geometric height estimate from the oblique survey view gave impossible results; the survey and look positions disagreed by 2\u20134 cm.\n5. The first grasp often missed because the look moves at pitch 70\u201380 gave a poor box position. A retry from a closer view usually succeeded.",
+   "usd": 1.6347,
+   "skill": null
+  }
+ ],
+ "events": [
+  {
+   "t": 1795207645,
+   "kind": "round_start",
+   "spent_usd": 10.72,
+   "round": 0
+  },
+  {
+   "t": 1795207906,
+   "kind": "candidate",
+   "spent_usd": 16.49,
+   "id": "r0a0",
+   "parent": null,
+   "origin": "actor",
+   "placed": 5,
+   "lifted": 6,
+   "fitness": 5.395,
+   "usd": 0.7734
+  },
+  {
+   "t": 1795207959,
+   "kind": "candidate",
+   "spent_usd": 17.49,
+   "id": "r0a1",
+   "parent": null,
+   "origin": "actor",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "usd": 1.0284
+  },
+  {
+   "t": 1795208074,
+   "kind": "candidate",
+   "spent_usd": 18.48,
+   "id": "r0a2",
+   "parent": null,
+   "origin": "actor",
+   "placed": 4,
+   "lifted": 4,
+   "fitness": 4.0,
+   "usd": 1.6347
+  },
+  {
+   "t": 1795208074,
+   "kind": "round_end",
+   "spent_usd": 18.48,
+   "round": 0,
+   "best": "r0a1",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0
+  }
+ ]
+}

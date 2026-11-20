@@ -38,6 +38,11 @@ HTTP, real time, for harnesses in any language: see the routes at the top of `sr
   Lifted: held with its bottom at least 2 cm off the table at some point.
 - Report placed and lifted out of 20, median seconds per episode, and model calls and cost per episode.
 - A policy sees only `state()` (or `/state`) and frames. `truth()`, `score()` and `/score` are for grading.
+- Record every benchmark episode with `valet_sim.scoreboard.record()` to `experiments/<name>/results/episodes.jsonl`:
+  placed, lifted, seconds, `slow_calls` (Claude or any model slower than about a second) and `fast_calls` (Jev,
+  a local model, a segmenter). `python -m valet_sim.scoreboard <dirs>` prints every config side by side. A config
+  with more than 5 slow calls per episode is marked not scalable: iterate with any model, but the goal is a policy
+  that does not lean on a slow LLM.
 - Reference: `python -m valet_sim.expert` reads the true box pose and places 13/20 (lifted 15/20). It proves the
   scenes are solvable and can generate demonstrations; it is a floor to beat, not a ceiling.
 

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+runs/
+# Machine-specific settings; copy valet.example.toml to start one.
+valet.toml

@@ -1,0 +1,28 @@
+[project]
+name = "valet"
+version = "0.1.0"
+description = "A robot harness: code runs the task, Jev checks each step, and a coding model or a person decides when Jev is unsure."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2",
+    "pillow>=11",
+    "typesafe-sdk>=0.7.5",
+]
+
+[project.optional-dependencies]
+# Escalation to Claude. LeRobot (for the SO-101) is installed from a checkout; see README.
+claude = ["anthropic>=2.11"]
+
+[project.scripts]
+valet = "valet.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

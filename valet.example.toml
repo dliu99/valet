@@ -1,0 +1,79 @@
+# Copy to valet.toml (git-ignored) and fill in for your arm. Lengths in metres, angles in degrees.
+
+[robot]                        # SO-101 follower through LeRobot
+port = "/dev/tty.usbmodem0000" # `lerobot-find-port`
+id = "valet_follower"          # the id you calibrated under (`lerobot-calibrate`)
+urdf = "SO101/so101_new_calib.urdf"  # from TheRobotStudio/SO-ARM100, Simulation/SO101
+allow_motion = false           # true to let the arm move; false only reads and plans
+max_relative_target = 10.0     # LeRobot clips each command's joint change to this
+speed_m_s = 0.05
+# Gripper pointing straight down: pose the arm by hand, run `valet pose`, paste the joints here.
+down_joints = [0.0, 0.0, 0.0, 90.0, 0.0, 0.0]
+home_joints = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[workspace]                    # every target is checked against this box before anything moves
+lo = [0.05, -0.30, -0.01]
+hi = [0.40, 0.30, 0.35]
+
+[camera]                       # the wrist camera
+key = "wrist"                  # must match the camera name in any policy's training dataset
+index = 0
+fps = 30
+width = 640
+height = 480
+fx = 500.0                     # intrinsics: calibrate with an OpenCV checkerboard
+fy = 500.0
+cx = 320.0
+cy = 240.0
+ee_to_cam_xyz = [0.0, -0.05, 0.03]    # camera position in the grasp frame; check with `valet locate`
+ee_to_cam_rpy_deg = [0.0, 0.0, 0.0]
+
+[gripper]                      # LeRobot's 0..100; measure on your arm
+open = 45.0
+closed = 0.0
+holding_min = 3.0              # a close that stops this far above `closed` is on something
+
+[table]
+z = 0.0                        # table height in the base frame
+board_height_m = 0.015
+
+[scan]                         # grasp-point positions to look over the table from
+points = [[0.22, 0.12, 0.30], [0.22, -0.12, 0.30]]
+
+[runtime]
+hover_m = 0.12
+look_up_m = 0.10
+max_attempts = 3
+max_escalations = 6
+max_seconds = 900.0
+
+[thresholds]                   # tune from runs/*/checks.jsonl once you have labelled checks
+yes = 0.7
+no = 0.3
+box_min_confidence = 0.5
+
+[jev]
+model = ""                     # empty: your account's default. Box questions need Jev 1.14.
+
+[claude]                       # used with `valet run --decider claude`
+model = "claude-opus-5-5"
+effort = "high"
+
+# Each recipe step names a skill; bind the names here.
+[skills.pick_flat]
+kind = "scripted_pick"
+hover_m = 0.08
+grasp_dz_m = 0.0
+
+[skills.place_on_stack]
+kind = "scripted_place"
+hover_m = 0.08
+release_m = 0.012
+
+# A trained LeRobot policy instead:
+# [skills.pick_flat]
+# kind = "lerobot"
+# policy_path = "you/so101_pick_slice_act"
+# dataset_repo_id = "you/so101_pick_slice"
+# max_steps = 300
+# device = "mps"

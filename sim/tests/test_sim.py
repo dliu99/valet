@@ -132,3 +132,16 @@ def test_a_held_box_blocks_the_wrist_view_as_a_real_one_does():
 
     sim = Sim()
     assert sim.model.vis.map.znear * sim.model.stat.extent == pytest.approx(NEAR_CLIP_M)
+
+
+def test_the_scoreboard_counts_benchmark_seeds_and_flags_slow_models(tmp_path):
+    from valet_sim.scoreboard import Episode, load, record, table
+
+    log = tmp_path / "experiments" / "x" / "results" / "episodes.jsonl"
+    for seed in range(4):
+        record(log, Episode("x", "a", seed, placed=seed < 2, lifted=True, seconds=10.0, slow_calls=2, fast_calls=50, usd=0.01))
+        record(log, Episode("x", "b", seed, placed=True, lifted=True, seconds=60.0, slow_calls=20, fast_calls=0, usd=0.3))
+    record(log, Episode("x", "a", 100, placed=True, lifted=True, seconds=1.0, slow_calls=0, fast_calls=1, usd=0.0))
+    rows = {r["config"]: r for r in table(load([tmp_path]))}
+    assert (rows["a"]["seeds"], rows["a"]["placed"], rows["a"]["scalable"]) == (4, 2, True)
+    assert (rows["b"]["placed"], rows["b"]["scalable"]) == (4, False)

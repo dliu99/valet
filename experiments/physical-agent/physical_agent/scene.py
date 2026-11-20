@@ -1,0 +1,82 @@
+"""One benchmark episode behind the tool, and what the agent sees of it each turn."""
+
+from __future__ import annotations
+
+import base64
+import io
+import queue
+from dataclasses import dataclass
+
+from PIL import Image
+
+from valet_sim.sim import Sim, SimSpec, with_box
+from valet_sim.task import Episode, episode, score
+
+from .tool import Arm
+
+NEAR_CLIP_M = 0.004
+
+
+@dataclass
+class Observation:
+    scene: Image.Image
+    wrist: Image.Image
+    state: str
+
+
+VIEWS = ("wrist", "both")
+
+
+def open_episode(seed: int, frame: str = "base") -> tuple[Sim, Arm, Episode]:
+    ep = episode(seed)
+    sim = Sim(with_box(SimSpec(seed=seed), ep.box, ep.target_xy))
+    # MuJoCo's default near plane is 3.2 cm, which clips the box out of the wrist view once it is between the jaws;
+    # the real camera sees it. (Found by the jev-policy team; not fixed in sim/ yet.)
+    sim.model.vis.map.znear = NEAR_CLIP_M / sim.model.stat.extent
+    return sim, Arm(sim, frame), ep
+
+
+def observe(arm: Arm) -> Observation:
+    j = arm.sim.joints()
+    e = arm.eef()
+    joints = ", ".join(f"{k} {v:.1f}" for k, v in j.items())
+    eef = ", ".join(f"{k} {v}" for k, v in e.items())
+    return Observation(_frame(arm, "side"), _frame(arm, "wrist"), f"joints (deg): {joints}\nend effector: {eef}")
+
+
+def _frame(arm: Arm, cam: str, tries: int = 4) -> Image.Image:
+    """The sim's renderer gives up after 10 s; with many sims sharing the GPU a frame can take longer."""
+    for _ in range(tries - 1):
+        try:
+            return arm.sim.frame(cam)
+        except queue.Empty:
+            continue
+    return arm.sim.frame(cam)
+
+
+def grade(sim: Sim) -> dict:
+    return score(sim.truth())
+
+
+def jpeg_b64(image: Image.Image, quality: int = 85) -> str:
+    buf = io.BytesIO()
+    image.convert("RGB").save(buf, format="JPEG", quality=quality)
+    return base64.standard_b64encode(buf.getvalue()).decode()
+
+
+def observation_blocks(obs: Observation, heading: str = "", views: str = "wrist") -> list[dict]:
+    """The wrist camera and the state; the scene camera too when `views` is "both" (the paper's setup, which the
+    real arm cannot have: it has only the wrist camera)."""
+    if views not in VIEWS:
+        raise ValueError(views)
+    blocks: list[dict] = []
+    if heading:
+        blocks.append({"type": "text", "text": heading})
+    if views == "both":
+        blocks += [{"type": "text", "text": "Scene camera:"}, _image(obs.scene)]
+    blocks += [{"type": "text", "text": "Wrist camera:"}, _image(obs.wrist), {"type": "text", "text": obs.state}]
+    return blocks
+
+
+def _image(image: Image.Image) -> dict:
+    return {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": jpeg_b64(image)}}

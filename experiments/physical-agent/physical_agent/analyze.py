@@ -12,7 +12,10 @@ import json
 import statistics
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw
+
+from .tool import to_base
 
 RUNS = Path(__file__).resolve().parent.parent / "runs"
 CLOSED = 20.0
@@ -53,6 +56,8 @@ def grasps(events: list[dict], seed: int) -> list[dict]:
         ran = acts[: e.get("ran", 0)]
         truth = e.get("truth") or {}
         for a in ran:
+            if "forward" in a:
+                a = to_base(a, np.array(e["start"]))
             g = float(a["gripper"])
             if current is None and g <= CLOSED and grip > CLOSED:
                 miss = ((a["x"] - box_xy[0]) ** 2 + (a["y"] - box_xy[1]) ** 2) ** 0.5
@@ -126,6 +131,22 @@ def episodes(run: str) -> str:
     return "\n".join(out)
 
 
+def show(episode_dir: str) -> str:
+    """One episode turn by turn: what the model said, what it called, and the truth after (grading only)."""
+    out = []
+    for line in (RUNS / episode_dir / "events.jsonl").read_text().splitlines():
+        e = json.loads(line)
+        said = (e.get("reasoning") or e.get("thinking_summary") or "").replace("\n", " ")
+        out.append(f"T{e['turn']}: {said[:400]}")
+        for a in (e.get("actions") or [])[: max(e.get("ran", 0), 1)]:
+            out.append("    " + ", ".join(f"{k} {v}" for k, v in a.items() if k != "control_steps"))
+        if e.get("result"):
+            t = e["truth"]
+            out.append(f"    -> {e['result']} | truth: held {t['held']}, box ({t['box']['x']:.3f}, {t['box']['y']:.3f}) "
+                       f"tilt {t['box']['tilt_deg']}")
+    return "\n".join(out)
+
+
 def sheet(episode_dir: str, turns: list[int], out: Path, width: int = 480) -> Path:
     """Scene and wrist frames side by side, one row per turn, labelled."""
     d = RUNS / episode_dir
@@ -137,7 +158,7 @@ def sheet(episode_dir: str, turns: list[int], out: Path, width: int = 480) -> Pa
         row = Image.new("RGB", (2 * width, h), "white")
         for k, im in enumerate(pair):
             row.paste(im.resize((width, h)), (k * width, 0))
-        ImageDraw.Draw(row).text((8, 6), "final" if t < 0 else f"after turn {t}", fill=(255, 255, 0))
+        ImageDraw.Draw(row).text((8, 6), "final" if t < 0 else "start" if t == 0 else f"after turn {t}", fill=(255, 255, 0))
         rows.append(row)
     sheet_im = Image.new("RGB", (2 * width, sum(r.height for r in rows)), "white")
     y = 0
@@ -153,8 +174,12 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="python -m physical_agent.analyze", description=__doc__)
     p.add_argument("runs", nargs="*")
     p.add_argument("--sheet", help="runs-relative episode folder, then turns (-1 = final)")
+    p.add_argument("--show", help="runs-relative episode folder: print it turn by turn")
     p.add_argument("--out", type=Path)
     a = p.parse_args(argv)
+    if a.show:
+        print(show(a.show))
+        return 0
     if a.sheet:
         turns = [int(t) for t in a.runs]
         print(sheet(a.sheet, turns, a.out or RUNS / "sheet.jpg"))

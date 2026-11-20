@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import io
+import queue
 from dataclasses import dataclass
 
 from PIL import Image
@@ -40,7 +41,17 @@ def observe(arm: Arm) -> Observation:
     e = arm.eef()
     joints = ", ".join(f"{k} {v:.1f}" for k, v in j.items())
     eef = ", ".join(f"{k} {v}" for k, v in e.items())
-    return Observation(arm.sim.frame("side"), arm.sim.frame("wrist"), f"joints (deg): {joints}\nend effector: {eef}")
+    return Observation(_frame(arm, "side"), _frame(arm, "wrist"), f"joints (deg): {joints}\nend effector: {eef}")
+
+
+def _frame(arm: Arm, cam: str, tries: int = 4) -> Image.Image:
+    """The sim's renderer gives up after 10 s; with many sims sharing the GPU a frame can take longer."""
+    for _ in range(tries - 1):
+        try:
+            return arm.sim.frame(cam)
+        except queue.Empty:
+            continue
+    return arm.sim.frame(cam)
 
 
 def grade(sim: Sim) -> dict:

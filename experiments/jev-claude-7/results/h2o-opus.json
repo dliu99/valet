@@ -1,0 +1,221 @@
+{
+ "summary": {
+  "name": "h2o-opus",
+  "seeds": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "model": "claude-opus-5-5",
+  "fast": "h2o",
+  "effort": "medium",
+  "lessons": "runs/h2o-opus/lessons.md",
+  "episodes": 5,
+  "placed": 4,
+  "lifted": 5,
+  "self_placed": 4,
+  "self_agrees": 5,
+  "median_seconds": 275.3,
+  "claude_calls_per_ep": 2.2,
+  "claude_usd_per_ep": 0.1045,
+  "jev_calls_per_ep": 15.6,
+  "jev_usd_per_ep": 0.0,
+  "replans_per_ep": 0.2,
+  "errors": [],
+  "wall_seconds": 1449
+ },
+ "results": [
+  {
+   "seed": 0,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0095,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 292.5,
+   "sim_seconds": 29.4,
+   "claude": {
+    "calls": 2,
+    "usd": 0.1141,
+    "in": 7214,
+    "out": 3901,
+    "cache_read": 1855,
+    "s": 43.6
+   },
+   "jev": {
+    "calls": 16,
+    "usd": 0.0,
+    "tokens": 28508,
+    "note": "local H2O-Lightning-4B: no API charge"
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.8984,
+    "jev_upright": 0.883,
+    "offset_cm": 1.1,
+    "height_cm": 8.9,
+    "first_height_cm": 9.0,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "04-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "h2o"
+  },
+  {
+   "seed": 1,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0179,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 251.9,
+   "sim_seconds": 29.2,
+   "claude": {
+    "calls": 2,
+    "usd": 0.1013,
+    "in": 7053,
+    "out": 3622,
+    "cache_read": 3232,
+    "s": 39.2
+   },
+   "jev": {
+    "calls": 14,
+    "usd": 0.0,
+    "tokens": 26228,
+    "note": "local H2O-Lightning-4B: no API charge"
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.7889,
+    "jev_upright": 0.6444,
+    "offset_cm": 2.3,
+    "height_cm": 7.9,
+    "first_height_cm": 7.2,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "03-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "h2o"
+  },
+  {
+   "seed": 2,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0238,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 1,
+   "seconds": 374.2,
+   "sim_seconds": 31.7,
+   "claude": {
+    "calls": 3,
+    "usd": 0.1369,
+    "in": 13746,
+    "out": 3714,
+    "cache_read": 3710,
+    "s": 37.1
+   },
+   "jev": {
+    "calls": 19,
+    "usd": 0.0,
+    "tokens": 34403,
+    "note": "local H2O-Lightning-4B: no API charge"
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.8932,
+    "jev_upright": 0.1764,
+    "offset_cm": 2.8,
+    "height_cm": 7.7,
+    "first_height_cm": 8.7,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "04-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "h2o"
+  },
+  {
+   "seed": 3,
+   "placed": true,
+   "lifted": true,
+   "off_target_m": 0.0136,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 250.9,
+   "sim_seconds": 27.5,
+   "claude": {
+    "calls": 2,
+    "usd": 0.078,
+    "in": 7249,
+    "out": 2416,
+    "cache_read": 3232,
+    "s": 26.0
+   },
+   "jev": {
+    "calls": 15,
+    "usd": 0.0,
+    "tokens": 28188,
+    "note": "local H2O-Lightning-4B: no API charge"
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.893,
+    "jev_upright": 0.1091,
+    "offset_cm": 0.8,
+    "height_cm": 6.8,
+    "first_height_cm": 6.7,
+    "tipped": false,
+    "placed_self": true,
+    "frame": "03-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "h2o"
+  },
+  {
+   "seed": 4,
+   "placed": false,
+   "lifted": true,
+   "off_target_m": 0.0454,
+   "tilt_deg": 0.0,
+   "released": true,
+   "replans": 0,
+   "seconds": 275.3,
+   "sim_seconds": 34.4,
+   "claude": {
+    "calls": 2,
+    "usd": 0.092,
+    "in": 7822,
+    "out": 3001,
+    "cache_read": 3232,
+    "s": 31.7
+   },
+   "jev": {
+    "calls": 14,
+    "usd": 0.0,
+    "tokens": 27871,
+    "note": "local H2O-Lightning-4B: no API charge"
+   },
+   "self_check": {
+    "holding": false,
+    "jev_on_square": 0.8958,
+    "jev_upright": 0.8741,
+    "offset_cm": 4.6,
+    "height_cm": 7.9,
+    "first_height_cm": 8.0,
+    "tipped": false,
+    "placed_self": false,
+    "frame": "02-final.jpg"
+   },
+   "model": "claude-opus-5-5",
+   "fast_model": "h2o"
+  }
+ ]
+}

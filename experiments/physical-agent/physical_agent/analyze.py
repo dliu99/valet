@@ -18,6 +18,7 @@ from PIL import Image, ImageDraw
 from .tool import to_base
 
 RUNS = Path(__file__).resolve().parent.parent / "runs"
+RESULTS = RUNS.parent / "results"
 CLOSED = 20.0
 OPEN = 30.0
 
@@ -61,7 +62,8 @@ def grasps(events: list[dict], seed: int) -> list[dict]:
             g = float(a["gripper"])
             if current is None and g <= CLOSED and grip > CLOSED:
                 miss = ((a["x"] - box_xy[0]) ** 2 + (a["y"] - box_xy[1]) ** 2) ** 0.5
-                current = {"turn": e["turn"], "held": False, "miss_m": round(miss, 4)}
+                current = {"turn": e["turn"], "held": False, "miss_m": round(miss, 4), "pitch": float(a["pitch_deg"]),
+                           "roll": float(a["roll_deg"]), "z": float(a["z"])}
                 attempts.append(current)
             elif current is not None and g >= OPEN:
                 current["released_turn"] = e["turn"]
@@ -87,13 +89,16 @@ def recovery(ep: dict) -> dict:
     tipped = any((e.get("truth") or {}).get("box", {}).get("tilt_deg", 0) > 15 for e in ep["events"])
     return {"attempts": len(atts), "failed": len(failed), "retried": retried, "recovered": recovered,
             "first_miss_m": atts[0]["miss_m"] if atts else None, "misses_m": [a["miss_m"] for a in atts],
+            "demo_pose": sum(abs(a["pitch"] - 70) < 1 and abs(a["z"] - 0.035) < 0.004 and abs(a["roll"] + 90) < 1 for a in atts),
+            "rolled": sum(abs(a["roll"] + 90) >= 5 for a in atts),
             "ik_failures": ik_fail, "tipped": tipped, "false_done": ep["ended"] == "done" and not ep["placed"]}
 
 
 def table(runs: list[str]) -> str:
     head = ("| run | model | views | frame | condition | placed | lifted | median turns | median s (wall / sim) | "
             "median tokens | $ / episode | grasps (held) | episodes with a failed grasp: retried / recovered / placed | "
-            "said done but not placed | turn budget hit | median miss at first grasp (cm) |")
+            "ended without a call, not placed | turn budget hit | median miss at first grasp (cm) | "
+            "lifted, not placed: > 3 cm off / tilted / in jaws | grasps at the demo's pose | grasps with roll turned |")
     lines = [head, "|" + "---|" * (head.count("|") - 1)]
     for run in runs:
         s, eps = load(run)
@@ -108,8 +113,17 @@ def table(runs: list[str]) -> str:
             f"{sum(r['attempts'] for r in recs)} ({sum(r['attempts'] - r['failed'] for r in recs)}) | "
             f"{len(with_fail)}: {sum(r['retried'] for _, r in with_fail)} / {sum(r['recovered'] for _, r in with_fail)} / "
             f"{sum(e['placed'] for e, _ in with_fail)} | {sum(r['false_done'] for r in recs)} | "
-            f"{s['ended'].get('turn budget', 0)} | {_median_cm([r['first_miss_m'] for r in recs])} |")
+            f"{s['ended'].get('turn budget', 0)} | {_median_cm([r['first_miss_m'] for r in recs])} | {_why_not(eps)} | "
+            f"{sum(r['demo_pose'] for r in recs)} | {sum(r['rolled'] for r in recs)} |")
     return "\n".join(lines)
+
+
+def _why_not(eps: list[dict]) -> str:
+    near = [e for e in eps if e["lifted"] and not e["placed"]]
+    off = sum(e["off_target_m"] > 0.03 for e in near)
+    tilted = sum(e["tilt_deg"] > 15 for e in near)
+    held = sum(not e["released"] for e in near)
+    return f"{off} / {tilted} / {held}"
 
 
 def _median_cm(xs: list) -> str:
@@ -176,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--sheet", help="runs-relative episode folder, then turns (-1 = final)")
     p.add_argument("--show", help="runs-relative episode folder: print it turn by turn")
     p.add_argument("--out", type=Path)
+    p.add_argument("--export", action="store_true", help="also write results/<run>.json: settings, summary, per-seed rows")
     a = p.parse_args(argv)
     if a.show:
         print(show(a.show))
@@ -184,6 +199,12 @@ def main(argv: list[str] | None = None) -> int:
         turns = [int(t) for t in a.runs]
         print(sheet(a.sheet, turns, a.out or RUNS / "sheet.jpg"))
         return 0
+    if a.export:
+        RESULTS.mkdir(exist_ok=True)
+        for run in a.runs:
+            summary, eps = load(run)
+            rows = [{k: v for k, v in e.items() if k != "events"} | {"grasps": recovery(e)} for e in eps]
+            (RESULTS / f"{run}.json").write_text(json.dumps({"summary": summary, "rows": rows}, indent=1))
     print(table(a.runs))
     print()
     for run in a.runs:

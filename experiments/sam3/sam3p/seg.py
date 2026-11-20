@@ -1,5 +1,6 @@
 """SAM 3 (Meta's open-vocabulary segmenter) on Apple silicon through mlx-vlm's port, `mlx-community/sam3-bf16`
-(facebook/sam3 is gated; the MLX conversion carries the same weights under the SAM License).
+(facebook/sam3 is gated; the MLX conversion carries the same weights under the SAM License). `version="3.1"` loads
+SAM 3.1 (`mlx-community/sam3.1-bf16`), whose detector differs only in its neck.
 
 One vision-backbone pass per frame serves every text prompt; each prompt then runs SAM 3's DETR encoder, decoder
 and mask head. `Segmenter.segment` returns, per prompt, the instances above a score floor, best first."""
@@ -12,7 +13,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from PIL import Image
 
-MODEL = "mlx-community/sam3-bf16"
+MODELS = {"3": "mlx-community/sam3-bf16", "3.1": "mlx-community/sam3.1-bf16"}
 
 
 @dataclass
@@ -30,24 +31,31 @@ class Instance:
 class Segmenter:
     resolution: int = 1008
     floor: float = 0.1
+    version: str = "3"
     calls: list[dict] = field(default_factory=list)
 
     def __post_init__(self):
         import mlx.core as mx
         from mlx_vlm.models.sam3.generate import Sam3Predictor
-        from mlx_vlm.models.sam3.processing_sam3 import Sam3Processor
         from mlx_vlm.utils import get_model_path, load_model
 
-        path = get_model_path(MODEL)
+        if self.version == "3.1":
+            from mlx_vlm.models.sam3_1 import generate as gen
+            from mlx_vlm.models.sam3_1.processing_sam3_1 import Sam31Processor as Processor
+        else:
+            from mlx_vlm.models.sam3 import generate as gen
+            from mlx_vlm.models.sam3.processing_sam3 import Sam3Processor as Processor
+        self._backbone, self._det_features = gen._get_backbone_features, gen._get_det_features
+        path = get_model_path(MODELS[self.version])
         self.mx = mx
         self.model = load_model(path)
-        self.processor = Sam3Processor.from_pretrained(str(path))
+        self.processor = Processor.from_pretrained(str(path))
         self.processor.image_size = self.resolution
         self.predictor = Sam3Predictor(self.model, self.processor, score_threshold=self.floor)
         self._last = None
 
     def segment(self, image: Image.Image, prompts: list[str]) -> dict[str, list[Instance]]:
-        from mlx_vlm.models.sam3.generate import _get_backbone_features, _get_det_features, _resize_masks
+        from mlx_vlm.models.sam3.generate import _resize_masks
 
         mx = self.mx
         t0 = time.time()
@@ -56,8 +64,8 @@ class Segmenter:
             src, pos_flat, fpn, (hf, wf) = self._last[2]
         else:
             pixel_values = mx.array(self.processor.preprocess_image(image)["pixel_values"])
-            backbone = _get_backbone_features(self.model, pixel_values)
-            src, pos_flat, fpn, (hf, wf) = _get_det_features(self.model, backbone)
+            backbone = self._backbone(self.model, pixel_values)
+            src, pos_flat, fpn, (hf, wf) = self._det_features(self.model, backbone)  # fpn: the levels the mask head reads
             self._last = (image, self.processor.image_size, (src, pos_flat, fpn, (hf, wf)))
         det = self.model.detector_model
         w, h = image.size

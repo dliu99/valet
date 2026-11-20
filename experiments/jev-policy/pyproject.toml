@@ -1,0 +1,16 @@
+[project]
+name = "jev-policy"
+version = "0.1.0"
+description = "Pure reactive Jev control of the simulated SO-101 on the valet-sim benchmark."
+requires-python = ">=3.12"
+dependencies = [
+    "valet-sim",
+    "anthropic>=0.70",
+    "httpx>=0.27",
+]
+
+[tool.uv.sources]
+valet-sim = { path = "../../sim", editable = true }
+
+[tool.uv]
+package = false

@@ -17,6 +17,7 @@ SIDE_CAMERA = "side_cam"
 GRASP_SITE = "grasp"
 CAMERA_DECOR = ("wrist_camera_lens", "wrist_camera_pcb")
 GRASP_IN_GRIPPER = (0.012, 0.0, -0.085)
+NEAR_CLIP_M = 0.004
 MOTORS = ("shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper")
 
 
@@ -103,5 +104,7 @@ def build(scene: SceneSpec = SceneSpec()) -> mujoco.MjModel:
     body.add_geom(name="box", type=mujoco.mjtGeom.mjGEOM_BOX, size=[b.w / 2, b.d / 2, b.h / 2], mass=b.mass_kg,
                   rgba=list(b.rgba), friction=[b.friction, 0.01, 0.001], condim=4, solref=[0.01, 1])
     world.add_camera(name=SIDE_CAMERA, pos=[0.25, -0.55, 0.3], xyaxes=[1, 0, 0, 0, 0.45, 1], fovy=55)
-    return spec.compile()
+    model = spec.compile()
+    model.vis.map.znear = NEAR_CLIP_M / model.stat.extent
+    return model
 

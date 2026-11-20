@@ -329,11 +329,12 @@ def expected(answer: dict, values: tuple[float, ...]) -> float:
 @dataclass
 class Config:
     max_ticks: int = 100
-    max_goals: int = 6
+    max_goals: int = 12
     stall_ticks: int = 6
     side: bool = False
     verify_done: bool = False
     claude: bool = True
+    gripper_loops: bool = True
     memory: bool = False
 
 
@@ -353,7 +354,8 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
 
     def frames() -> dict[str, bytes]:
         f = {"wrist": jpeg(arm.marked_frame())}
-        f["side"] = jpeg(arm.marked_frame("side") if cfg.side else sim.frame("side"))
+        if cfg.side:
+            f["side"] = jpeg(arm.marked_frame("side"))
         return f
 
     f = frames()
@@ -370,7 +372,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         state = {"goal": goal, "arm": reading, "last_move": last and {k: last[k] for k in ("move", "amount", "result")}}
         if memory and memory.at:
             state["last_seen_cm_from_red_dot"] = memory.cm_from(dot)
-        images = {"wrist": f["wrist"]} | ({"side": f["side"]} if cfg.side else {})
+        images = f
         answers = jev.ask(state, images, questions)
         move = answers["move:next"]["choice"]
         amount, result = None, None
@@ -403,7 +405,7 @@ def run_episode(seed: int, cfg: Config, out: Path) -> dict:
         why = None
         if move == "done":
             why = "done"
-        elif stalled(history, cfg.stall_ticks):
+        elif stalled(history, cfg.stall_ticks, gripper_counts=not cfg.gripper_loops):
             why = "stall"
         if why and not writer:
             if why == "done":
@@ -469,10 +471,14 @@ class Memory:
         return {OBJECTS[k]: round(float(np.linalg.norm((v - dot)[:2])) * 100, 1) for k, v in self.at.items()}
 
 
-def stalled(history: list[dict], n: int) -> bool:
-    """No progress: the jaws are back within 1.5 cm of where they were n ticks ago and the gripper did nothing."""
+def stalled(history: list[dict], n: int, gripper_counts: bool = True) -> bool:
+    """No progress: the jaws are back within 1.5 cm of where they were n ticks ago, and in the same state."""
     recent = history[-n:]
-    if len(recent) < n or any(h["move"] in ("open", "close", "new goal") for h in recent):
+    if len(recent) < n or any(h["move"] == "new goal" for h in recent):
+        return False
+    if gripper_counts and any(h["move"] in ("open", "close") for h in recent):
+        return False
+    if recent[-1]["arm"]["jaws"] != recent[0]["arm"]["jaws"]:
         return False
     return float(np.linalg.norm(np.subtract(recent[-1]["grasp_point"], recent[0]["grasp_point"]))) < 0.015
 
@@ -494,14 +500,19 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--no-claude", action="store_true", help="Jev alone: the goal is the task sentence, and Jev's done ends the episode")
     p.add_argument("--memory", action="store_true", help="remember where the wrist camera last saw the box and the square")
     p.add_argument("--jobs", type=int, default=5)
+    p.add_argument("--repeats", type=int, default=1)
+    p.add_argument("--max-goals", type=int, default=Config.max_goals)
+    p.add_argument("--no-gripper-loops", action="store_true", help="gripper moves always count as progress")
     p.add_argument("--tag", default="run")
     a = p.parse_args(argv)
     load_env()
-    cfg = Config(max_ticks=a.max_ticks, side=a.side, verify_done=a.verify_done, claude=not a.no_claude, memory=a.memory)
+    cfg = Config(max_ticks=a.max_ticks, max_goals=a.max_goals, side=a.side, verify_done=a.verify_done, claude=not a.no_claude,
+                 memory=a.memory, gripper_loops=not a.no_gripper_loops)
     run_dir = HERE / "runs" / f"{time.strftime('%Y%m%d-%H%M%S')}-{a.tag}"
     results = []
     with ProcessPoolExecutor(a.jobs) as pool:
-        futures = [pool.submit(run_episode, seed, cfg, run_dir / f"seed{seed:02d}") for seed in a.seeds]
+        futures = [pool.submit(run_episode, seed, cfg, run_dir / (f"seed{seed:02d}" + (f"-r{k}" if a.repeats > 1 else "")))
+                   for k in range(a.repeats) for seed in a.seeds]
     for fut in futures:
         r = fut.result()
         results.append(r)
@@ -509,7 +520,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"seed {seed}: placed={r['placed']} lifted={r['lifted']} touched={r['touched']} closest={r['closest_cm']}cm off={r['off_target_m']} end={r['end']} ticks={r['ticks']} "
               f"episode={r['episode_s']}s usd={r['usd']['total']}", flush=True)
     n = len(results)
-    summary = {"tag": a.tag, "config": vars(cfg), "seeds": a.seeds,
+    summary = {"tag": a.tag, "config": vars(cfg), "seeds": a.seeds, "repeats": a.repeats,
                "placed": sum(r["placed"] for r in results), "lifted": sum(r["lifted"] for r in results), "n": n,
                "median_episode_s": statistics.median(r["episode_s"] for r in results),
                "median_wall_s": statistics.median(r["wall_s"] for r in results),

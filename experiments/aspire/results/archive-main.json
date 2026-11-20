@@ -1,0 +1,1322 @@
+{
+ "archive": [
+  {
+   "id": "r0a0",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 9,
+   "lifted": 9,
+   "fitness": 9.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0202,
+     "error": null,
+     "localize_calls": 3
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0133,
+     "error": null,
+     "localize_calls": 3
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0061,
+     "error": null,
+     "localize_calls": 3
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0111,
+     "error": null,
+     "localize_calls": 3
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0125,
+     "error": null,
+     "localize_calls": 3
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0094,
+     "error": null,
+     "localize_calls": 3
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0069,
+     "error": null,
+     "localize_calls": 3
+    },
+    "107": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0174,
+     "error": null,
+     "localize_calls": 3
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0035,
+     "error": null,
+     "localize_calls": 3
+    },
+    "109": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2271,
+     "error": null,
+     "localize_calls": 3
+    }
+   },
+   "notes": "This is the run-2 program (8/10 placed on the debug scenes) plus one untested change: the measured box width is now clamped to 2\u20136 cm. Final pipeline: find the box and square from the start view; take a second view to estimate the box's top height (where the two camera rays to the box centre come closest); get box yaw and width from white pixels projected at that height; pick the roll that closes across the short side; shift the grasp so the fixed jaw clears the box; grasp at half height; carry low at pitch 90; lower and release over the square, offsetting for where the box sits in the jaws.\n\nWhat the traces showed:\n- Run 1: the high survey poses were unreachable, so stereo failed. Boxes were also grasped high and turned in the jaws, ending on their side (seeds 102 and 105). Fixed by grasping at half the estimated height and carrying at a lower height so pitch 90 stays reachable.\n- Run 2, seeds 108 and 109: the white-pixel mask also picked up the beige table, so the measured short side came out at 7\u201310 cm. The grasp was then shifted so far off centre that the jaws closed on nothing. The width clamp limits that shift; it should help there but was never run.\n- Runs 3 and 4 (5/10 and 6/10): I tried a brighter \"top face\" mask and a different second viewpoint. Both did worse because the fixed jaw covers the box in those views (seen in the wrist frames), so I went back to the run-2 version.\n\nKnown weaknesses: the yaw estimate is still unreliable. There is no retry if the grasp misses, and no check on height or placement after release.",
+   "usd": 0.72,
+   "skill": null
+  },
+  {
+   "id": "r0a2",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 9,
+   "lifted": 10,
+   "fitness": 9.395,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0213,
+     "error": null,
+     "localize_calls": 4
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0149,
+     "error": null,
+     "localize_calls": 4
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0163,
+     "error": null,
+     "localize_calls": 4
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0215,
+     "error": null,
+     "localize_calls": 4
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0186,
+     "error": null,
+     "localize_calls": 4
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.027,
+     "error": null,
+     "localize_calls": 4
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0137,
+     "error": null,
+     "localize_calls": 4
+    },
+    "107": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0078,
+     "error": null,
+     "localize_calls": 5
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0243,
+     "error": null,
+     "localize_calls": 4
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0182,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "Pipeline: from the start pose, localize the box and the square. Fly over the box and localize it again. Find the box's top face by thresholding bright pixels inside the bbox. Get the top height by triangulating the face's centroid from the two views. Get yaw and size from a minimum-area rectangle fit, keeping the smaller-area fit of the two views. Pick a roll that closes the jaws across a face, and offset the grasp point for the fixed jaw. If the jaw lands on the box top, rotate 90 degrees. Grasp 2.5 cm below the top, lift, and check the jaw reading. If nothing is held, look again and retry with a rotated grasp. Carry the box to the square and refine the square only if its bbox is unclipped and square-shaped. Place at the grasp height. If the place move stopped or the jaws stall while opening, back up a little and reopen. Moves fall back to lower pitches when out of reach.\n\nFixes, each found in the traces:\n- Run 1: pitch 90 couldn't be reached above z of about 0.08.\n- Run 2: the jaws landed on the box top. Rotated boxes and a bad height estimate from bbox-centre triangulation caused this; triangulating the top-face centroid fixed it.\n- Run 3: a blocked square bbox biased the square refinement, and the jaws stalled when opening against a stopped place. Fixed with the bbox shape checks and the back-up-before-open step.\n- Run 4: a wrong yaw estimate on seed 107. Fixed by the lift check and retry.\n\nResult: 9/10 placed, 10/10 lifted. The open failure is seed 107. The first yaw estimate there is wrong because a side face gets mixed into the top-face mask. The retry lifts the box, but it is held off-centre and ends tipped over after release.",
+   "usd": 1.3873,
+   "skill": null
+  },
+  {
+   "id": "r0a1",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 5,
+   "lifted": 8,
+   "fitness": 6.078,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.019,
+     "error": null,
+     "localize_calls": 3
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0081,
+     "error": null,
+     "localize_calls": 3
+    },
+    "102": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.018,
+     "error": null,
+     "localize_calls": 3
+    },
+    "103": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.0799,
+     "error": null,
+     "localize_calls": 3
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0115,
+     "error": null,
+     "localize_calls": 3
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0078,
+     "error": null,
+     "localize_calls": 3
+    },
+    "106": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.2157,
+     "error": null,
+     "localize_calls": 5
+    },
+    "107": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0148,
+     "error": null,
+     "localize_calls": 3
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0113,
+     "error": null,
+     "localize_calls": 3
+    },
+    "109": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2759,
+     "error": null,
+     "localize_calls": 5
+    }
+   },
+   "notes": "Final program places the box on 5 of the 10 debug scenes (100, 101, 104, 105, 108) and lifts it on 8. Run 3 had the same score; this version adds a retry and gentler placing.\n\nHow it works:\n- **Find:** from the starting pose it locates the box and the square. The square's position is taken straight from where the camera ray meets the table.\n- **Measure:** it moves to a second, closer view (pitch 75, falling back to 60). Box height comes from matching the bbox top edge across the two views. The centre is the midpoint of the near bottom edge and far top edge, replaced by the centre of the bright top-face pixels when the two agree within 3 cm. Yaw and width come from the shape of the top face.\n- **Grasp:** grip near the top (z = h - 2.5 cm), so tall boxes no longer get hit on the way down. It approaches along the jaw axis, trying pitch 90 first and stepping down to 40 until a pose is reachable. Pitch 90 is unreachable beyond about 0.25 m, which caused the many unreachable calls in run 1. The grasp point is shifted so the fixed jaw clears the box.\n- **Check:** after lifting it reads the jaw opening; if the jaws closed fully (missed), it looks again and retries once.\n- **Place:** the wrist roll is the one closest to the grasp roll, avoiding a large turn with the box in hand. Lowering height comes from the measured grasp height, and the centre is corrected for the fixed-jaw offset. If the jaws stall on opening, it raises 1.5 cm and opens again.\n\nFixes, by the failure that prompted them:\n- Run 1: the scan poses and the pitch-90 views were unreachable, and the box height was clamped to a wrong 2 cm. The jaws then landed on top of a tall box (seed 101 keyframes).\n- Run 2: the approach at z 0.078 hit the top of a roughly 10 cm box (seed 100 side view).\n- Run 4: re-measuring from a close-up view just before grasping made centre and yaw worse (wild yaw changes), so I removed it.\n\nRemaining failures (102, 103, 106, 107, 109):\n- **Centre/yaw error of 1\u20132 cm:** the jaws land on an edge or the box slips out (103, 106, 109).\n- **Approach hits a box taller than estimated:** the grasp happens high and the box then wedges (102).\n- **Box tilted in the hand:** after the grasp at pitch 80 the box hangs tilted on the fixed jaw and falls over at release (107).\n- **Height estimate:** the edge-matching height is rough and is the main weak point.",
+   "usd": 1.4162,
+   "skill": null
+  },
+  {
+   "id": "r0v0",
+   "round": 0,
+   "parent": "r0a2-run2",
+   "origin": "verifier",
+   "placed": 9,
+   "lifted": 9,
+   "fitness": 9.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0138,
+     "error": null,
+     "localize_calls": 5
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0108,
+     "error": null,
+     "localize_calls": 5
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0083,
+     "error": null,
+     "localize_calls": 5
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0198,
+     "error": null,
+     "localize_calls": 5
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0154,
+     "error": null,
+     "localize_calls": 5
+    },
+    "105": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2507,
+     "error": null,
+     "localize_calls": 5
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0237,
+     "error": null,
+     "localize_calls": 5
+    },
+    "107": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0017,
+     "error": null,
+     "localize_calls": 5
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0108,
+     "error": null,
+     "localize_calls": 5
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0175,
+     "error": null,
+     "localize_calls": 5
+    }
+   },
+   "notes": "The original program failed the way the skill describes: it got box height by doubling the triangulated z of the two bbox centres, so h came out at 0.11\u20130.15 (clamped at 0.15 in seeds 100 and 106). The jaws then closed above the box (set_gripper reached about 0 at 0.59\u20130.76 A in most failing scenes) and the top-face fits came out about 2 cm wide.\n\nFixes:\n1. Triangulate the top-face centroid instead. I segment the bright, low-saturation top-face pixels in both views (keeping an observe frame taken where the first localize looked), triangulate their centroids, and use that z directly as the top height. The footprint is back-projected at that height, and the grasp z is set 2.5 cm below the top. This took the debug run from 1/10 to 7/10 placed.\n2. Add a closer, steeper look from above the box before descending. In seed 109 the grasp xy was beside the box and the box was knocked over. The new view now updates only the box centre. When I also let it update yaw and size, seeds 101 and 107 broke: it picked a narrower width, the roll turned to about 0, and a jaw came down on the box. So those keep the hover-view values.\n3. Tighten the square refinement during carry. It is now rejected if the bbox is too big or touches the frame edge, or if it moves the target more than 2.5 cm. This fixes seed 104, where a 263x246 px bbox moved the target 4 cm.\n\nThe last debug run used fixes 1 and 2 with yaw and size also updated from the close view, and fix 3; it placed 7/10. I did not run the submitted version, which keeps the hover-view yaw and size. Seed 105 still fails: the descent stops about 3 cm above its goal and the jaws close on air.",
+   "usd": 0.6386,
+   "skill": "Triangulate the top-face centroid for box height, not the bbox centre"
+  },
+  {
+   "id": "r0v2",
+   "round": 0,
+   "parent": "r0a2-run3",
+   "origin": "verifier",
+   "placed": 8,
+   "lifted": 8,
+   "fitness": 8.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0158,
+     "error": null,
+     "localize_calls": 4
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0089,
+     "error": null,
+     "localize_calls": 4
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0093,
+     "error": null,
+     "localize_calls": 4
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0173,
+     "error": null,
+     "localize_calls": 4
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0155,
+     "error": null,
+     "localize_calls": 4
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0156,
+     "error": null,
+     "localize_calls": 4
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0085,
+     "error": null,
+     "localize_calls": 4
+    },
+    "107": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1165,
+     "error": null,
+     "localize_calls": 4
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0148,
+     "error": null,
+     "localize_calls": 4
+    },
+    "109": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1896,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "Applied the \"distrust a square re-localized with the box in the jaws\" fix. In seeds 102, 104 and 108 the program re-localized the square at the carry pose (calls #16/#18) while holding the box. The bboxes were about half as tall as wide (99x53, 97x46, 105x56) because the held box covered part of the square. The program accepted them anyway, shifted the target 2-3 cm and missed the square by 2.7-3.5 cm. Now the second view is only used if its bbox stays off the frame edge, is wider than 30 px, has height/width between 0.7 and 1.4, and lands within 2.5 cm of the first, clear estimate. Otherwise the first estimate is kept, and both values are logged. Debug result went from 5/10 to 8/10 placed, and off_target dropped in the scenes that already passed. Not fixed: seeds 107 and 109. There the grasp descent stops 4-7 cm short because a jaw lands on top of a tall box (roll/width choice and grasp offset), so nothing is lifted. That's a separate failure.",
+   "usd": 0.2955,
+   "skill": "Distrust a square re-localized while the box is in the jaws"
+  },
+  {
+   "id": "r1a1",
+   "round": 1,
+   "parent": "r0a0",
+   "origin": "actor",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0019,
+     "error": null,
+     "localize_calls": 3
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0098,
+     "error": null,
+     "localize_calls": 3
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0092,
+     "error": null,
+     "localize_calls": 3
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0103,
+     "error": null,
+     "localize_calls": 3
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0044,
+     "error": null,
+     "localize_calls": 3
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0068,
+     "error": null,
+     "localize_calls": 3
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0044,
+     "error": null,
+     "localize_calls": 3
+    },
+    "107": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0102,
+     "error": null,
+     "localize_calls": 3
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0025,
+     "error": null,
+     "localize_calls": 3
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0078,
+     "error": null,
+     "localize_calls": 3
+    }
+   },
+   "notes": "Seed 109 failure: tall box (~6.6 cm) seen obliquely at pitch 60. box_shape ran PCA on every bright pixel, side faces included, so it measured the box as 7.3 x 7.9 cm and got an unreliable yaw (-53 deg) for a near-square footprint. The jaws closed at the wrong angle (stalled at 32, 2.7 A), and during the lift (#17) the box slipped out (reading 0). Fix: segment only the top face (bright, low saturation, within 18 of the 97th percentile) and fit a minimum-area rectangle back-projected at the box height, as in r0a2. The yaw and width now come from the rectangle's short side. Height now comes from triangulating the top-face centroids of the two views (skill entry) instead of the bbox centres; this needs the observe frame kept from the first localize, and the old method stays as fallback. The old PCA is kept as a fallback for when the rectangle fit fails. Result: 10/10 placed (was 9/10), and off-target error is smaller on most seeds.",
+   "usd": 0.3819,
+   "skill": null
+  },
+  {
+   "id": "r1a0",
+   "round": 1,
+   "parent": "r0a2",
+   "origin": "actor",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0213,
+     "error": null,
+     "localize_calls": 4
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0232,
+     "error": null,
+     "localize_calls": 5
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0163,
+     "error": null,
+     "localize_calls": 4
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0215,
+     "error": null,
+     "localize_calls": 4
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0186,
+     "error": null,
+     "localize_calls": 4
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.027,
+     "error": null,
+     "localize_calls": 4
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0137,
+     "error": null,
+     "localize_calls": 4
+    },
+    "107": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0146,
+     "error": null,
+     "localize_calls": 5
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0243,
+     "error": null,
+     "localize_calls": 4
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0231,
+     "error": null,
+     "localize_calls": 5
+    }
+   },
+   "notes": "Seed 107 failure: the first grasp chose roll 2.2 (jaws closing along the reach). The descent (#10) moved from pitch 85 to 90, and on the way the open jaw struck the top of the box. The move came back 'stopped' and left the box tipped. The program then retried at roll -88 using the old pose estimate. The jaws closed on the leaning box and it slipped out. The third attempt was a diagonal grasp, and the box ended tilted 90 degrees. Fixes: (1) After a stopped descent, back off and re-localize/re-fit the box top from the hover pose before trying the alternative roll (remeasure helper, also used for the not-held retry). (2) The grasp cost now favors rolls near -90 more (0.00012 per degree instead of 0.00005), so near-square boxes don't get an along-reach grasp. (3) The pre-grasp pose tries pitch 90 first, so the final descent is mostly straight down. I first tried a version that used the pre-pose pitch for the descent. It broke seeds 100 and 108: grasping at pitch 72 gave about 3.2 cm placement error. So the descent pitch order is back to 90/84/78/72. Final run r1a0-run3: 10/10 placed, 10/10 lifted (was 9/10).",
+   "usd": 0.6955,
+   "skill": null
+  },
+  {
+   "id": "r1a2",
+   "round": 1,
+   "parent": "r0a2",
+   "origin": "actor",
+   "placed": 9,
+   "lifted": 10,
+   "fitness": 9.396,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0213,
+     "error": null,
+     "localize_calls": 4
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0149,
+     "error": null,
+     "localize_calls": 4
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0163,
+     "error": null,
+     "localize_calls": 4
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0215,
+     "error": null,
+     "localize_calls": 4
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0186,
+     "error": null,
+     "localize_calls": 4
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.027,
+     "error": null,
+     "localize_calls": 4
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0147,
+     "error": null,
+     "localize_calls": 4
+    },
+    "107": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0062,
+     "error": null,
+     "localize_calls": 5
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0243,
+     "error": null,
+     "localize_calls": 4
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0182,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "Seed 107 is still not fixed: this program places 9 of the 10 debug scenes, the same as r0a2.\n\nBehaviour is unchanged from r0a2; the full run r1a2-run2 gave identical scores. Two small changes:\n1. The top-face rectangle now comes from the close hover view instead of whichever view gives the smaller area. The start view's top face can be partly in the arm's shadow, which gives a smaller but wrong rectangle. In seed 107 this changed nothing.\n2. The retry re-looks at the box with the jaws at 40 instead of wide open, because open jaws hid part of the box in that view (run r1a2-run1).\n\nWhat goes wrong in seed 107:\n- The roll \u2248 2 descent (call #10) stopped about 7 cm high. The program then grasped at roll -88: the close (#14) stalled at a reading of 23.5, and the box slipped out on the lift (#15, reading -0.5).\n- The measured width was about 5.9 cm. The box is about 4.5 cm by eye in the frames, not measured. So the grasp offset left the fixed jaw roughly 2 cm from the box face. The moving jaw likely pushed the box across and turned it, leaving a weak grip.\n- The retry then grasped the box across its corners. At the place the box jammed in the jaws (the open stalled at about 26 with amps 2.7) and fell onto its side when released (tilt 90).\n\nExperiments I did not keep, for whoever continues:\n- A face-on retry with a deeper or re-closed grip (run r1a2-run3) still left the box wedged and it toppled.\n- Moving the jaws 5 mm toward the box centre (run r1a2-run4) made the first grasp close on nothing in 107. The other scenes still placed, but it does not fix 107.\n\nThe likely real fix is a better width estimate. The bright-pixel mask from the angled hover view probably picks up a side face, which would explain the oversized width.",
+   "usd": 1.0483,
+   "skill": null
+  },
+  {
+   "id": "r1v0",
+   "round": 1,
+   "parent": "r1a0-run2",
+   "origin": "verifier",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0214,
+     "error": null,
+     "localize_calls": 4
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0229,
+     "error": null,
+     "localize_calls": 5
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.015,
+     "error": null,
+     "localize_calls": 4
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0212,
+     "error": null,
+     "localize_calls": 4
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0184,
+     "error": null,
+     "localize_calls": 4
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0252,
+     "error": null,
+     "localize_calls": 4
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0135,
+     "error": null,
+     "localize_calls": 4
+    },
+    "107": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0078,
+     "error": null,
+     "localize_calls": 5
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0212,
+     "error": null,
+     "localize_calls": 4
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0234,
+     "error": null,
+     "localize_calls": 5
+    }
+   },
+   "notes": "Seeds 100 and 108 matched the skill's failure signature. The pre-grasp hover was unreachable at pitch 90/85/78 and settled near 70 (#10-13). The descent then reused that pitch via [max(pp,72), ...] and grasped at about 72.8 deg (#14), while the place descent ran at 88-90 deg (#22/#21). Because the held box swings about the grasp point when pitch changes, it landed flat but about 3.2 cm off target. Fix: the grasp descent and the place descent now both use the pitch list [90, 84, 78, 72]. The grasp pitch is logged next to the place pitch, and the ease/reopen moves fall back to the same list if the earlier pitch is unreachable. Debug run: 10/10 placed (was 8/10). Seed 100 went from 0.032 to 0.021 m off target and seed 108 from 0.032 to 0.021 m.",
+   "usd": 0.3099,
+   "skill": "Descend to grasp at vertical pitch, not at the hover's fallback pitch"
+  },
+  {
+   "id": "r1v1",
+   "round": 1,
+   "parent": "r0a2",
+   "origin": "verifier",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "per_seed": {
+    "100": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0213,
+     "error": null,
+     "localize_calls": 4
+    },
+    "101": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0232,
+     "error": null,
+     "localize_calls": 5
+    },
+    "102": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0163,
+     "error": null,
+     "localize_calls": 4
+    },
+    "103": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0215,
+     "error": null,
+     "localize_calls": 4
+    },
+    "104": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0186,
+     "error": null,
+     "localize_calls": 4
+    },
+    "105": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.027,
+     "error": null,
+     "localize_calls": 4
+    },
+    "106": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0137,
+     "error": null,
+     "localize_calls": 4
+    },
+    "107": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0164,
+     "error": null,
+     "localize_calls": 5
+    },
+    "108": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0243,
+     "error": null,
+     "localize_calls": 4
+    },
+    "109": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0231,
+     "error": null,
+     "localize_calls": 5
+    }
+   },
+   "notes": "Seed 107 failure: the first grasp descent (call #10, roll 2.24) stopped at z=0.100 against a planned 0.0275 (err 76 mm, pitch sagged to 71), meaning a jaw landed on the box top. The program then retried at roll -87.76 using the old centre and yaw. That grip timed out at 2.7 A and read -0.5 after the lift, so the box slipped out. The final fallback forced yaw+45 and grasped the box across its corners, and it fell over on release (tilt 90).\nFix: when a descent stops more than 1.5 cm above the grasp z, try_grasp now retreats to the box top + 6 cm, opens the jaws, goes back to the overhead view and localizes the box again. It rebuilds the top-face rectangle at the known height to get a new centre, yaw and sizes, recomputes the reach angle and roll candidates, and picks a roll more than 45\u00b0 from the blocked one. The updated estimate is returned to run(), so any later retry starts from it. The forced +45\u00b0 diagonal-yaw fallback is removed; the retry uses the freshly measured yaw. Debug result: placed 10/10 (was 9/10), lifted 10/10, and seed 107 is now placed at 1.6 cm off target. Seeds 101 and 109 also changed but are still placed (off target went from 1.5 to 2.3 cm and from 1.8 to 2.3 cm).",
+   "usd": 0.3008,
+   "skill": "Re-measure the box after a blocked grasp descent, before retrying at another roll"
+  }
+ ],
+ "events": [
+  {
+   "t": 1795206185,
+   "kind": "round_start",
+   "spent_usd": 0.59,
+   "round": 0
+  },
+  {
+   "t": 1795206478,
+   "kind": "candidate",
+   "spent_usd": 3.52,
+   "id": "r0a0",
+   "parent": null,
+   "origin": "actor",
+   "placed": 9,
+   "lifted": 9,
+   "fitness": 9.0,
+   "usd": 0.72
+  },
+  {
+   "t": 1795206661,
+   "kind": "candidate",
+   "spent_usd": 4.73,
+   "id": "r0a2",
+   "parent": null,
+   "origin": "actor",
+   "placed": 9,
+   "lifted": 10,
+   "fitness": 9.395,
+   "usd": 1.3873
+  },
+  {
+   "t": 1795206668,
+   "kind": "candidate",
+   "spent_usd": 4.73,
+   "id": "r0a1",
+   "parent": null,
+   "origin": "actor",
+   "placed": 5,
+   "lifted": 8,
+   "fitness": 6.078,
+   "usd": 1.4162
+  },
+  {
+   "t": 1795206669,
+   "kind": "round_end",
+   "spent_usd": 4.73,
+   "round": 0,
+   "best": "r0a2",
+   "placed": 9,
+   "lifted": 10,
+   "fitness": 9.395
+  },
+  {
+   "t": 1795206669,
+   "kind": "round_start",
+   "spent_usd": 4.73,
+   "round": 1
+  },
+  {
+   "t": 1795206772,
+   "kind": "fixes_found",
+   "spent_usd": 5.13,
+   "round": 0,
+   "n": 8,
+   "chosen": [
+    {
+     "before": "r0a2-run2",
+     "after": "r0a2-run3",
+     "fixed": {
+      "100": "placed",
+      "101": "placed",
+      "102": "lifted",
+      "103": "placed",
+      "104": "lifted",
+      "105": "placed",
+      "106": "placed"
+     },
+     "broke": [
+      108
+     ]
+    },
+    {
+     "before": "r0a1-run2",
+     "after": "r0a1-run3",
+     "fixed": {
+      "100": "placed",
+      "104": "placed",
+      "105": "placed",
+      "106": "lifted",
+      "107": "lifted",
+      "108": "placed"
+     },
+     "broke": [
+      109
+     ]
+    },
+    {
+     "before": "r0a2-run3",
+     "after": "r0a2-run4",
+     "fixed": {
+      "102": "placed",
+      "104": "placed",
+      "108": "placed",
+      "109": "placed"
+     },
+     "broke": []
+    }
+   ]
+  },
+  {
+   "t": 1795206793,
+   "kind": "skill_candidate",
+   "spent_usd": 5.37,
+   "before": "r0a2-run2",
+   "after": "r0a2-run3",
+   "fixed": {
+    "100": "placed",
+    "101": "placed",
+    "102": "lifted",
+    "103": "placed",
+    "104": "lifted",
+    "105": "placed",
+    "106": "placed"
+   },
+   "title": "Triangulate the top-face centroid for box height, not the bbox centre"
+  },
+  {
+   "t": 1795206926,
+   "kind": "candidate",
+   "spent_usd": 6.17,
+   "id": "r0v0",
+   "parent": "r0a2-run2",
+   "origin": "verifier",
+   "placed": 9,
+   "lifted": 9,
+   "fitness": 9.0,
+   "usd": 0.6386
+  },
+  {
+   "t": 1795206926,
+   "kind": "skill_admitted",
+   "spent_usd": 6.17,
+   "path": "skills/01-triangulate-the-top-face-centroid-for-box-height.md",
+   "title": "Triangulate the top-face centroid for box height, not the bbox centre",
+   "before": "r0a2-run2",
+   "after": "r0a2-run3",
+   "fixed": {
+    "100": "placed",
+    "101": "placed",
+    "102": "lifted",
+    "103": "placed",
+    "104": "lifted",
+    "105": "placed",
+    "106": "placed"
+   },
+   "verifier": "r0v0",
+   "reproduced": [
+    "100",
+    "101",
+    "102",
+    "103",
+    "104",
+    "106"
+   ],
+   "verifier_placed": 9,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 9.0,
+   "before_fitness": 1.0
+  },
+  {
+   "t": 1795206936,
+   "kind": "skill_none",
+   "spent_usd": 6.31,
+   "before": "r0a1-run2",
+   "after": "r0a1-run3",
+   "fixed": {
+    "100": "placed",
+    "104": "placed",
+    "105": "placed",
+    "106": "lifted",
+    "107": "lifted",
+    "108": "placed"
+   }
+  },
+  {
+   "t": 1795206956,
+   "kind": "skill_candidate",
+   "spent_usd": 6.47,
+   "before": "r0a2-run3",
+   "after": "r0a2-run4",
+   "fixed": {
+    "102": "placed",
+    "104": "placed",
+    "108": "placed",
+    "109": "placed"
+   },
+   "title": "Distrust a square re-localized while the box is in the jaws"
+  },
+  {
+   "t": 1795207018,
+   "kind": "candidate",
+   "spent_usd": 6.76,
+   "id": "r0v2",
+   "parent": "r0a2-run3",
+   "origin": "verifier",
+   "placed": 8,
+   "lifted": 8,
+   "fitness": 8.0,
+   "usd": 0.2955
+  },
+  {
+   "t": 1795207018,
+   "kind": "skill_admitted",
+   "spent_usd": 6.76,
+   "path": "skills/02-distrust-a-square-re-localized-while-the-box-is-.md",
+   "title": "Distrust a square re-localized while the box is in the jaws",
+   "before": "r0a2-run3",
+   "after": "r0a2-run4",
+   "fixed": {
+    "102": "placed",
+    "104": "placed",
+    "108": "placed",
+    "109": "placed"
+   },
+   "verifier": "r0v2",
+   "reproduced": [
+    "102",
+    "104",
+    "108"
+   ],
+   "verifier_placed": 8,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 8.0,
+   "before_fitness": 6.137
+  },
+  {
+   "t": 1795207018,
+   "kind": "skills_done",
+   "spent_usd": 6.76,
+   "round": 0
+  },
+  {
+   "t": 1795207018,
+   "kind": "round_start",
+   "spent_usd": 6.76,
+   "round": 1
+  },
+  {
+   "t": 1795207117,
+   "kind": "candidate",
+   "spent_usd": 7.78,
+   "id": "r1a1",
+   "parent": "r0a0",
+   "origin": "actor",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "usd": 0.3819
+  },
+  {
+   "t": 1795207219,
+   "kind": "candidate",
+   "spent_usd": 8.59,
+   "id": "r1a0",
+   "parent": "r0a2",
+   "origin": "actor",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "usd": 0.6955
+  },
+  {
+   "t": 1795207324,
+   "kind": "candidate",
+   "spent_usd": 9.0,
+   "id": "r1a2",
+   "parent": "r0a2",
+   "origin": "actor",
+   "placed": 9,
+   "lifted": 10,
+   "fitness": 9.396,
+   "usd": 1.0483
+  },
+  {
+   "t": 1795207325,
+   "kind": "fixes_found",
+   "spent_usd": 9.0,
+   "round": 1,
+   "n": 3,
+   "chosen": [
+    {
+     "before": "r1a0-run2",
+     "after": "r1a0-run3",
+     "fixed": {
+      "100": "placed",
+      "108": "placed"
+     },
+     "broke": []
+    },
+    {
+     "before": "r0a2",
+     "after": "r1a0",
+     "fixed": {
+      "107": "placed"
+     },
+     "broke": []
+    },
+    {
+     "before": "r0a0",
+     "after": "r1a1",
+     "fixed": {
+      "109": "placed"
+     },
+     "broke": []
+    }
+   ]
+  },
+  {
+   "t": 1795207343,
+   "kind": "skill_candidate",
+   "spent_usd": 9.14,
+   "before": "r1a0-run2",
+   "after": "r1a0-run3",
+   "fixed": {
+    "100": "placed",
+    "108": "placed"
+   },
+   "title": "Descend to grasp at vertical pitch, not at the hover's fallback pitch"
+  },
+  {
+   "t": 1795207432,
+   "kind": "candidate",
+   "spent_usd": 9.49,
+   "id": "r1v0",
+   "parent": "r1a0-run2",
+   "origin": "verifier",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "usd": 0.3099
+  },
+  {
+   "t": 1795207432,
+   "kind": "skill_admitted",
+   "spent_usd": 9.49,
+   "path": "skills/03-descend-to-grasp-at-vertical-pitch-not-at-the-ho.md",
+   "title": "Descend to grasp at vertical pitch, not at the hover's fallback pitch",
+   "before": "r1a0-run2",
+   "after": "r1a0-run3",
+   "fixed": {
+    "100": "placed",
+    "108": "placed"
+   },
+   "verifier": "r1v0",
+   "reproduced": [
+    "100",
+    "108"
+   ],
+   "verifier_placed": 10,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 10.0,
+   "before_fitness": 8.757
+  },
+  {
+   "t": 1795207452,
+   "kind": "skill_candidate",
+   "spent_usd": 9.62,
+   "before": "r0a2",
+   "after": "r1a0",
+   "fixed": {
+    "107": "placed"
+   },
+   "title": "Re-measure the box after a blocked grasp descent, before retrying at another roll"
+  },
+  {
+   "t": 1795207538,
+   "kind": "candidate",
+   "spent_usd": 9.94,
+   "id": "r1v1",
+   "parent": "r0a2",
+   "origin": "verifier",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0,
+   "usd": 0.3008
+  },
+  {
+   "t": 1795207538,
+   "kind": "skill_admitted",
+   "spent_usd": 9.94,
+   "path": "skills/04-re-measure-the-box-after-a-blocked-grasp-descent.md",
+   "title": "Re-measure the box after a blocked grasp descent, before retrying at another roll",
+   "before": "r0a2",
+   "after": "r1a0",
+   "fixed": {
+    "107": "placed"
+   },
+   "verifier": "r1v1",
+   "reproduced": [
+    "107"
+   ],
+   "verifier_placed": 10,
+   "before_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+   ],
+   "verifier_fitness_on_before_seeds": 10.0,
+   "before_fitness": 9.395
+  },
+  {
+   "t": 1795207544,
+   "kind": "skill_none",
+   "spent_usd": 10.02,
+   "before": "r0a0",
+   "after": "r1a1",
+   "fixed": {
+    "109": "placed"
+   }
+  },
+  {
+   "t": 1795207544,
+   "kind": "skills_done",
+   "spent_usd": 10.02,
+   "round": 1
+  },
+  {
+   "t": 1795207544,
+   "kind": "round_end",
+   "spent_usd": 10.02,
+   "round": 1,
+   "best": "r1a0",
+   "placed": 10,
+   "lifted": 10,
+   "fitness": 10.0
+  }
+ ]
+}

@@ -101,8 +101,8 @@ class Robot:
             joints = self._sim.joints()
             f = perceive.locate(image, text, perceive.frame_key(raw), self._backend)
             self._rec.calls[-1]["cached"] = f.cached  # for cost accounting; not shown to the program
-            out = {"found": f.found, "bbox": None, "center_px": None, "table_xy": None, "camera": camera,
-                   "joints": _r(joints, 2)}
+            out = {"found": f.found, "bbox": None, "center_px": None, "table_xy": None, "confidence": f.confidence,
+                   "camera": camera, "joints": _r(joints, 2)}
             if f.bbox is not None:
                 l, t, r, b = f.bbox
                 c = ((l + r) / 2, (t + b) / 2)

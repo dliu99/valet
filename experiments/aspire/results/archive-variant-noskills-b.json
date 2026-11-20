@@ -1,0 +1,319 @@
+{
+ "archive": [
+  {
+   "id": "r0a0",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 8,
+   "lifted": 8,
+   "fitness": 8.0,
+   "per_seed": {
+    "200": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0166,
+     "error": null,
+     "localize_calls": 3
+    },
+    "201": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0117,
+     "error": null,
+     "localize_calls": 3
+    },
+    "202": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0225,
+     "error": null,
+     "localize_calls": 3
+    },
+    "203": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0152,
+     "error": null,
+     "localize_calls": 3
+    },
+    "204": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0163,
+     "error": null,
+     "localize_calls": 3
+    },
+    "205": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.02,
+     "error": null,
+     "localize_calls": 3
+    },
+    "206": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.119,
+     "error": null,
+     "localize_calls": 3
+    },
+    "207": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0205,
+     "error": null,
+     "localize_calls": 3
+    },
+    "208": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.014,
+     "error": null,
+     "localize_calls": 3
+    },
+    "209": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1304,
+     "error": null,
+     "localize_calls": 3
+    }
+   },
+   "notes": "Submitted the run-2 program, the best of four versions: 8 of 10 debug scenes placed, 8 lifted.\n\nHow it works: from the start pose it finds the box and the blue square with localize. The box's base is estimated from where the bottom edge of its bounding box meets the table. It then takes a second, closer look from beside the box and gets the height by triangulating two camera rays: one through the top edge of the first bounding box, one through the centre of the second. In the second frame it takes the white pixels, projects them onto the plane at that height and uses PCA to get the box centre, short axis and width. Roll is set so the jaws close across the short axis. The grasp point is shifted so the fixed jaw sits just outside the box, and the grasp height is the estimated height minus 3 cm. To place it, it moves the same grasp-to-box offset over the square, lowers to just above the grasp height (+4 mm) and opens.\n\nRun 1 fixes: the planned 0.28 m survey pose was unreachable at pitch 60\u201390 (the 4-pitch fallback stopped at 60), so the box was measured from the start pose, the second view never happened and the height fell back to 4 cm. The boxes were taller than that, and the white mask also took in the side faces, so the measured width was too large. The grasp point came out offset by about 1.5 cm and the jaw landed on the box top (descend stopped around z = 0.04). Run 2 lowered the viewpoints, let the pitch fall back down to 40\u00b0, and added the triangulated height.\n\nStill failing in run 2:\n- **Seed 206:** box straight in front of the arm. Both views were taken from the y\u22480 line, so the triangulation came out nearly flat (height 0.012 m). The grasp height was clamped to 0.012 m, the descent stopped at z = 0.048, and the jaws closed on nothing.\n- **Seed 209:** large box. The orientation estimate was off (PCA on top plus side faces), so the jaws caught a corner. The gripper stalled at 5.7, then lost the box during the lift.\n\nTried and rolled back:\n- **Run 3** (4/10 placed): kept only the brightest face, used the smallest enclosing rectangle for orientation, and triangulated the bright-face centroids. The height came out about 0.09 m on every scene and the jaws closed on nothing in most failures.\n- **Run 4** (3/10 placed): grasped 5 cm below the estimated top instead of 3 cm. In seed 201 the box was already lying on its side before the descent. In 204, 205 and 208 the arm stopped about 11 cm up on the way down.\n\nKnown weaknesses: the height estimate is unreliable when the two views are nearly in line, and the box orientation is unreliable for near-square boxes.",
+   "usd": 0.9869,
+   "skill": null
+  },
+  {
+   "id": "r0a1",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 0,
+   "lifted": 1,
+   "fitness": 0.377,
+   "per_seed": {
+    "200": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2139,
+     "error": null,
+     "localize_calls": 4
+    },
+    "201": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.218,
+     "error": null,
+     "localize_calls": 4
+    },
+    "202": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.125,
+     "error": null,
+     "localize_calls": 4
+    },
+    "203": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.0276,
+     "error": null,
+     "localize_calls": 4
+    },
+    "204": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1826,
+     "error": null,
+     "localize_calls": 4
+    },
+    "205": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0339,
+     "error": null,
+     "localize_calls": 4
+    },
+    "206": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.0302,
+     "error": null,
+     "localize_calls": 4
+    },
+    "207": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.1905,
+     "error": null,
+     "localize_calls": 4
+    },
+    "208": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.0147,
+     "error": null,
+     "localize_calls": 4
+    },
+    "209": {
+     "placed": false,
+     "lifted": false,
+     "off_target_m": 0.2198,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "Not solved: this program placed the box in 0 of 10 debug scenes and lifted it in only 1 (seed 205), and that box was released about 3.4 cm from the square's centre. I'm submitting it because it was the best of four versions; the last one lifted nothing.\n\nHow it works: it finds the box and the square from the start pose with localize. It estimates the box's height and footprint by assuming the box is as deep as it is tall. It then twice moves above the box at pitch 90 (dropping to 80, 70 or 60 where that can't be reached) and localizes again. A minimum-area rectangle fitted to the white pixels sets the roll. Then it comes down from above to grasp low, carries the box and releases it over the square.\n\nWhat went wrong in each version:\n- Run 1: the colour threshold also picked up the table, so the box's angle came out wrong. Pitch-90 poses higher than about z 0.10 were unreachable, and the jaws came down on the box.\n- Run 2: my own pixel segmentation latched onto the white jaw, which is visible in the wrist image. The box estimate drifted toward +y each step, and the gripper closed on empty table.\n- Run 3 (this program): many boxes are taller than the 0.09 m approach height. In seed 200 the side and wrist frames show the open jaws coming down onto the top of a tall box and knocking it over.\n  - The height estimate comes out at about 0.05\u20130.10 m. In seed 200 it was 0.064 m, which is too low.\n  - Each refining localize moved the estimate about 1.5 cm further toward +y and \u2212x, which hurt.\n- Run 4: I switched to a side grasp from behind the box at pitch 30. The footprint estimate from the bottom edge of the box's bounding box was too close to the base (seeds 200 and 201), or overshot by 10 cm or more on the second look (seeds 204\u2013209). Many low poses near the base were unreachable or ran into the table, so nothing was lifted.\n\nWhat I'd try next:\n- A side grasp at about 2\u20133 cm height, coming in along the reach direction, using a properly checked footprint estimate (for example, the lowest white pixels with the jaw region masked out).\n- Detecting a stall on the way down to measure how tall the box is.\n- After grasping, re-measuring where the box sits relative to the grasp point before placing it.",
+   "usd": 1.0614,
+   "skill": null
+  },
+  {
+   "id": "r0a2",
+   "round": 0,
+   "parent": null,
+   "origin": "actor",
+   "placed": 6,
+   "lifted": 10,
+   "fitness": 7.517,
+   "per_seed": {
+    "200": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.058,
+     "error": null,
+     "localize_calls": 4
+    },
+    "201": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0061,
+     "error": null,
+     "localize_calls": 6
+    },
+    "202": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0156,
+     "error": null,
+     "localize_calls": 4
+    },
+    "203": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0084,
+     "error": null,
+     "localize_calls": 4
+    },
+    "204": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0233,
+     "error": null,
+     "localize_calls": 4
+    },
+    "205": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.053,
+     "error": null,
+     "localize_calls": 5
+    },
+    "206": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0156,
+     "error": null,
+     "localize_calls": 4
+    },
+    "207": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0161,
+     "error": null,
+     "localize_calls": 4
+    },
+    "208": {
+     "placed": true,
+     "lifted": true,
+     "off_target_m": 0.0221,
+     "error": null,
+     "localize_calls": 4
+    },
+    "209": {
+     "placed": false,
+     "lifted": true,
+     "off_target_m": 0.0076,
+     "error": null,
+     "localize_calls": 4
+    }
+   },
+   "notes": "Debug results by version: run 1 0/10 placed and 0/10 lifted; run 3 4/10 placed and 10/10 lifted; run 4 2/10 placed and 10/10 lifted; run 5 (this program) 6/10 placed and 10/10 lifted.\n\nWhat the traces showed and what changed:\n- Run 1: high top-down poses were unreachable (pitch 90 at z=0.10 or above around x=0.23), so the arm swept from its start pose straight down onto the box and knocked it over. Fix: move_any tries pitches 90, then 80 down to 40, then a lower height, until IK finds a solution.\n- The fixed jaw sits 2 cm off the grasp point, so centring the grasp point on the box put that jaw on the box top. Calls ending \"stopped\" at z 0.035\u20130.047 in seeds 206, 208 and 209 show this. Fix: the grasp point is offset so the fixed jaw clears the box side. If a descent still stops well above its target, the arm backs off, shifts 12 mm and tries again.\n- Boxes are tall upright prisms, about 8\u201310 cm high. Triangulating the box's bounding-box centre from the start view and an angled close-up view gave heights of about 0.07\u20130.097 m. The box top is now estimated from that. It is used to project the white top-face pixels onto the table plane (giving centre, width and yaw from PCA), to set the approach height and to grasp about 3.5 cm below the top. Before this, the approach height of 0.08 was below the top of the box and the jaws hit it.\n- Placing: the arm lowers to the height it grasped at plus 6 mm, then opens. The square's position is re-measured from an angled close-up view before setting down.\n- A grasp counts as held only if the jaw reading stays above 3 after lifting; otherwise the arm reopens and retries, up to 3 attempts.\n\nFailures not fixed:\n- Seeds 200 and 209: the jaws closed diagonally across the box corners (gripper \"timeout\" at a reading of 21\u201333), so the box tilted in the jaws. In the seed 209 close-up (call 6) the arm's shadow splits the top face, which probably skews the yaw estimate.\n- Seed 205: the yaw and width estimate was off and the jaws closed on nothing.\n- Seed 201: the first descent landed on the box and knocked it over.\n- In all three remaining seeds where the first grasp failed, the box had been knocked flat; the retry picked it up and set it down on the square, but lying on its side (graded tilt 90).\nA likely next step is a top-face segmentation that ignores the shadow, or fitting a rectangle instead of using PCA.",
+   "usd": 1.2582,
+   "skill": null
+  }
+ ],
+ "events": [
+  {
+   "t": 1795208083,
+   "kind": "round_start",
+   "spent_usd": 18.48,
+   "round": 0
+  },
+  {
+   "t": 1795208367,
+   "kind": "candidate",
+   "spent_usd": 25.05,
+   "id": "r0a0",
+   "parent": null,
+   "origin": "actor",
+   "placed": 8,
+   "lifted": 8,
+   "fitness": 8.0,
+   "usd": 0.9869
+  },
+  {
+   "t": 1795208377,
+   "kind": "candidate",
+   "spent_usd": 25.05,
+   "id": "r0a1",
+   "parent": null,
+   "origin": "actor",
+   "placed": 0,
+   "lifted": 1,
+   "fitness": 0.377,
+   "usd": 1.0614
+  },
+  {
+   "t": 1795212268,
+   "kind": "round_resume",
+   "spent_usd": 25.89,
+   "round": 0,
+   "missing": [
+    "r0a2"
+   ]
+  },
+  {
+   "t": 1795212613,
+   "kind": "candidate",
+   "spent_usd": 29.49,
+   "id": "r0a2",
+   "parent": null,
+   "origin": "actor",
+   "placed": 6,
+   "lifted": 10,
+   "fitness": 7.517,
+   "usd": 1.2582
+  },
+  {
+   "t": 1795212613,
+   "kind": "round_end",
+   "spent_usd": 29.49,
+   "round": 0,
+   "best": "r0a0",
+   "placed": 8,
+   "lifted": 8,
+   "fitness": 8.0
+  }
+ ]
+}

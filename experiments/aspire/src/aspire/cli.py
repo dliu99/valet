@@ -29,6 +29,7 @@ def main(argv: list[str] | None = None) -> int:
     v.add_argument("--seeds", default="heldout", help="heldout, debug, or a comma list")
     v.add_argument("--out", type=Path, required=True)
     v.add_argument("--backend", default="claude", choices=["claude", "jev", "h2o"], help="what answers localize")
+    v.add_argument("--record", metavar="CONFIG", help="append benchmark episodes to results/episodes.jsonl as CONFIG")
 
     sub.add_parser("spend", help="API spend so far, by role")
 
@@ -62,6 +63,10 @@ def main(argv: list[str] | None = None) -> int:
                   "localize_calls": ev["localize_calls"], "localize_paid": ev["localize_paid"], "usd": round(usd, 4), "wall_s": round(time.time() - t0),
                   "rows": rows}
         (a.out / "eval.json").write_text(json.dumps(report, indent=1))
+        if a.record and a.task == "benchmark":
+            from . import board
+
+            board.record_results(ev["results"], a.backend, a.record)
         for r in rows:
             print(f"seed {r['seed']:3}: {'placed' if r['placed'] else 'lifted' if r['lifted'] else 'failed':7} "
                   f"off {r['off_target_m']:.3f} tilt {r['tilt_deg']:5.1f} released {r['released']} {r['error'] or ''}")

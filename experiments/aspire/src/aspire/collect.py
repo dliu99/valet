@@ -16,6 +16,9 @@ RUNS = ("main", "variant-skills", "variant-skills-b", "variant-noskills", "varia
 EVALS = {
     "benchmark_final_heldout": "heldout/benchmark_final",
     "benchmark_final_heldout_after_merge": "heldout/benchmark_final_after_merge",
+    "benchmark_final_heldout_jev": "heldout/benchmark_final_jev",
+    "benchmark_final_heldout_jev_found_fix": "heldout/benchmark_final_jev_v2",
+    "benchmark_final_heldout_h2o": "heldout/benchmark_final_h2o",
     "zeroshot_variant_debug": "heldout/zeroshot_variant_debug",
     "zeroshot_variant_heldout": "heldout/zeroshot_variant_heldout",
     "variant_skills_final_heldout": "heldout/variant_skills_final",

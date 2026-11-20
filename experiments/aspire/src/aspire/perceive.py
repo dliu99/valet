@@ -46,7 +46,9 @@ def locate(image: Image.Image, text: str, key: str, backend: str = "jev") -> Fou
     path = CACHE_DIR / backend / hashlib.sha256(f"{text}\n{key}".encode()).hexdigest()[:32]
     if path.exists():
         d = json.loads(path.read_text())
-        return Found(d["found"], tuple(d["bbox"]) if d["bbox"] else None, d["confidence"], backend, cached=True)
+        bbox = tuple(d["bbox"]) if d["bbox"] else None
+        found = d["found"] if backend == "claude" else _has_area(bbox)
+        return Found(found, bbox, d["confidence"], backend, cached=True)
     if backend == "jev":
         out = _jev(image, text)
     elif backend == "h2o":
@@ -84,7 +86,13 @@ def _jev(image: Image.Image, text: str) -> Found:
     if b is None:
         return Found(False, None, conf, name)
     bbox = (b.left * w, b.top * h, b.right * w, b.bottom * h)
-    return Found(bool(conf is None or conf >= 0.3) and bbox[2] > bbox[0] and bbox[3] > bbox[1], bbox, conf, name)
+    return Found(_has_area(bbox), bbox, conf, name)
+
+
+def _has_area(bbox) -> bool:
+    """A System One Box answer counts as found when it is a box at all; its confidence goes to the program to weigh.
+    (A 0.3 confidence cutoff here dropped real boxes Jev answered at 0.27-0.28.)"""
+    return bbox is not None and bbox[2] - bbox[0] > 1 and bbox[3] - bbox[1] > 1
 
 
 def _h2o(image: Image.Image, text: str) -> Found:
@@ -106,8 +114,7 @@ def _h2o(image: Image.Image, text: str) -> Found:
         return Found(False, None, conf, "h2o")
     w, h = image.size
     bbox = (b["left"] * w, b["top"] * h, b["right"] * w, b["bottom"] * h)
-    found = a.get("found", True) and bbox[2] > bbox[0] and bbox[3] > bbox[1]
-    return Found(bool(found), bbox, None if conf is None else float(conf), "h2o")
+    return Found(_has_area(bbox), bbox, None if conf is None else float(conf), "h2o")
 
 
 CLAUDE_SCHEMA = {

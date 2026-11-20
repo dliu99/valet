@@ -56,6 +56,8 @@ current frame. Only what is in view can be found; move the arm to look elsewhere
 - `bbox`: `[left, top, right, bottom]` in pixels, or None
 - `center_px`: `[u, v]`, the box's centre
 - `table_xy`: `[x, y]` where the ray through `center_px` meets the table plane z = 0
+- `confidence`: the model's confidence in the box, 0 to 1, when the model gives one (System One models do; Claude
+  does not)
 - `joints`: the joint readings the frame was taken at (for the geometry helpers)
 
 At most 10 calls per scene.

@@ -108,3 +108,25 @@ def test_the_budget_stops_calls_before_they_overspend(tmp_path, monkeypatch):
     with pytest.raises(ledger.BudgetExceeded):
         ledger.check(0.2)
     assert json.loads((tmp_path / "ledger.jsonl").read_text())["role"] == "actor"
+
+
+def test_benchmark_episodes_go_on_the_scoreboard_with_claude_as_slow_calls(tmp_path):
+    from valet_sim.scoreboard import load, table
+
+    from aspire import board
+
+    results = [{"seed": s, "score": {"placed": s % 2 == 0, "lifted": True}, "sim_s": 10.0, "localize_calls": 4} for s in range(4)]
+    board.record_results(results, "claude", "c", tmp_path / "episodes.jsonl")
+    board.record_results(results, "jev", "j", tmp_path / "episodes.jsonl")
+    rows = {r["config"]: r for r in table(load([tmp_path]))}
+    assert rows["c"]["slow_calls"] == 4 and rows["c"]["fast_calls"] == 0 and rows["c"]["placed"] == 2
+    assert rows["j"]["slow_calls"] == 0 and rows["j"]["fast_calls"] == 4
+
+
+def test_a_system_one_box_counts_as_found_whatever_its_confidence(tmp_path, monkeypatch):
+    monkeypatch.setattr(perceive, "CACHE_DIR", tmp_path)
+    path = tmp_path / "jev" / __import__("hashlib").sha256(b"the white box\nk").hexdigest()[:32]
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"found": False, "bbox": [10, 10, 60, 50], "confidence": 0.27, "backend": "jev", "cached": False}))
+    f = perceive.locate(None, "the white box", "k", "jev")
+    assert f.found and f.cached and f.confidence == 0.27

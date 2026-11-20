@@ -177,6 +177,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seeds", default="20-39")
     p.add_argument("--res", type=int, nargs="*", default=[336, 504, 672, 1008])
     p.add_argument("--jev", action="store_true")
+    p.add_argument("--sam", default="3", choices=["3", "3.1"], help="SAM version")
+    p.add_argument("--no-truth", action="store_true", help="skip the fits on true masks (already measured)")
     p.add_argument("--out", default=str(RESULTS / "perception.jsonl"))
     p.add_argument("--overlays", default=None, help="directory for a few mask overlays")
     a = p.parse_args(argv)
@@ -190,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.res:
         from .seg import Segmenter
 
-        segmenter = Segmenter(resolution=a.res[0])
+        segmenter = Segmenter(resolution=a.res[0], version=a.sam)
         perception = Perception(segmenter, cam, jaw)
     jev = None
     if a.jev:
@@ -204,7 +206,8 @@ def main(argv: list[str] | None = None) -> int:
     with out.open("w") as f:
         for fr in frames(seeds, cam, ik, rng):
             jm = _dilate(jaw(fr["joints"]["gripper"]), 3)
-            todo = [("truth-mask", None)] + [(f"sam3-{r}", r) for r in a.res] + ([("jev", None)] if jev else [])
+            name = "sam3" if a.sam == "3" else "sam3.1"
+            todo = ([] if a.no_truth else [("truth-mask", None)]) + [(f"{name}-{r}", r) for r in a.res] + ([("jev", None)] if jev else [])
             for method, res in todo:
                 key = (fr["seed"], method)
                 extra = {}
@@ -236,7 +239,7 @@ def main(argv: list[str] | None = None) -> int:
                 f.flush()
             print(fr["seed"], fr["view"], {r["method"]: (r.get("box_cm"), r.get("square_cm")) for r in rows[-len(todo):]}, flush=True)
     table = summarize(rows)
-    (RESULTS / "perception.md").write_text(table + "\n")
+    (out.parent / out.name.replace(".jsonl", ".md")).write_text(table + "\n")
     print(table)
     if jev:
         print("jev usd", round(sum(c["usd"] for c in jev.calls), 4), "calls", len(jev.calls))

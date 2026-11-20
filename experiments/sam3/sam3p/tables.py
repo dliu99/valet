@@ -64,10 +64,11 @@ def by_view(rows: list[dict], methods: tuple[str, ...]) -> str:
 
 
 def main() -> int:
-    rows = [json.loads(line) for line in (RESULTS / "perception.jsonl").read_text().splitlines() if line.strip()]
+    files = [RESULTS / "perception.jsonl", RESULTS / "perception_sam31.jsonl"]
+    rows = [json.loads(line) for f in files if f.exists() for line in f.read_text().splitlines() if line.strip()]
     print(perception(rows))
     print()
-    print(by_view(rows, tuple(m for m in ("truth-mask", "sam3-336", "sam3-504", "sam3-1008", "jev") if any(r["method"] == m for r in rows))))
+    print(by_view(rows, tuple(m for m in ("truth-mask", "sam3-336", "sam3-504", "sam3-1008", "sam3.1-504", "sam3.1-1008", "jev") if any(r["method"] == m for r in rows))))
     return 0
 
 

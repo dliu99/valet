@@ -44,16 +44,22 @@ class Segmenter:
         self.processor = Sam3Processor.from_pretrained(str(path))
         self.processor.image_size = self.resolution
         self.predictor = Sam3Predictor(self.model, self.processor, score_threshold=self.floor)
+        self._last = None
 
     def segment(self, image: Image.Image, prompts: list[str]) -> dict[str, list[Instance]]:
         from mlx_vlm.models.sam3.generate import _get_backbone_features, _get_det_features, _resize_masks
 
         mx = self.mx
         t0 = time.time()
-        pixel_values = mx.array(self.processor.preprocess_image(image)["pixel_values"])
-        backbone = _get_backbone_features(self.model, pixel_values)
+        same = self._last is not None and self._last[0] is image and self._last[1] == self.processor.image_size
+        if same:  # more prompts on a frame already seen: reuse its backbone pass
+            src, pos_flat, fpn, (hf, wf) = self._last[2]
+        else:
+            pixel_values = mx.array(self.processor.preprocess_image(image)["pixel_values"])
+            backbone = _get_backbone_features(self.model, pixel_values)
+            src, pos_flat, fpn, (hf, wf) = _get_det_features(self.model, backbone)
+            self._last = (image, self.processor.image_size, (src, pos_flat, fpn, (hf, wf)))
         det = self.model.detector_model
-        src, pos_flat, fpn, (hf, wf) = _get_det_features(self.model, backbone)
         w, h = image.size
         out: dict[str, list[Instance]] = {}
         for prompt in prompts:
@@ -81,7 +87,7 @@ class Segmenter:
                     if masks[k].any() and not any(_iou(masks[k], i.mask) > 0.7 for i in insts):
                         insts.append(Instance(masks[k], float(s[keep[k]]), tuple(float(v) for v in b[k])))
             out[prompt] = insts
-        self.calls.append({"s": round(time.time() - t0, 3), "prompts": len(prompts)})
+        self.calls.append({"s": round(time.time() - t0, 3), "prompts": len(prompts), "new_frame": not same})
         return out
 
 

@@ -1,0 +1,5 @@
+{"experiment": "sam3", "config": "sam3-504", "seed": 0, "placed": true, "lifted": true, "seconds": 3.7, "slow_calls": 0, "fast_calls": 3, "usd": 0.0, "calls": {"sam3": 3}}
+{"experiment": "sam3", "config": "sam3-504", "seed": 1, "placed": true, "lifted": true, "seconds": 3.6, "slow_calls": 0, "fast_calls": 3, "usd": 0.0, "calls": {"sam3": 3}}
+{"experiment": "sam3", "config": "sam3-504", "seed": 2, "placed": true, "lifted": true, "seconds": 3.1, "slow_calls": 0, "fast_calls": 3, "usd": 0.0, "calls": {"sam3": 3}}
+{"experiment": "sam3", "config": "sam3-504", "seed": 3, "placed": true, "lifted": true, "seconds": 2.9, "slow_calls": 0, "fast_calls": 3, "usd": 0.0, "calls": {"sam3": 3}}
+{"experiment": "sam3", "config": "sam3-504", "seed": 4, "placed": true, "lifted": true, "seconds": 3.8, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"sam3": 4}}

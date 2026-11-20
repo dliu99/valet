@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+.pytest_cache/
+runs/**/*.jpg
+runs/**/error*.txt
+runs/h2o-server.log

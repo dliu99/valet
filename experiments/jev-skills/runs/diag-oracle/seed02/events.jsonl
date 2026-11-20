@@ -1,0 +1,27 @@
+{"t": 0.0, "kind": "chose", "step": 0, "choice": "look_square", "p": 1.0, "probs": {}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.11, "kind": "box_estimate", "xy": [0.2375, 0.0975], "h": null, "tri": null, "rect": null, "views": 1}
+{"t": 0.11, "kind": "square_estimate", "xy": [0.264, -0.1052]}
+{"t": 0.11, "kind": "ran", "step": 0, "skill": "look_square", "ok": false, "report": "cannot look down on the square from here"}
+{"t": 0.11, "kind": "judged", "step": 1, "skill": "look_square", "p": 0.86, "verdict": "yes", "code_ok": false, "truth": true}
+{"t": 0.11, "kind": "chose", "step": 1, "choice": "look_box", "p": 1.0, "probs": {}, "right": ["look_box"]}
+{"t": 1.17, "kind": "box_estimate", "xy": [0.2384, 0.093], "h": 0.08046977604130284, "tri": [0.2379, 0.0936, 0.0805], "rect": {"area": 0.0018577359433366112, "yaw": 65.0, "da": 0.042587878035751675, "db": 0.043621237521556694, "x": 0.23842279040017067, "y": 0.09298822504839416}, "views": 2}
+{"t": 1.61, "kind": "box_estimate", "xy": [0.2354, 0.0963], "h": 0.07266654618549305, "tri": [0.2354, 0.0963, 0.0727], "rect": null, "views": 3}
+{"t": 2.05, "kind": "box_estimate", "xy": [0.2394, 0.0957], "h": 0.07287779140478416, "tri": [0.2362, 0.0961, 0.0729], "rect": {"area": 0.002052746929352343, "yaw": 66.0, "da": 0.04474815974219806, "db": 0.04587332621449855, "x": 0.2394156491820944, "y": 0.09565289165769357}, "views": 4}
+{"t": 2.49, "kind": "box_estimate", "xy": [0.2248, 0.0991], "h": 0.07202695907963286, "tri": [0.2355, 0.0961, 0.072], "rect": {"area": 0.003707283394370957, "yaw": 68.0, "da": 0.046609880432760514, "db": 0.07953857336577144, "x": 0.22483053331930924, "y": 0.0991178387516945}, "views": 5}
+{"t": 2.49, "kind": "ran", "step": 1, "skill": "look_box", "ok": true, "report": "measured the box, but two views disagree by over 1 mm; top 7.2 cm high"}
+{"t": 2.49, "kind": "judged", "step": 2, "skill": "look_box", "p": 0.39, "verdict": "unsure", "code_ok": true, "truth": false}
+{"t": 2.49, "kind": "chose", "step": 2, "choice": "grasp_near_top", "p": 1.0, "probs": {}, "right": ["grasp_near_top"]}
+{"t": 3.76, "kind": "grasp_descend", "g": [0.2306, 0.1133], "gz": 0.047, "roll": -140.04887589253917, "status": "reached", "z": 0.0452, "pitch": 89.8}
+{"t": 5.68, "kind": "ran", "step": 2, "skill": "grasp_near_top", "ok": true, "report": "holding the box, lifted 6 cm (reading 22), gripped 2.7 cm below its top"}
+{"t": 5.68, "kind": "judged", "step": 3, "skill": "grasp_near_top", "p": 0.94, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 5.68, "kind": "chose", "step": 3, "choice": "carry", "p": 1.0, "probs": {}, "right": ["carry"]}
+{"t": 6.67, "kind": "ran", "step": 3, "skill": "carry", "ok": true, "report": "holding the box above the square (0.3 cm from the drop point); square re-check: only part of the square is visible (0.4 cm of 7)"}
+{"t": 6.67, "kind": "judged", "step": 4, "skill": "carry", "p": 0.87, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 6.67, "kind": "chose", "step": 4, "choice": "place", "p": 1.0, "probs": {}, "right": ["place"]}
+{"t": 9.2, "kind": "ran", "step": 4, "skill": "place", "ok": true, "report": "released the box; box top seen 1.5 cm from the square's centre"}
+{"t": 9.2, "kind": "judged", "step": 5, "skill": "place", "p": 0.5, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 9.2, "kind": "chose", "step": 5, "choice": "done", "p": 1.0, "probs": {}, "right": ["done"]}
+{"t": 9.2, "kind": "final_check", "step": 5, "p": 0.46, "truth": true}
+{"t": 9.2, "kind": "chose", "step": 6, "choice": "done", "p": 1.0, "probs": {}, "right": ["done"]}
+{"t": 9.2, "kind": "final_check", "step": 6, "p": 0.43, "truth": true}
+{"t": 10.2, "kind": "summary", "seed": 2, "config": "diag-oracle", "placed": true, "lifted": true, "off_target_m": 0.0145, "tilt_deg": 0.0, "resting": true, "released": true, "finished": false, "sim_s": 10.2, "fast_s": 1.4, "slow_s": 0.0, "seconds": 11.6, "wall_s": 3.0, "fast_calls": 14, "slow_calls": 0, "usd": 0.00063, "calls": {"oracle:choose": 7, "jev:look_workspace": 1, "jev:judge": 7, "jev:look_box": 4, "jev:carry": 1, "jev:place_check": 1}}

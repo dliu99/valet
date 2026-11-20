@@ -1,0 +1,49 @@
+{"t": 0.0, "kind": "goal", "goal": "Pick up the white box, set it upright on top of the blue square on the table, release it, and finish with the box standing still on the blue square and the gripper open."}
+{"t": 0.0, "kind": "chose", "step": 0, "choice": "look_workspace", "p": 0.79, "probs": {"look_workspace": 0.81, "look_box": 0.05, "look_square": 0.01, "grasp_near_top": 0.01, "grasp_middle": 0.02, "carry": 0.02, "place": 0.05, "back_off": 0.02, "done": 0.01}, "right": ["look_box", "look_square", "look_workspace"]}
+{"t": 0.11, "kind": "box_estimate", "xy": [0.2375, 0.0975], "h": null, "tri": null, "rect": null, "views": 1}
+{"t": 0.11, "kind": "square_estimate", "xy": [0.264, -0.1052]}
+{"t": 0.11, "kind": "ran", "step": 0, "skill": "look_workspace", "ok": true, "report": "found the white box; found the blue square"}
+{"t": 0.11, "kind": "judged", "step": 1, "skill": "look_workspace", "p": 0.8, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 0.11, "kind": "chose", "step": 1, "choice": "look_box", "p": 0.33, "probs": {"look_workspace": 0.03, "look_box": 0.4, "look_square": 0.06, "grasp_near_top": 0.03, "grasp_middle": 0.03, "carry": 0.1, "place": 0.11, "back_off": 0.24, "done": 0.0}, "right": ["look_box"]}
+{"t": 1.17, "kind": "box_estimate", "xy": [0.2384, 0.0931], "h": 0.0804725726667278, "tri": [0.2379, 0.0936, 0.0805], "rect": {"area": 0.0018598771337277348, "yaw": 66.0, "da": 0.042520197634322715, "db": 0.043741027492930185, "x": 0.2383947012936854, "y": 0.09314102798383293}, "views": 2}
+{"t": 1.61, "kind": "box_estimate", "xy": [0.2359, 0.0969], "h": 0.0720737228212572, "tri": [0.2359, 0.0969, 0.0721], "rect": null, "views": 3}
+{"t": 2.05, "kind": "box_estimate", "xy": [0.2391, 0.0957], "h": 0.07212844714321127, "tri": [0.2366, 0.0966, 0.0721], "rect": {"area": 0.002115624578310623, "yaw": 67.0, "da": 0.045597655343783905, "db": 0.046397661510440696, "x": 0.239144786824596, "y": 0.0956907410249811}, "views": 4}
+{"t": 2.49, "kind": "box_estimate", "xy": [0.2258, 0.0991], "h": 0.07200895240181114, "tri": [0.236, 0.0963, 0.072], "rect": {"area": 0.0035980268561431506, "yaw": 67.0, "da": 0.0462839219187379, "db": 0.07773815845727847, "x": 0.2258134951606458, "y": 0.09909416341358769}, "views": 5}
+{"t": 2.49, "kind": "ran", "step": 1, "skill": "look_box", "ok": true, "report": "measured the box, but two views disagree by over 1 mm; top 7.2 cm high"}
+{"t": 2.49, "kind": "judged", "step": 2, "skill": "look_box", "p": 0.41, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.49, "kind": "chose", "step": 2, "choice": "back_off", "p": 0.54, "probs": {"look_workspace": 0.01, "look_box": 0.11, "look_square": 0.03, "grasp_near_top": 0.19, "grasp_middle": 0.04, "carry": 0.02, "place": 0.01, "back_off": 0.59, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.55, "kind": "ran", "step": 2, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.55, "kind": "judged", "step": 3, "skill": "back_off", "p": 0.67, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.55, "kind": "chose", "step": 3, "choice": "back_off", "p": 0.37, "probs": {"look_workspace": 0.06, "look_box": 0.13, "look_square": 0.03, "grasp_near_top": 0.25, "grasp_middle": 0.06, "carry": 0.02, "place": 0.01, "back_off": 0.44, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.6, "kind": "ran", "step": 3, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.6, "kind": "judged", "step": 4, "skill": "back_off", "p": 0.66, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.6, "kind": "chose", "step": 4, "choice": "back_off", "p": 0.37, "probs": {"look_workspace": 0.04, "look_box": 0.18, "look_square": 0.03, "grasp_near_top": 0.23, "grasp_middle": 0.05, "carry": 0.02, "place": 0.01, "back_off": 0.44, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.66, "kind": "ran", "step": 4, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.66, "kind": "judged", "step": 5, "skill": "back_off", "p": 0.67, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.66, "kind": "chose", "step": 5, "choice": "back_off", "p": 0.36, "probs": {"look_workspace": 0.05, "look_box": 0.17, "look_square": 0.02, "grasp_near_top": 0.24, "grasp_middle": 0.06, "carry": 0.02, "place": 0.01, "back_off": 0.43, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.71, "kind": "ran", "step": 5, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.71, "kind": "judged", "step": 6, "skill": "back_off", "p": 0.67, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.71, "kind": "chose", "step": 6, "choice": "back_off", "p": 0.38, "probs": {"look_workspace": 0.06, "look_box": 0.13, "look_square": 0.02, "grasp_near_top": 0.27, "grasp_middle": 0.05, "carry": 0.01, "place": 0.01, "back_off": 0.45, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.77, "kind": "ran", "step": 6, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.77, "kind": "judged", "step": 7, "skill": "back_off", "p": 0.69, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.77, "kind": "chose", "step": 7, "choice": "back_off", "p": 0.36, "probs": {"look_workspace": 0.07, "look_box": 0.18, "look_square": 0.02, "grasp_near_top": 0.23, "grasp_middle": 0.06, "carry": 0.01, "place": 0.0, "back_off": 0.43, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.82, "kind": "ran", "step": 7, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.82, "kind": "judged", "step": 8, "skill": "back_off", "p": 0.59, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.82, "kind": "chose", "step": 8, "choice": "back_off", "p": 0.64, "probs": {"look_workspace": 0.02, "look_box": 0.11, "look_square": 0.01, "grasp_near_top": 0.14, "grasp_middle": 0.03, "carry": 0.01, "place": 0.0, "back_off": 0.68, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.88, "kind": "ran", "step": 8, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.88, "kind": "judged", "step": 9, "skill": "back_off", "p": 0.65, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.88, "kind": "chose", "step": 9, "choice": "back_off", "p": 0.63, "probs": {"look_workspace": 0.04, "look_box": 0.1, "look_square": 0.01, "grasp_near_top": 0.14, "grasp_middle": 0.03, "carry": 0.01, "place": 0.0, "back_off": 0.67, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.93, "kind": "ran", "step": 9, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.93, "kind": "judged", "step": 10, "skill": "back_off", "p": 0.7, "verdict": "yes", "code_ok": true, "truth": true}
+{"t": 2.93, "kind": "chose", "step": 10, "choice": "back_off", "p": 0.58, "probs": {"look_workspace": 0.04, "look_box": 0.15, "look_square": 0.01, "grasp_near_top": 0.12, "grasp_middle": 0.04, "carry": 0.01, "place": 0.0, "back_off": 0.63, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 2.99, "kind": "ran", "step": 10, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 2.99, "kind": "judged", "step": 11, "skill": "back_off", "p": 0.67, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 2.99, "kind": "chose", "step": 11, "choice": "back_off", "p": 0.71, "probs": {"look_workspace": 0.04, "look_box": 0.09, "look_square": 0.01, "grasp_near_top": 0.1, "grasp_middle": 0.02, "carry": 0.0, "place": 0.0, "back_off": 0.74, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 3.04, "kind": "ran", "step": 11, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 3.04, "kind": "judged", "step": 12, "skill": "back_off", "p": 0.67, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 3.04, "kind": "chose", "step": 12, "choice": "back_off", "p": 0.63, "probs": {"look_workspace": 0.02, "look_box": 0.1, "look_square": 0.01, "grasp_near_top": 0.15, "grasp_middle": 0.04, "carry": 0.01, "place": 0.0, "back_off": 0.67, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 3.1, "kind": "ran", "step": 12, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 3.1, "kind": "judged", "step": 13, "skill": "back_off", "p": 0.69, "verdict": "unsure", "code_ok": true, "truth": true}
+{"t": 3.1, "kind": "chose", "step": 13, "choice": "back_off", "p": 0.6, "probs": {"look_workspace": 0.02, "look_box": 0.08, "look_square": 0.01, "grasp_near_top": 0.18, "grasp_middle": 0.04, "carry": 0.02, "place": 0.01, "back_off": 0.64, "done": 0.0}, "right": ["grasp_near_top"]}
+{"t": 3.15, "kind": "ran", "step": 13, "skill": "back_off", "ok": true, "report": "jaws open and raised clear"}
+{"t": 4.16, "kind": "summary", "seed": 2, "config": "h0-base", "placed": false, "lifted": false, "off_target_m": 0.2002, "tilt_deg": 0.0, "resting": true, "released": true, "finished": false, "sim_s": 4.2, "fast_s": 3.7, "slow_s": 1.5, "seconds": 9.3, "wall_s": 8.6, "fast_calls": 32, "slow_calls": 1, "usd": 0.00192, "calls": {"claude:goal": 1, "jev:choose": 14, "jev:look_workspace": 1, "jev:judge": 13, "jev:look_box": 4}}

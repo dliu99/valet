@@ -1,0 +1,11 @@
+log(await moveTo({ pan_deg: 20, reach_cm: 26, height_cm: 18, pitch_deg: 40 }));
+const a = await locate("white supplement bottle", { height_cm: 5 });
+log("a", a.box, a.centre);
+log(await move({ pan_deg: -10 }));
+const b = await locate("white supplement bottle", { height_cm: 5 });
+log("b", b.box, b.centre);
+log("tri", await triangulate(a, b));
+log(await move({ pan_deg: 10, reach_cm: -6 }));
+const c = await locate("white supplement bottle", { height_cm: 5 });
+log("c", c.box, c.centre);
+log("tri ac", await triangulate(a, c));

@@ -25,7 +25,7 @@ class Camera:
 
 
 # The real wrist camera, fitted so table features seen from seven poses land within 0.6 cm of each other
-# (runs/tools/calib.py). The sim renders with its own camera, which the sim's Locator keeps.
+# (tools/calib.py). The sim renders with its own camera, which the sim's Locator keeps.
 REAL_CAMERA = Camera(46.6, (0.978327, -0.205435, -0.003679, 0.025671), 0.5722)
 MIN_RAY_DOWN = 0.05
 MIN_TRIANGULATION_DEG = 5.0

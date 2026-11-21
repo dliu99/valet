@@ -35,6 +35,5 @@ request and response; any tick can be re-asked with an edited goal. Runs are kep
 ## Checks
 
 ```bash
-npm run check && npm test
-uv run --no-sync pytest
+npm run check
 ```

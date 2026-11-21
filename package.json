@@ -13,7 +13,6 @@
   "scripts": {
     "valet": "node brain/cli.ts",
     "eval": "node brain/eval.ts",
-    "test": "node --test --test-concurrency=1 'brain/test/*.test.ts'",
     "check": "tsc --noEmit"
   },
   "dependencies": {

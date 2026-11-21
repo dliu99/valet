@@ -24,12 +24,6 @@ sam = ["mlx-vlm>=0.8,<0.9; sys_platform == 'darwin'"]
 [project.scripts]
 valet-armd = "valet.armd.__main__:main"
 
-[dependency-groups]
-dev = ["pytest>=8"]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

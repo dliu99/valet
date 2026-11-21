@@ -159,7 +159,7 @@ class SamPolicy:
         ax = self.closing_axis(q)
         now = np.degrees(np.arctan2(ax[1], ax[0]))
         turn = (yaw_deg - now + 45) % 90 - 45
-        return float(np.clip(-90.0 - turn, -150, -30))
+        return float(np.clip(-90.0 + turn, -150, -30))  # rolling the wrist turns the closing axis the same way
 
     def grasp_path(self) -> tuple[list[dict], float, np.ndarray]:
         side, h = self.est.hw

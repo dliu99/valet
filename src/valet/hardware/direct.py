@@ -38,12 +38,21 @@ class Stopped(RuntimeError):
     pass
 
 
+class NotCalibrated(RuntimeError):
+    pass
+
+
 class Arm:
     def __init__(self, port: str = PORT, robot_id: str = "valet_follower", urdf: str = URDF):
         from lerobot.model import RobotKinematics
         from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
 
-        self.bus = SO101Follower(SO101FollowerConfig(port=port, id=robot_id)).bus
+        robot = SO101Follower(SO101FollowerConfig(port=port, id=robot_id))
+        if not robot.calibration_fpath.is_file():
+            raise NotCalibrated(f"no calibration file at {robot.calibration_fpath}: run lerobot-calibrate with --robot.id={robot_id}")
+        # LeRobot's Robot disconnects its bus, torque off, when it is garbage collected.
+        self.robot = robot
+        self.bus = robot.bus
         self.kin = RobotKinematics(urdf_path=urdf, target_frame_name="gripper_frame_link", joint_names=MOTORS)
         self.bus.connect()
         cal = self.bus.read_calibration()
@@ -53,15 +62,49 @@ class Arm:
     def close(self) -> None:
         self.bus.disconnect(disable_torque=False)
 
+    def _reconnect(self) -> None:
+        try:
+            self.bus.disconnect(disable_torque=False)
+        except Exception:
+            pass
+        self.bus.connect()
+
+    def _read(self, name: str, normalize: bool = True) -> dict:
+        # The USB serial adapter can drop off and come back; the servos keep their goals meanwhile.
+        try:
+            return self.bus.sync_read(name, normalize=normalize)
+        except (ConnectionError, OSError):
+            self._reconnect()
+            return self.bus.sync_read(name, normalize=normalize)
+
+    def _write(self, name: str, values: dict) -> None:
+        try:
+            self.bus.sync_write(name, values)
+        except (ConnectionError, OSError):
+            self._reconnect()
+            self.bus.sync_write(name, values)
+
     # ---- reading
 
     def q(self) -> np.ndarray:
-        p = self.bus.sync_read("Present_Position")
+        p = self._read("Present_Position")
         return np.array([p[m] for m in MOTORS], float)
 
     def amps(self) -> np.ndarray:
-        c = self.bus.sync_read("Present_Current", normalize=False)
+        c = self._read("Present_Current", normalize=False)
         return np.array([c[m] for m in MOTORS], float) * AMPS_PER_UNIT
+
+    def status(self) -> np.ndarray:
+        s = self._read("Status", normalize=False)
+        return np.array([s[m] for m in MOTORS], int)
+
+    def voltage(self) -> np.ndarray:
+        v = self._read("Present_Voltage", normalize=False)
+        return np.array([v[m] for m in MOTORS], float) / 10.0
+
+    def torque_enabled(self) -> bool:
+        t = self._read("Torque_Enable", normalize=False)
+        return all(t[m] for m in MOTORS)
 
     def fk(self, q: np.ndarray) -> np.ndarray:
         return self.kin.forward_kinematics(np.asarray(q, float))
@@ -69,7 +112,7 @@ class Arm:
     def state(self, note: str = "") -> dict:
         q = self.q()
         T = self.fk(q)
-        torque = self.bus.sync_read("Torque_Enable", normalize=False)
+        torque = self._read("Torque_Enable", normalize=False)
         return {
             "joints": {m: round(float(v), 1) for m, v in zip(MOTORS, q)},
             "xyz": [round(float(v), 3) for v in T[:3, 3]],
@@ -84,12 +127,15 @@ class Arm:
     def hold(self) -> None:
         """Torque on with every goal at the present position, so nothing jumps."""
         q = self.q()
-        self.bus.sync_write("Goal_Position", {m: float(v) for m, v in zip(MOTORS, q)})
+        self._write("Goal_Position", {m: float(v) for m, v in zip(MOTORS, q)})
         time.sleep(0.05)
         self.bus.enable_torque()
 
     def relax(self) -> None:
         self.bus.disable_torque()
+
+    def write_goals(self, goals: dict[str, float]) -> None:
+        self._write("Goal_Position", goals)
 
     def movej(self, target: dict[str, float], speed: float = 25.0, max_amps: float = 1.6, lag_deg: float = 14.0) -> None:
         """Straight line in joint space at `speed` deg/s for the slowest joint."""

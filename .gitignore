@@ -6,3 +6,6 @@ dist/
 runs/
 # Machine-specific settings; copy valet.example.toml to start one.
 valet.toml
+node_modules/
+# API keys; never commit.
+.env

@@ -71,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
 
         seg = Segmenter(resolution=a.res)
     perception = Perception(seg, box_prompt=a.prompt, merge=a.merge, fallback=a.fallback)
-    log_dir = RESULTS / "runs" / cfg.name
+    log_dir = RESULTS / "logs" / cfg.name
     log_dir.mkdir(parents=True, exist_ok=True)
     placed = lifted = 0
     rows = []

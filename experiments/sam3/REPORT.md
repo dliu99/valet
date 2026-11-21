@@ -105,7 +105,7 @@ mask IoU < 0.8 on 2/40 frames, "white box" 4/40, "white block" 8/40, "cube" 11/4
 
 Config `sam3-504-twoview-orwhitecube` (`--config twoview --fallback "white cube"`), recorded with
 `valet_sim.scoreboard.record()` in `results/episodes.jsonl`; per-episode logs with every look, fit and grade in
-`results/runs/sam3-504-twoview-orwhitecube/`.
+`results/logs/sam3-504-twoview-orwhitecube/`.
 
 | | placed | lifted | slow calls / ep | fast calls / ep (SAM 3 frames) | s / SAM 3 frame | median wall s / ep | median simulated s / ep | $ / ep |
 |---|---|---|---|---|---|---|---|---|

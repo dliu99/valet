@@ -13,12 +13,6 @@ dependencies = [
 [project.scripts]
 valet-sim = "valet_sim.server:main"
 
-[dependency-groups]
-dev = ["pytest>=8"]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

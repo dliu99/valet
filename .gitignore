@@ -1,7 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
-.pytest_cache/
 dist/
 # Run records and frames stay local; the words Jev reads (Claude's rewrites) are tracked.
 runs/*

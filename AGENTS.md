@@ -7,14 +7,15 @@
   locate an object coarsely; the last centimetres are Jev's nudges. `armd` is the only process on
   the servo bus; it moves where it is told and only an explicit POST /relax turns torque off.
 - Python 3.12, managed with uv. `uv sync` and plain `uv run` uninstall a hand-installed LeRobot,
-  so use `uv run --no-sync`. `uv run --no-sync pytest` must pass before a Python change is done;
-  tests use the fake arm (`valet.armd.fake`) and never touch hardware or the network.
+  so use `uv run --no-sync`.
 - Verify an armd change by running it: `uv run --no-sync valet-armd serve --fake --allow-motion`
   and drive it over HTTP, or `uv run --no-sync valet-armd check --fake --allow-motion`.
-- The brain is TypeScript on Node 22.19+, run directly with no build step. `npm run check` and
-  `npm test` must pass before a brain change is done. Tests use the in-process armd double and a
-  scripted stub decider, and never call a paid API. Verify a brain change on the real arm, with the
-  person's go-ahead, and look at the run in `valet ui`.
+- The brain is TypeScript on Node 22.19+, run directly with no build step. `npm run check` must
+  pass before a brain change is done. Verify a brain change on the real arm, with the person's
+  go-ahead, and look at the run in `valet ui`.
+- Do not write unit tests, in Python or TypeScript, and do not add test files, test doubles,
+  fixtures or a test runner. Verify a change by running the real thing (armd over HTTP with
+  `--fake`, the sim, or the arm with the person's go-ahead).
 - The planner and the chat decider go through pi-ai. Jev and h2o are still called on System One's
   wire format directly (`brain/deciders/systemone.ts`). Every decision is recorded with its exact wire request and
   response. Keep it that way: the debug UI and replay depend on it.

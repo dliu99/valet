@@ -1,0 +1,10 @@
+log(await moveTo({ pan_deg: -4, reach_cm: 16, height_cm: 22, pitch_deg: 40 }));
+const cap = "blue cap of the white supplement bottle";
+const a = await locate(cap, { height_cm: 13 });
+log("a", a.confidence, a.box, a.centre);
+log(await move({ pan_deg: 12 }));
+const b = await locate(cap, { height_cm: 13 });
+log("b", b.confidence, b.box, b.centre);
+log("tri", await triangulate(a, b));
+const body = await locate("white supplement bottle", { height_cm: 0 });
+log("body foot", body.confidence, body.box, body.foot);

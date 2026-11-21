@@ -3,7 +3,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 dist/
-runs/
+# Run records and frames stay local; the words Jev reads (Claude's rewrites) are tracked.
+runs/*
+!runs/prompts.json
 # Machine-specific settings; copy valet.example.toml to start one.
 valet.toml
 node_modules/

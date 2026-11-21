@@ -1,0 +1,139 @@
+{
+ "seed": 24,
+ "placed": true,
+ "lifted": true,
+ "off_target_m": 0.0128,
+ "tilt_deg": 0.0,
+ "resting": true,
+ "released": true,
+ "outcome": "done",
+ "sim_s": 11.1,
+ "wall_s": 3.3,
+ "looks": 3,
+ "sam_calls": 3,
+ "sam_s_median": 0.53,
+ "graded": [
+  {
+   "tag": "survey",
+   "box_cm": 1.18,
+   "square_cm": 0.04
+  },
+  {
+   "tag": "above-box-0",
+   "box_cm": 1.1,
+   "square_cm": 0.06
+  },
+  {
+   "tag": "above-box-0-two-view",
+   "box_cm": 0.01
+  },
+  {
+   "tag": "after-place",
+   "box_cm": 0.02,
+   "square_cm": 0.06
+  }
+ ],
+ "truth": {
+  "x": 0.2271,
+  "y": -0.1549,
+  "z": 0.0384,
+  "tilt_deg": 0.0,
+  "w": 0.044954032550039734,
+  "d": 0.044954032550039734,
+  "h": 0.07692637522290752
+ },
+ "events": [
+  {
+   "t": 0.0,
+   "what": "look",
+   "tag": "survey",
+   "box": [
+    0.2692,
+    0.0351,
+    -0.2,
+    0.0568,
+    0.0268,
+    0.97
+   ],
+   "square": [
+    0.2301,
+    -0.1423,
+    0.944
+   ],
+   "box_frac": 0.015,
+   "s": {
+    "segment": 0.525,
+    "fit": 0.288
+   }
+  },
+  {
+   "t": 0.36,
+   "what": "look",
+   "tag": "above-box-0",
+   "box": [
+    0.2745,
+    0.017,
+    -1.6,
+    0.0568,
+    0.0268,
+    0.903
+   ],
+   "square": [
+    0.2303,
+    -0.1423,
+    0.957
+   ],
+   "box_frac": 0.018,
+   "s": {
+    "segment": 0.531,
+    "fit": 0.194
+   }
+  },
+  {
+   "t": 0.36,
+   "what": "two-view",
+   "box": [
+    0.2658,
+    0.0239,
+    0.0437,
+    0.0777,
+    0.952
+   ]
+  },
+  {
+   "t": 3.68,
+   "what": "closed",
+   "gripper": 24.1
+  },
+  {
+   "t": 10.62,
+   "what": "look",
+   "tag": "after-place",
+   "box": [
+    0.2273,
+    -0.1549,
+    -42.6,
+    0.0437,
+    0.0777,
+    0.975
+   ],
+   "square": [
+    0.2303,
+    -0.1424,
+    0.968
+   ],
+   "box_frac": 0.018,
+   "s": {
+    "segment": 0.53,
+    "fit": 0.222
+   }
+  },
+  {
+   "t": 10.62,
+   "what": "placed?",
+   "off_cm": 1.3,
+   "iou": 0.975,
+   "upright": true
+  }
+ ]
+}

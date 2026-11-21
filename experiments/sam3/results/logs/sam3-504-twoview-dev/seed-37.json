@@ -1,0 +1,197 @@
+{
+ "seed": 37,
+ "placed": false,
+ "lifted": false,
+ "off_target_m": 0.2811,
+ "tilt_deg": 0.0,
+ "resting": true,
+ "released": true,
+ "outcome": "missed",
+ "sim_s": 2.2,
+ "wall_s": 5.4,
+ "looks": 7,
+ "sam_calls": 7,
+ "sam_s_median": 0.529,
+ "graded": [
+  {
+   "tag": "survey",
+   "box_cm": 0.08,
+   "square_cm": 0.04
+  },
+  {
+   "tag": "above-box-0"
+  },
+  {
+   "tag": "search",
+   "box_cm": 0.08,
+   "square_cm": 3.55
+  },
+  {
+   "tag": "above-box-1"
+  },
+  {
+   "tag": "search",
+   "box_cm": 0.09,
+   "square_cm": 3.51
+  },
+  {
+   "tag": "above-box-2"
+  },
+  {
+   "tag": "search",
+   "box_cm": 0.09,
+   "square_cm": 3.5
+  }
+ ],
+ "truth": {
+  "x": 0.2418,
+  "y": -0.1394,
+  "z": 0.0347,
+  "tilt_deg": 0.0,
+  "w": 0.050562295474203545,
+  "d": 0.050562295474203545,
+  "h": 0.06956886642342677
+ },
+ "events": [
+  {
+   "t": 0.0,
+   "what": "look",
+   "tag": "survey",
+   "box": [
+    0.2414,
+    -0.1401,
+    12.0,
+    0.0485,
+    0.069,
+    0.982
+   ],
+   "square": [
+    0.2157,
+    0.1401,
+    0.961
+   ],
+   "box_frac": 0.026,
+   "s": {
+    "segment": 0.504,
+    "fit": 0.368
+   }
+  },
+  {
+   "t": 0.56,
+   "what": "look",
+   "tag": "above-box-0",
+   "box": null,
+   "square": null,
+   "box_frac": 0.0,
+   "s": {
+    "segment": 0.529,
+    "fit": 0.0
+   }
+  },
+  {
+   "t": 0.56,
+   "what": "lost the box"
+  },
+  {
+   "t": 0.81,
+   "what": "look",
+   "tag": "search",
+   "box": [
+    0.2423,
+    -0.14,
+    12.9,
+    0.0485,
+    0.069,
+    0.938
+   ],
+   "square": [
+    0.2389,
+    0.1136,
+    0.0
+   ],
+   "box_frac": 0.016,
+   "s": {
+    "segment": 0.602,
+    "fit": 0.167
+   }
+  },
+  {
+   "t": 1.01,
+   "what": "look",
+   "tag": "above-box-1",
+   "box": null,
+   "square": null,
+   "box_frac": 0.0,
+   "s": {
+    "segment": 0.508,
+    "fit": 0.0
+   }
+  },
+  {
+   "t": 1.01,
+   "what": "lost the box"
+  },
+  {
+   "t": 1.23,
+   "what": "look",
+   "tag": "search",
+   "box": [
+    0.2425,
+    -0.1399,
+    12.7,
+    0.0485,
+    0.069,
+    0.937
+   ],
+   "square": [
+    0.2387,
+    0.1139,
+    0.0
+   ],
+   "box_frac": 0.016,
+   "s": {
+    "segment": 0.583,
+    "fit": 0.182
+   }
+  },
+  {
+   "t": 1.45,
+   "what": "look",
+   "tag": "above-box-2",
+   "box": null,
+   "square": null,
+   "box_frac": 0.0,
+   "s": {
+    "segment": 0.522,
+    "fit": 0.0
+   }
+  },
+  {
+   "t": 1.45,
+   "what": "lost the box"
+  },
+  {
+   "t": 1.67,
+   "what": "look",
+   "tag": "search",
+   "box": [
+    0.2425,
+    -0.1399,
+    12.8,
+    0.0485,
+    0.069,
+    0.939
+   ],
+   "square": [
+    0.2387,
+    0.114,
+    0.0
+   ],
+   "box_frac": 0.016,
+   "s": {
+    "segment": 0.61,
+    "fit": 0.171
+   }
+  }
+ ]
+}

@@ -1,0 +1,1 @@
+{"pose": {"pan_deg": 12, "reach_m": 0.18, "height_m": 0.2, "pitch_deg": 45}, "ok": true, "joints": {"shoulder_pan": 11.69, "shoulder_lift": -44.13, "elbow_flex": 2.24, "wrist_flex": 88.4, "wrist_roll": -97.71, "gripper": 69.7}, "tip": {"x": 0.2162, "y": -0.0289, "z": 0.1962}}

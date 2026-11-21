@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>valet debug</title>
+<style>
+:root {
+  --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66; --line: #e3e1db;
+  --accent: #2f6fde; --yes: #2c8a4b; --no: #c2412d; --unsure: #b7791f; --code: #f1efe9; --box: #e8467c;
+  --yes-bg: rgba(44, 138, 75, .1); --no-bg: rgba(194, 65, 45, .09); --unsure-bg: rgba(183, 121, 31, .12); --accent-bg: rgba(47, 111, 222, .09);
+  --claude: #8250c4; --claude-bg: rgba(130, 80, 196, .09);
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151514; --panel: #1f1f1d; --ink: #ecebe6; --muted: #9b9a94; --line: #34332f;
+    --accent: #6b9cf0; --yes: #4fb873; --no: #e06b55; --unsure: #d9a441; --code: #262624; --box: #ff6f9c;
+    --claude: #b58cf0; --claude-bg: rgba(181, 140, 240, .12); --yes-bg: rgba(79, 184, 115, .13); --no-bg: rgba(224, 107, 85, .12); --unsure-bg: rgba(217, 164, 65, .14); --accent-bg: rgba(107, 156, 240, .13); }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, sans-serif; }
+.app { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+aside { border-right: 1px solid var(--line); padding: 16px 12px; background: var(--panel); position: sticky; top: 0; height: 100vh; overflow: auto; }
+aside h1 { font-size: 15px; margin: 0 0 12px 4px; letter-spacing: .02em; }
+.run-link { display: block; padding: 8px 10px; border-radius: 8px; color: inherit; text-decoration: none; margin-bottom: 4px; overflow-wrap: anywhere; }
+.run-link:hover, .run-link.on { background: var(--code); }
+.run-link small { color: var(--muted); display: block; font-size: 12px; }
+main { padding: 20px 24px 80px; min-width: 0; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--code); }
+.pill.done { color: var(--yes); } .pill.failed, .pill.stopped { color: var(--no); } .pill.running { color: var(--accent); }
+.head h2 { margin: 0 0 6px; font-size: 19px; }
+.meta { color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 12px 0; min-width: 0; }
+.card > h3 { margin: 0 0 8px; font-size: 14px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.card > h3 .m, .m { color: var(--muted); font-weight: 400; font-family: var(--mono); font-size: 12px; }
+.lanes { position: relative; }
+.lane { display: grid; grid-template-columns: 70px 1fr; align-items: center; margin: 4px 0; }
+.lane > b { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.track { position: relative; height: 24px; background: var(--code); border-radius: 6px; overflow: hidden; }
+.blk { position: absolute; top: 3px; bottom: 3px; min-width: 3px; border-radius: 3px; cursor: pointer; background: var(--accent); opacity: .85; font-size: 10px; color: #fff; overflow: hidden; white-space: nowrap; padding: 0 3px; line-height: 18px; }
+.blk:hover, .blk.on { opacity: 1; outline: 2px solid var(--ink); }
+.blk.wait { background: var(--unsure); } .blk.done { background: var(--yes); } .blk.stuck, .blk.err { background: var(--no); }
+.blk.stage { background: #7a6fbf; } .blk.planner { background: #3f8f8a; } .blk.ask { background: #8b8b8b; }
+.axis { display: flex; justify-content: space-between; color: var(--muted); font: 11px var(--mono); margin-left: 70px; }
+.cols { display: grid; grid-template-columns: minmax(260px, 460px) 1fr; gap: 16px; }
+.frame { position: relative; margin-bottom: 8px; }
+.frame img { width: 100%; display: block; border-radius: 6px; background: var(--code); }
+.frame .cap { font: 11px var(--mono); color: var(--muted); margin-top: 2px; }
+.ov { position: absolute; border: 2px solid var(--box); border-radius: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); pointer-events: none; }
+.ov.win { border: 1.5px dashed #2fbf71; }
+.ov.old { border-color: var(--muted); border-style: dotted; }
+.q { padding: 6px 0; border-top: 1px solid var(--line); }
+.q:first-child { border-top: 0; }
+.q .id { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.bar { display: grid; grid-template-columns: 96px 1fr 44px; gap: 8px; align-items: center; font: 12px var(--mono); margin: 2px 0; }
+.bar .t { height: 8px; background: var(--code); border-radius: 4px; position: relative; overflow: hidden; }
+.bar .f { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+.bar.top .f { background: var(--yes); }
+.bar .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font: 12px var(--mono); }
+.kv b { color: var(--muted); font-weight: 400; }
+details { margin-top: 6px; } summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+pre { background: var(--code); padding: 8px 10px; border-radius: 6px; overflow: auto; font: 12px/1.4 var(--mono); max-height: 420px; white-space: pre-wrap; word-break: break-word; margin: 4px 0; }
+.msg { border-left: 3px solid var(--line); padding: 4px 0 4px 10px; margin: 8px 0; }
+.msg.system { border-color: var(--muted); } .msg.user { border-color: var(--accent); } .msg.assistant { border-color: var(--yes); } .msg.toolResult, .msg.tool { border-color: var(--unsure); }
+.msg .role { font: 11px var(--mono); text-transform: uppercase; color: var(--muted); }
+.msg img { max-width: 320px; border-radius: 6px; margin: 4px 6px 0 0; display: block; }
+.diff { font: 12px/1.4 var(--mono); background: var(--code); border-radius: 6px; padding: 6px 0; overflow: auto; max-height: 420px; }
+.diff div { padding: 0 10px; white-space: pre-wrap; }
+.diff .add { background: rgba(44, 138, 75, .18); } .diff .del { background: rgba(194, 65, 45, .18); text-decoration: line-through; opacity: .8; }
+textarea { width: 100%; min-height: 220px; font: 12px/1.4 var(--mono); background: var(--code); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+button, select { font: inherit; padding: 4px 12px; border-radius: 7px; border: 1px solid var(--line); background: var(--code); color: var(--ink); cursor: pointer; }
+button:hover { border-color: var(--accent); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.err { color: var(--no); }
+.empty { color: var(--muted); padding: 40px 0; }
+.tabs { display: flex; gap: 6px; margin: 12px 0 0; flex-wrap: wrap; }
+.tabs button.on { border-color: var(--accent); color: var(--accent); }
+
+/* A goal run (valet do): what is happening now, the steps, one step in full, and the cards Jev reads. */
+h4 { margin: 14px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+h4 small { text-transform: none; letter-spacing: 0; font-weight: 400; }
+h4:first-child { margin-top: 0; }
+blockquote { margin: 0 0 8px; padding: 6px 10px; border-left: 3px solid var(--accent); background: var(--accent-bg); border-radius: 0 6px 6px 0; }
+.goal-head .kicker { display: flex; gap: 8px; align-items: center; color: var(--muted); font: 12px var(--mono); margin-bottom: 4px; }
+.goal-head h2 { font-size: 21px; line-height: 1.3; margin: 0 0 6px; }
+.now { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+.cam { position: relative; background: #000; border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 9; }
+.cam img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cam .badge { position: absolute; left: 8px; top: 8px; padding: 2px 8px; border-radius: 999px; font: 600 11px var(--mono); background: rgba(0, 0, 0, .65); color: #fff; }
+.cam .badge.live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ff4d4d; margin-right: 6px; vertical-align: 1px; animation: blink 1.4s infinite; }
+.cam .none { color: #aaa; position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; font-size: 13px; }
+@keyframes blink { 50% { opacity: .25; } }
+.cam-note { font: 12px var(--mono); color: var(--muted); margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.cam-note button { font-size: 12px; padding: 2px 10px; }
+.activity { padding: 8px 10px; border-radius: 8px; font-weight: 600; margin-bottom: 4px; background: var(--code); }
+.activity.running { background: var(--accent-bg); color: var(--accent); }
+.activity.running::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 8px; animation: blink 1.4s infinite; }
+.activity.done { background: var(--yes-bg); color: var(--yes); } .activity.failed, .activity.stopped { background: var(--no-bg); color: var(--no); }
+.gauges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.gauge { background: var(--code); border-radius: 7px; padding: 5px 8px; min-width: 0; }
+.gauge span { display: block; font-size: 11px; color: var(--muted); }
+.gauge b { font: 600 15px var(--mono); white-space: nowrap; }
+.facts { display: flex; flex-wrap: wrap; gap: 5px; }
+.fact { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12.5px; border: 1px solid var(--line); background: var(--panel); }
+.fact i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+.fact.yes { border-color: var(--yes); background: var(--yes-bg); } .fact.yes i { background: var(--yes); }
+.fact.no { color: var(--muted); } .fact.no i { background: transparent; border: 1.5px solid var(--muted); }
+.fact.val i { display: none; }
+.fact b { font-family: var(--mono); font-weight: 600; }
+.fact em { font-style: normal; font: 11px var(--mono); }
+.fact.changed { box-shadow: 0 0 0 2px var(--unsure); }
+.held { font-size: 13.5px; }
+.strip-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 18px 0 6px; flex-wrap: wrap; }
+.strip-head h3 { margin: 0; font-size: 15px; }
+.strip-head .keys { color: var(--muted); font-size: 12px; }
+.strip-head button.on { border-color: var(--accent); color: var(--accent); }
+.strip { position: relative; display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; }
+.chip { flex: none; width: 150px; padding: 0; text-align: left; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); overflow: hidden; border-top: 4px solid var(--muted); }
+.chip.on { outline: 3px solid var(--accent); outline-offset: -1px; }
+.chip img, .chip .noimg { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
+.chip .chip-text { padding: 5px 8px 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip .chip-n { font: 600 11px var(--mono); color: var(--muted); margin-right: 5px; }
+.chip .chip-foot { padding: 0 8px 6px; display: flex; justify-content: space-between; font: 11.5px var(--mono); color: var(--muted); }
+.chip .chip-o { font-weight: 700; }
+.ok { --tone: var(--yes); --tone-bg: var(--yes-bg); } .bad { --tone: var(--no); --tone-bg: var(--no-bg); }
+.unsure { --tone: var(--unsure); --tone-bg: var(--unsure-bg); } .running { --tone: var(--accent); --tone-bg: var(--accent-bg); }
+.chip.ok, .chip.bad, .chip.unsure, .chip.running { border-top-color: var(--tone); }
+.chip .chip-o { color: var(--tone, var(--muted)); }
+.chip.running .chip-o { animation: blink 1.4s infinite; }
+.step-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.step-head h3 { margin: 0; font-size: 18px; }
+.step-head .verdict { padding: 3px 10px; border-radius: 7px; font-weight: 700; background: var(--tone-bg, var(--code)); color: var(--tone, var(--ink)); }
+.step-head nav { margin-left: auto; display: flex; gap: 6px; }
+.tag { display: inline-block; font: 600 10.5px var(--mono); text-transform: uppercase; padding: 1px 7px; border-radius: 999px; background: var(--accent-bg); color: var(--accent); vertical-align: 3px; margin-left: 6px; }
+.tag.no { background: var(--code); color: var(--muted); } .tag.yes { background: var(--yes-bg); color: var(--yes); } .tag.warn { background: var(--unsure-bg); color: var(--unsure); }
+.step-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; }
+figure.shot { margin: 0; }
+.shot-img { position: relative; line-height: 0; }
+.shot-img img { width: 100%; height: auto; display: block; border-radius: 7px; background: var(--code); }
+figure.shot figcaption { font: 11.5px var(--mono); color: var(--muted); margin-top: 4px; }
+.result { margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: var(--tone-bg, var(--code)); }
+.result .why { margin: 0; font-weight: 600; color: var(--tone, var(--ink)); }
+.moves { margin: 8px 0 4px; padding-left: 20px; font-size: 12.5px; }
+.moves li { margin: 2px 0; } .moves li.bad { color: var(--no); }
+.moves code, .lib code, .opt code { font-family: var(--mono); font-size: 12.5px; }
+.result pre { background: var(--panel); }
+.looks { margin-top: 14px; }
+.look { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.look-q { margin-bottom: 6px; }
+.look-q .kind { font: 600 11px var(--mono); text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+.look-q q { quotes: none; }
+.look-a { display: flex; align-items: center; gap: 8px; font: 12.5px var(--mono); margin-top: 3px; }
+.pbar { flex: none; width: 80px; height: 7px; border-radius: 4px; background: var(--code); position: relative; overflow: hidden; }
+.pbar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+.opts { display: flex; flex-direction: column; gap: 4px; }
+.opt { padding: 6px 9px; border-radius: 8px; border: 1px solid transparent; }
+.opt.chosen { border-color: var(--accent); background: var(--accent-bg); }
+.unsure .opt.chosen { border-color: var(--unsure); background: var(--unsure-bg); }
+.opt-top { display: flex; align-items: baseline; gap: 8px; }
+.opt-top code { font-weight: 700; }
+.opt-amt { color: var(--muted); font: 12px var(--mono); }
+.opt-p { margin-left: auto; font: 700 13px var(--mono); }
+.opt-bar { position: relative; height: 8px; border-radius: 4px; background: var(--code); margin: 3px 0; }
+.opt-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: var(--muted); opacity: .55; }
+.opt.chosen .opt-bar i { background: var(--accent); opacity: 1; }
+.unsure .opt.chosen .opt-bar i { background: var(--unsure); }
+.opt-bar s { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--unsure); }
+.opt .says { font-size: 13px; color: var(--muted); }
+.opt.chosen .says { color: var(--ink); }
+.opt.end code { font-style: italic; }
+.not-offered { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+.not-offered code { font-family: var(--mono); }
+.legend { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.legend s { display: inline-block; width: 2px; height: 10px; background: var(--unsure); vertical-align: -1px; margin: 0 4px; }
+.amount { margin-top: 14px; }
+.scale { position: relative; margin: 14px 8px 4px; height: 44px; }
+.scale-track { position: absolute; left: 0; right: 0; top: 8px; height: 6px; border-radius: 3px; background: var(--code); }
+.scale .stop { position: absolute; top: 3px; width: 2px; height: 16px; margin-left: -1px; background: var(--muted); opacity: .6; }
+.scale .marker { position: absolute; top: 0; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--accent); border: 3px solid var(--panel); box-shadow: 0 0 0 1px var(--accent); }
+.scale .lab { position: absolute; top: 26px; font: 11.5px var(--mono); color: var(--muted); white-space: nowrap; }
+.lib-goal { display: grid; gap: 4px; margin-bottom: 10px; }
+.lib-goal b { color: var(--muted); font-weight: 600; font-size: 12px; margin-right: 6px; }
+.lib-row { display: grid; grid-template-columns: 170px minmax(0, 1.4fr) minmax(0, 1.1fr) minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.lib-row.th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; border-top: 0; padding-top: 0; }
+.lib-row.off .lib-says, .lib-row.off .lib-amount { color: var(--muted); }
+.lib-row .levels { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.lib-row .levels span { font: 11.5px var(--mono); background: var(--code); border-radius: 5px; padding: 0 6px; }
+.lib-name code { font-weight: 700; }
+.lib-ready code { font-size: 12px; overflow-wrap: anywhere; }
+.lib-row .lbl { display: none; }
+.chip .noimg { display: grid; place-items: center; color: #999; font-size: 11.5px; }
+.chip.check { width: 132px; background: var(--claude-bg); }
+.chip.check .chip-n { color: var(--claude); font-weight: 700; }
+.tag.claude { background: var(--claude-bg); color: var(--claude); }
+.was { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(127, 127, 127, .6); font-size: 12.5px; margin-top: 3px; }
+.new { margin-top: 2px; }
+.edit, .hist { padding: 8px 0; border-top: 1px solid var(--line); }
+.edit:first-of-type { border-top: 0; }
+.hist-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.hist-head a { color: var(--accent); font-size: 12.5px; }
+.hist-title { margin-top: 18px; }
+.said { margin: 6px 0 0; color: var(--ink); font-style: italic; }
+.did { font-weight: 600; margin: 0 0 4px; }
+.err.small { font-size: 12px; overflow-wrap: anywhere; }
+.checked { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.check-link { text-align: left; border-color: var(--claude); color: var(--claude); background: var(--claude-bg); }
+.check-detail .step-head h3 q { quotes: "\201C" "\201D"; }
+.check-detail { border-left: 4px solid var(--claude); }
+.lib-choice { padding: 8px 0 10px; border-top: 1px solid var(--line); }
+.lib-choice > b { color: var(--muted); font-weight: 600; font-size: 12px; margin-right: 6px; }
+.sent { color: var(--unsure); font-size: 12px; margin-top: 3px; }
+@media (max-width: 1100px) { .now { grid-template-columns: 1fr; } .lib-row { grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1fr); } .lib-row .lib-ready { grid-column: 2 / -1; } .lib-row.th .lib-ready { display: none; } }
+@media (max-width: 960px) { .step-grid { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; } aside { position: static; height: auto; max-height: 220px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .cols { grid-template-columns: 1fr; } main { padding: 12px 16px 60px; }
+}
+@media (max-width: 560px) {
+  .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .look { grid-template-columns: 1fr; }
+  .lib-row { grid-template-columns: 1fr; gap: 4px; } .lib-row .lib-ready { grid-column: auto; } .lib-row.th { display: none; }
+  .lib-row .lbl { display: inline; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  .strip-head .keys { display: none; }
+  .chip { width: 128px; }
+  .step-head nav { margin-left: 0; }
+  .goal-head h2 { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside><h1>valet · runs</h1><div id="runs"></div></aside>
+  <main id="main"><div class="empty">Pick a run. Start one with <code>npm run valet -- do "move the bottle 10 cm right" --what "bottle" --ui</code>.</div></main>
+</div>
+<script>
+const $ = (sel, el = document) => el.querySelector(sel);
+const h = (tag, attrs = {}, ...kids) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") el.className = v; else if (k === "style") el.setAttribute("style", v);
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v); else if (v != null && v !== false) el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat(Infinity)) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  return el;
+};
+const json = (v) => h("pre", {}, JSON.stringify(v, null, 2));
+// Open folds stay open when the page redraws for new records.
+const opened = new Set();
+const fold = (label, v, key) => {
+  const d = h("details", key && opened.has(key) ? { open: "" } : {}, h("summary", {}, label), v && v.nodeType ? v : json(v));
+  if (key) d.addEventListener("toggle", () => (d.open ? opened.add(key) : opened.delete(key)));
+  return d;
+};
+const fx = (v, d = 2) => (typeof v === "number" ? v.toFixed(d) : "–");
+const r1 = (v) => Math.round(v * 10) / 10;
+const when = (t) => (t ? new Date(t).toLocaleString() : "");
+const clock = (t) => (t ? new Date(t).toLocaleTimeString() : "");
+const secs = (ms) => (ms < 60000 ? `${Math.round(ms / 1000)} s` : `${Math.floor(ms / 60000)} min ${Math.round((ms % 60000) / 1000)} s`);
+const words = (k) => k.replace(/_(cm|deg|pct)$/, "").replaceAll("_", " ");
+const SHA = /^[0-9a-f]{64}$/;
+const ENDS = new Set(["done", "stuck"]);
+const UNSURE_WHY = /^unsure; ran nothing/;
+const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+async function get(path) { const r = await fetch(path); return r.json(); }
+
+let config = { deciders: ["jev", "h2o", "chat"], decider: "jev", sure: 0.35, locateMin: 0.3, armd: "" };
+let library = { skills: [], error: null, file: "brain/skills.ts", mtime: 0, prompts: { texts: {}, history: [] }, defaults: {} };
+let selected = Number(new URLSearchParams(location.search).get("run")) || null;
+let newestRun = null;
+let detail = null;
+let focus = null;
+let tab = "timeline";
+let goalTab = "steps";
+// The step or checkpoint the person picked (its key); null follows the newest as the run goes.
+let pinned = null;
+
+async function refreshList() {
+  const { runs } = await get("/api/runs");
+  const followed = selected === null || selected === newestRun;
+  newestRun = runs[0]?.id ?? null;
+  const box = $("#runs"); box.replaceChildren();
+  if (!runs.length) box.append(h("div", { class: "empty" }, "No runs yet."));
+  for (const r of runs) {
+    box.append(h("a", { class: "run-link" + (r.id === selected ? " on" : ""), href: "?run=" + r.id, onclick: (e) => { e.preventDefault(); select(r.id); } },
+      h("span", { class: "pill " + r.status }, r.status), " ", h("b", {}, r.kind), " #", r.id, " ", r.goal,
+      h("small", {}, when(r.startedAt), " · ", r.decider, r.planner && r.planner !== "none" ? " · " + r.planner : "")));
+  }
+  // Watching the newest run, a new run that starts takes over the page.
+  if (newestRun !== null && followed && selected !== newestRun) select(newestRun);
+}
+
+function select(id) {
+  selected = id; detail = null; focus = null; pinned = null;
+  history.replaceState(null, "", "?run=" + id);
+  refreshRun(); refreshList();
+}
+
+async function refreshRun() {
+  if (!selected) return;
+  const d = await get("/api/runs/" + selected);
+  if (d.error) { $("#main").replaceChildren(h("div", { class: "empty" }, d.error)); return; }
+  if (d.id !== selected) return;
+  const fresh = !detail || detail.id !== d.id || detail.entries.length !== d.entries.length || detail.run.status !== d.run.status || detail.run.summary !== d.run.summary;
+  detail = digest(d);
+  if (fresh) render();
+}
+
+function digest(d) {
+  const ticks = [], motions = {}, moves = [], llm = [], turns = [], steps = [];
+  let arm = null, armFrom = null, frame = null, frameFrom = null;
+  for (const e of d.entries) {
+    if (e.kind === "valet.tick") {
+      const t = { entry: e.id, ...e.data };
+      ticks.push(t);
+      if (t.arm?.pan_deg != null) { arm = t.arm; armFrom = lookName(t); }
+      if (t.frames?.[0]) { frame = t.frames[0]; frameFrom = lookName(t); }
+    } else if (e.kind === "valet.step") steps.push(e.data);
+    else if (e.kind === "valet.motion") {
+      (motions[e.data.task + "#" + e.data.tick] ??= []).push(e.data);
+      moves.push(e.data);
+      if (e.data.result?.after) { arm = e.data.result.after; armFrom = `after a move in step ${stepOfTask(e.data.task) ?? e.data.task}`; }
+    }
+    else if (e.kind === "valet.llm_request") llm.push({ entry: e.id, ...e.data });
+    else if (e.model) turns.push(e);
+  }
+  return { ...d, ticks, motions, llm, turns, steps, goal: goalItems(d, ticks, moves), latest: { arm, armFrom, frame, frameFrom } };
+}
+
+// "do.4" is the inside of step 4 of goal "do".
+const stepOfTask = (task) => /\.(\d+)(\.|$)/.exec(task ?? "")?.[1];
+const lookName = (t) => (t.role === "step" ? `step ${t.tick}` : t.role === "ask" ? `a look in step ${stepOfTask(t.task) ?? t.task}` : `${t.role} ${t.task}#${t.tick ?? "-"}`);
+const isStep = (x) => x.type === "step";
+
+/** The message brain/overseer.ts sends Claude at a checkpoint: JSON text naming the checkpoint, then the pictures. */
+function checkpointSent(m) {
+  const content = Array.isArray(m?.content) ? m.content : [];
+  const text = content.find((c) => c.type === "text")?.text;
+  if (!text || !text.trimStart().startsWith("{")) return null;
+  try {
+    const sent = JSON.parse(text);
+    return sent?.checkpoint ? { kind: sent.checkpoint, sent, images: content.filter((c) => c.type === "image").map(findSha).filter(Boolean) } : null;
+  } catch { return null; }
+}
+
+/**
+ * The goal in the order it happened: each step (where Jev chose, what the skill did, the looks and moves inside it) and
+ * each Claude checkpoint (the note the director recorded, the message Claude was sent and its reply, and the verdict
+ * kept on the run). A checkpoint Claude has been sent but not answered is pending.
+ */
+function goalItems(d, ticks, moves) {
+  const items = [], byStep = new Map(), asks = [];
+  let ask = null;
+  const stepItem = (task, n) => {
+    const key = `${task}#${n}`;
+    if (!byStep.has(key)) { const s = { type: "step", key: `s${n}`, n, task, tick: null, result: null, looks: [], moves: [], checks: [] }; byStep.set(key, s); items.push(s); }
+    return byStep.get(key);
+  };
+  for (const e of d.entries) {
+    if (e.kind === "valet.tick" && e.data.role === "step") stepItem(e.data.task, e.data.tick).tick = { entry: e.id, ...e.data };
+    else if (e.kind === "valet.step" && e.data.skill.startsWith("claude:")) items.push({ type: "check", entry: Number(e.id), kind: e.data.skill.slice(7), n: e.data.step, note: e.data });
+    else if (e.kind === "valet.step") { const s = stepItem(e.data.task, e.data.step); s.result ??= e.data; }
+    else if (e.kind === "pi.user") { const sent = checkpointSent(e.model?.[0]); ask = sent ? { entry: Number(e.id), look: asks.length + 1, ...sent, replies: [] } : null; if (ask) asks.push(ask); }
+    else if (ask && (e.kind === "pi.assistant" || e.kind === "pi.tool-result")) ask.replies.push(...(e.model ?? []));
+  }
+  const unanswered = [...asks], verdicts = [...(d.run.checkpoints ?? [])];
+  const take = (list, ok) => { const i = list.findIndex(ok); return i < 0 ? null : list.splice(i, 1)[0]; };
+  const checks = items.filter((x) => x.type === "check");
+  for (const c of checks) {
+    c.ask = take(unanswered, (a) => a.kind === c.kind && a.entry < c.entry);
+    c.doc = c.ask ? take(verdicts, (v) => v.kind === c.kind && v.n === c.ask.look) ?? take(verdicts, (v) => v.kind === c.kind) : null;
+  }
+  const lastN = items.filter(isStep).at(-1)?.n ?? 0;
+  for (const a of unanswered) {
+    const c = { type: "check", kind: a.kind, n: lastN, note: null, ask: a, doc: take(verdicts, (v) => v.n === a.look) };
+    items.push(c);
+    checks.push(c);
+  }
+  checks.forEach((c, i) => { c.key = `c${i + 1}`; });
+  for (const s of items.filter(isStep)) {
+    const inner = `${s.task}.${s.n}`;
+    const inside = (task) => task === inner || task?.startsWith(inner + ".");
+    s.looks = ticks.filter((x) => x.role !== "step" && inside(x.task));
+    s.moves = moves.filter((m) => inside(m.task));
+    s.checks = checks.filter((c) => c.n === s.n);
+  }
+  return items;
+}
+
+/** The newest step at or before `item` that asked Jev (an only-choice step does not). */
+function askedAt(item) {
+  const items = detail.goal, i = item ? items.indexOf(item) : items.length - 1;
+  return items.slice(0, i + 1).reverse().find((x) => isStep(x) && x.tick) ?? null;
+}
+
+function render() {
+  if (detail.run.kind === "do") return renderGoal();
+  const run = detail.run;
+  $("#main").replaceChildren(
+    h("div", { class: "head" },
+      h("h2", {}, run.goal || "(no goal)", " ", h("span", { class: "pill " + run.status }, run.status)),
+      h("div", { class: "meta" },
+        h("span", {}, run.kind, " #", detail.id), h("span", {}, "planner ", h("code", {}, run.planner)), h("span", {}, "decider ", h("code", {}, run.decider)),
+        h("span", {}, when(run.startedAt)), run.endedAt ? h("span", {}, Math.round((run.endedAt - run.startedAt) / 1000), " s") : null,
+        h("span", {}, detail.ticks.length, " decisions · ", detail.steps.length, " skill steps · ", (run.programs || []).length, " programs · ", detail.llm.length || detail.turns.filter((t) => t.kind === "pi.assistant").length, " planner turns")),
+      run.summary ? h("p", {}, run.summary) : null),
+    h("div", { class: "tabs" }, ["timeline", "steps & programs"].map((t) => h("button", { class: tab === t ? "on" : "", onclick: () => { tab = t; render(); } }, t))),
+    tab === "timeline" ? timeline() : tasksView(),
+    h("div", { id: "focus" }, tab === "timeline" ? focusView() : null));
+}
+
+// ---- A goal run (valet do) ----
+
+function renderGoal() {
+  const items = detail.goal;
+  const shown = items.find((x) => x.key === pinned) ?? items.at(-1);
+  $("#main").replaceChildren(
+    goalHead(),
+    nowPanel(),
+    h("div", { class: "tabs" }, [["steps", "steps"], ["timeline", "raw timeline"]].map(([k, label]) => h("button", { class: goalTab === k ? "on" : "", onclick: () => { goalTab = k; render(); } }, label))),
+    ...(goalTab === "steps"
+      ? [...stepStrip(items, shown), !shown ? h("div", { class: "card empty" }, "No steps yet: the arm is being held and the first look taken.") : isStep(shown) ? stepDetail(shown, items) : checkDetail(shown, items), libraryPanel(askedAt(shown))]
+      : [timeline(), h("div", { id: "focus" }, focusView())]));
+  fillLive();
+  const strip = $("#strip"), on = strip && $(".chip.on", strip);
+  if (on) strip.scrollLeft = Math.max(0, on.offsetLeft - (strip.clientWidth - on.offsetWidth) / 2);
+}
+
+const show = (item) => () => { pinned = item === detail.goal.at(-1) ? null : item.key; render(); };
+
+function goalHead() {
+  const run = detail.run, items = detail.goal, state = items.find((x) => x.tick)?.tick.state;
+  const ms = (run.endedAt ?? Date.now()) - run.startedAt;
+  const checks = items.filter((x) => x.type === "check").length;
+  return h("div", { class: "goal-head" },
+    h("div", { class: "kicker" }, h("span", { class: "pill " + run.status }, run.status), `do #${detail.id}`),
+    h("h2", {}, state?.goal ?? run.goal),
+    h("div", { class: "meta" },
+      state?.object ? h("span", {}, "object ", h("b", {}, state.object)) : null,
+      h("span", {}, "decider ", h("code", {}, run.decider)),
+      run.planner && run.planner !== "none" ? h("span", {}, "checked by ", h("code", {}, run.planner)) : h("span", {}, "no Claude checkpoints"),
+      h("span", {}, "started ", when(run.startedAt)),
+      h("span", {}, run.endedAt ? "took " : "running for ", secs(ms)),
+      h("span", {}, items.filter(isStep).length, " steps", checks ? ` · ${checks} checkpoints` : "")));
+}
+
+// The camera and arm boxes outlive redraws, so the live picture does not flicker when a record arrives.
+const live = { on: store.get("valet.live") !== "off", state: null, error: null, frameAt: 0, blob: null, timer: null };
+const camImg = h("img", { alt: "wrist camera" });
+const camBadge = h("div", { class: "badge" });
+const camNone = h("div", { class: "none" });
+const cam = h("div", { class: "cam" }, camImg, camNone, camBadge);
+const camText = h("span");
+const camToggle = h("button", { onclick: () => {
+  live.on = !live.on; store.set("valet.live", live.on ? "on" : "off");
+  if (!live.on) { live.state = null; live.blob = null; }
+  pollLive(); fillLive();
+} });
+const camNote = h("div", { class: "cam-note" }, camText, camToggle);
+const armBox = h("div");
+const activityBox = h("div", { class: "activity" });
+
+function nowPanel() {
+  const last = askedAt(null), before = last && askedAt(detail.goal[detail.goal.indexOf(last) - 1]);
+  const held = detail.goal.filter((x) => isStep(x) && x.result).at(-1)?.result.held ?? null;
+  return h("section", { class: "card now" },
+    h("div", {}, cam, camNote),
+    h("div", {},
+      activityBox,
+      h("h4", {}, "Arm ", h("small", { id: "arm-src" })), armBox,
+      h("h4", {}, "Facts ", h("small", {}, last ? `code-computed at step ${last.n}; outlined: changed since step ${before?.n ?? "–"}` : "none yet")),
+      last ? factsView(last.tick.state?.facts, before?.tick.state?.facts) : h("div", { class: "m" }, "–"),
+      h("h4", {}, "Held"), h("div", { class: "held" }, heldText(held))));
+}
+
+function heldText(held) {
+  if (!held) return "nothing";
+  if (typeof held !== "object") return String(held);
+  const g = held.grasp;
+  return [h("b", {}, held.what), g ? ` picked up at pan ${fx(g.pan_deg, 1)}°, reach ${fx(g.reach_cm, 1)} cm, height ${fx(g.height_cm, 1)} cm` : null];
+}
+
+function activity() {
+  const run = detail.run, last = detail.goal.at(-1);
+  if (run.status !== "running") return { cls: run.status, text: `Ended: ${run.summary ?? run.status}` };
+  if (!last) return { cls: "running", text: "Starting: holding the arm and taking the first look" };
+  if (last.type === "check") return last.note ? { cls: "running", text: `Step ${last.n + 1}: looking, and asking Jev what next` } : { cls: "running", text: `After step ${last.n}: Claude is checking "${last.kind}"` };
+  if (last.tick?.error) return { cls: "failed", text: `Step ${last.n}: the decision failed: ${last.tick.error}` };
+  if (!last.result) return { cls: "running", text: `Step ${last.n}: running ${choiceText(last)} (${secs(Date.now() - last.tick.t - (last.tick.ms?.model ?? 0))})` };
+  return { cls: "running", text: `Step ${last.n + 1}: looking, and asking Jev what next` };
+}
+
+function fillLive() {
+  if (!detail || detail.run.kind !== "do") return;
+  const a = activity();
+  activityBox.className = "activity " + a.cls; activityBox.textContent = a.text;
+  const { arm, armFrom, frame, frameFrom } = detail.latest;
+  const seeing = live.on && !live.error && live.blob;
+  if (seeing) {
+    if (camImg.src !== live.blob) camImg.src = live.blob;
+    camBadge.className = "badge live"; camBadge.textContent = "LIVE · wrist";
+  } else if (frame) {
+    const src = `/frames/${frame.sha256}.jpg`;
+    if (!camImg.src.endsWith(src)) camImg.src = src;
+    camBadge.className = "badge"; camBadge.textContent = `recorded · ${frameFrom}`;
+  }
+  camImg.hidden = !(seeing || frame);
+  camNone.hidden = !camImg.hidden;
+  camNone.textContent = live.error ? `armd not reachable: ${live.error}` : "No frame yet";
+  camText.textContent = !live.on ? "live view off; showing the last recorded frame" : live.error ? `armd ${config.armd} not reachable; showing the last recorded frame` : seeing ? `live from armd ${config.armd}` : "connecting to armd…";
+  camToggle.textContent = live.on ? "Stop live view" : "Show live view";
+  const liveArm = live.on && !live.error && live.state;
+  const shown = liveArm ? live.state : arm;
+  const src = $("#arm-src");
+  if (src) src.textContent = liveArm ? "live from armd" : shown ? `recorded, ${armFrom}` : "";
+  armBox.replaceChildren(shown ? armView(shown) : h("div", { class: "m" }, "no arm state recorded"));
+}
+
+function armView(a) {
+  const g = (label, value) => h("div", { class: "gauge" }, h("span", {}, label), h("b", {}, value));
+  return h("div", { class: "gauges" },
+    g("pan", `${fx(a.pan_deg, 1)}°`), g("reach", `${fx(a.reach_m * 100, 1)} cm`), g("jaw tip height", `${fx(a.height_m * 100, 1)} cm`),
+    g("pitch", `${fx(a.pitch_deg, 1)}°`), g("gripper", `${fx(a.gripper_pct, 0)}% ${a.grip}`), g("torque", a.torque ? "on" : "off"));
+}
+
+async function pollLive() {
+  clearTimeout(live.timer);
+  const again = (ms) => { live.timer = setTimeout(pollLive, ms); };
+  if (!live.on || document.hidden || detail?.run.kind !== "do") return again(1500);
+  try {
+    const d = await get("/api/live");
+    live.state = d.state ?? null; live.error = d.error ?? null;
+    if (d.error) { fillLive(); return again(4000); }
+    const r = await fetch("/api/live/wrist.jpg");
+    if (!r.ok) { live.error = (await r.json().catch(() => ({}))).error ?? `HTTP ${r.status}`; fillLive(); return again(3000); }
+    const url = URL.createObjectURL(await r.blob());
+    const old = live.blob;
+    live.blob = url; live.frameAt = Date.now();
+    fillLive();
+    if (old) setTimeout(() => URL.revokeObjectURL(old), 1000);
+    again(350);
+  } catch (e) {
+    live.error = "the UI server is not answering"; fillLive(); again(4000);
+  }
+}
+
+function factsView(facts, before) {
+  if (!facts) return h("div", { class: "m" }, "no facts recorded");
+  return h("div", { class: "facts" }, Object.entries(facts).map(([k, v]) => {
+    const changed = before && JSON.stringify(before[k]) !== JSON.stringify(v);
+    const unit = k.endsWith("_cm") ? " cm" : k.endsWith("_deg") ? "°" : k.endsWith("_pct") ? "%" : "";
+    const tone = v === true ? "yes" : v === false ? "no" : "val";
+    return h("span", { class: `fact ${tone}${changed ? " changed" : ""}`, title: `${k} = ${JSON.stringify(v)}${changed ? `, was ${JSON.stringify(before[k])}` : ""}` },
+      h("i"), words(k), typeof v === "boolean" ? h("em", {}, v ? "yes" : "no") : h("b", {}, `${v}${unit}`));
+  }));
+}
+
+const choiceOf = (s) => s.result?.skill ?? s.tick?.reading?.action ?? "?";
+const amountOf = (s) => (s.result ? (s.result.amount == null ? null : `${s.result.amount} ${s.result.unit === "deg" ? "°" : s.result.unit}`) : s.tick?.step);
+const choiceText = (s) => [choiceOf(s), amountOf(s)].filter(Boolean).join(" ");
+const pOf = (s) => s.result?.p ?? s.tick?.reading?.p;
+
+function outcome(s) {
+  if (s.tick?.error) return { cls: "bad", word: "error", text: `the decision failed: ${s.tick.error}` };
+  const r = s.result;
+  if (!r) return detail.run.status === "running" ? { cls: "running", word: "running", text: `running ${choiceText(s)}…` } : { cls: "bad", word: "no result", text: "no result was recorded for this step" };
+  if (UNSURE_WHY.test(r.why)) return { cls: "unsure", word: "unsure", text: `Jev was unsure (p ${fx(r.p)}: below ${config.sure}, or under ${config.margin} ahead of the next choice): nothing ran` };
+  if (r.skill === "done") return { cls: "ok", word: "done", text: r.why };
+  if (r.skill === "stuck") return { cls: "bad", word: "stuck", text: r.why };
+  return r.ok ? { cls: "ok", word: "ok", text: r.why } : { cls: "bad", word: "failed", text: r.why };
+}
+
+/** Code's side of a checkpoint Claude agreed with; brain/overseer.ts's ON_DISAGREE has the other side. */
+const ON_AGREE = { found: "the object counts as found, and Jev goes on", gripped: "the grip counts as good, and Jev goes on", done: "the run ends: done" };
+
+function checkOutcome(c) {
+  if (!c.note) return detail.run.status === "running" ? { cls: "running", word: "looking", text: "Claude is looking at the pictures" } : { cls: "bad", word: "no verdict", text: "Claude was asked, but no verdict was recorded" };
+  if (/^Claude could not be asked/.test(c.note.why)) return { cls: "bad", word: "not asked", text: c.note.why };
+  if (c.kind === "handback") return { cls: "unsure", word: "reviewed", text: c.note.why };
+  return c.note.ok ? { cls: "ok", word: "agrees", text: c.note.why } : { cls: "bad", word: "disagrees", text: c.note.why };
+}
+
+function stepStrip(items, shown) {
+  return [
+    h("div", { class: "strip-head" },
+      h("h3", {}, "Steps and checkpoints"),
+      h("span", { class: "keys" }, "← → to step through"),
+      h("button", { class: pinned === null ? "on" : "", onclick: () => { pinned = null; render(); } }, pinned === null ? "Following the newest" : "Follow the newest")),
+    h("div", { class: "strip", id: "strip" }, items.map((x) => {
+      const on = x === shown ? " on" : "";
+      if (x.type === "check") {
+        const o = checkOutcome(x), f = x.doc?.frames?.at(-1) ?? x.ask?.images?.at(-1);
+        return h("button", { class: `chip check ${o.cls}${on}`, onclick: show(x), title: `Claude checks "${x.kind}": ${o.text}` },
+          f ? h("img", { src: `/frames/${f}.jpg`, alt: "", loading: "lazy" }) : h("div", { class: "noimg" }),
+          h("div", { class: "chip-text" }, h("span", { class: "chip-n" }, "Claude"), h("b", {}, x.kind)),
+          h("div", { class: "chip-foot" }, h("span", {}, `after ${x.n}`), h("span", { class: "chip-o" }, o.word)));
+      }
+      const o = outcome(x), f = x.tick?.frames?.[0];
+      return h("button", { class: `chip ${o.cls}${on}`, onclick: show(x), title: `${choiceText(x)}: ${o.text}` },
+        f ? h("img", { src: `/frames/${f.sha256}.jpg`, width: f.width, height: f.height, alt: "", loading: "lazy" }) : h("div", { class: "noimg" }, x.tick ? null : "Jev not asked"),
+        h("div", { class: "chip-text" }, h("span", { class: "chip-n" }, x.n), h("b", {}, choiceOf(x)), amountOf(x) ? ` ${amountOf(x)}` : ""),
+        h("div", { class: "chip-foot" }, h("span", {}, "p ", fx(pOf(x))), h("span", { class: "chip-o" }, o.word)));
+    })),
+  ];
+}
+
+function itemNav(items, i) {
+  return h("nav", {},
+    h("button", { disabled: i <= 0 ? "" : null, onclick: items[i - 1] ? show(items[i - 1]) : null }, "← earlier"),
+    h("button", { disabled: i >= items.length - 1 ? "" : null, onclick: items[i + 1] ? show(items[i + 1]) : null }, "later →"));
+}
+
+function stepDetail(s, items) {
+  const t = s.tick, r = s.result, o = outcome(s), i = items.indexOf(s), prev = askedAt(items[i - 1]);
+  const chosen = t?.reading?.action ?? t?.answers?.skill?.choice;
+  const checked = s.checks.length ? h("div", { class: "checked" }, s.checks.map((c) => {
+    const co = checkOutcome(c);
+    return h("button", { class: `check-link ${co.cls}`, onclick: show(c) }, `Claude checked "${c.kind}" after this step: ${co.word} →`);
+  })) : null;
+  return h("section", { class: `card step-detail ${o.cls}` },
+    h("div", { class: "step-head" },
+      h("h3", {}, `Step ${s.n}`, s === items.at(-1) ? h("span", { class: "tag" }, "newest") : null),
+      h("span", { class: "verdict" }, choiceText(s), " · p ", fx(pOf(s)), " · ", o.word),
+      t ? h("span", { class: "m" }, clock(t.t), " · Jev answered in ", t.ms?.model ?? "–", " ms", r && !UNSURE_WHY.test(r.why) && !ENDS.has(r.skill) ? ` · skill ran ${(r.ms / 1000).toFixed(1)} s` : "") : h("span", { class: "m" }, "Jev was not asked: it was the only skill on offer"),
+      itemNav(items, i)),
+    h("div", { class: "step-grid" },
+      h("div", {},
+        t ? shot(t.frames?.[0], "what Jev saw") : null,
+        h("div", { class: "result" },
+          h("h4", {}, "What happened"),
+          h("p", { class: "why" }, o.text),
+          s.moves.length ? h("ol", { class: "moves" }, s.moves.map(moveLine)) : null,
+          r?.log?.length ? h("pre", {}, r.log.join("\n")) : null,
+          r ? h("div", { class: "kv", style: "margin-top:6px" }, h("b", {}, "held after"), h("span", {}, heldText(r.held))) : null,
+          r?.result ? fold("skill result", r.result, `result:${detail.id}:${s.n}`) : null),
+        checked,
+        looksView(s)),
+      t ? h("div", {},
+        choiceView(t, chosen),
+        amountView(t, chosen, r),
+        h("h4", {}, "Facts at this step ", h("small", {}, "code-computed; they decide which skills are offered")),
+        factsView(t.state?.facts, prev?.tick.state?.facts),
+        h("h4", {}, "Arm, as Jev was told"),
+        t.state?.arm ? factsView(t.state.arm) : h("div", { class: "m" }, "–"),
+        h("div", { class: "kv", style: "margin-top:8px" }, h("b", {}, "held"), h("span", {}, String(t.state?.held ?? "–")), h("b", {}, "usage"), h("span", {}, t.usage ? `${t.usage.input} in · ${t.usage.output} out` : "–")),
+        fold("everything Jev was sent as state (recent_steps, camera, …)", t.state, `state:${detail.id}:${s.n}`),
+        fold("wire request (images as frame hashes)", t.wire?.request, `wireq:${detail.id}:${s.n}`),
+        fold("wire response", t.wire?.response, `wirer:${detail.id}:${s.n}`)) : h("div", {})));
+}
+
+function checkDetail(c, items) {
+  const o = checkOutcome(c), i = items.indexOf(c), sent = c.ask?.sent ?? {}, v = c.doc;
+  const frames = v?.frames ?? c.ask?.images ?? [], labels = sent.pictures ?? [];
+  const onNo = sent.if_you_disagree ?? config.onDisagree?.[c.kind] ?? "–";
+  const did = !c.note ? (o.cls === "running" ? "waits for Claude's verdict" : "went on as Jev said")
+    : /^Claude could not be asked/.test(c.note.why) ? "went on as Jev said, without Claude"
+    : c.kind === "handback" ? `ended the run${v?.edited?.length ? `; Claude's rewrites of ${v.edited.join(", ")} apply from the next run` : ""}`
+    : c.note.ok ? ON_AGREE[c.kind] ?? "went on as Jev said" : `Claude disagreed: ${onNo}`;
+  const said = (c.ask?.replies ?? []).filter((m) => m.role === "assistant").flatMap((m) => (Array.isArray(m.content) ? m.content : [{ type: "text", text: m.content }]).filter((b) => b.type === "text" && b.text?.trim()).map((b) => b.text));
+  const answer = (c.ask?.replies ?? []).find((m) => m.role === "assistant" && m.model)?.model;
+  return h("section", { class: `card check-detail ${o.cls}` },
+    h("div", { class: "step-head" },
+      h("h3", {}, "Claude checks ", h("q", {}, c.kind), c === items.at(-1) ? h("span", { class: "tag" }, "newest") : null),
+      h("span", { class: "verdict" }, `Claude ${o.word}`),
+      h("span", { class: "m" }, `after step ${c.n}`, v?.at ? ` · ${clock(v.at)}` : "", answer ? ` · ${answer}` : ""),
+      itemNav(items, i)),
+    h("div", { class: "step-grid" },
+      h("div", {},
+        frames.length ? frames.map((sha, j) => shot({ cam: "wrist", sha256: sha }, labels[j] ?? `picture ${j + 1}`)) : h("div", { class: "m" }, "no pictures recorded")),
+      h("div", {},
+        h("h4", {}, "The claim Claude was asked to check"),
+        h("blockquote", {}, sent.claim ?? config.claims?.[c.kind] ?? "–"),
+        sent.why_jev_stopped ? [h("h4", {}, "Why Jev stopped"), h("p", {}, sent.why_jev_stopped)] : null,
+        h("h4", {}, "Claude's verdict"),
+        h("div", { class: "result" },
+          h("p", { class: "why" }, v ? `${c.kind === "handback" ? "" : v.agree ? "Agrees. " : "Disagrees. "}${v.why}` : c.note?.why ?? o.text),
+          said.map((t) => h("p", { class: "said" }, t))),
+        h("h4", {}, "What code did"),
+        h("p", { class: "did" }, did),
+        c.kind !== "handback" && c.note?.ok ? h("p", { class: "m" }, "Had Claude disagreed: ", onNo) : null,
+        editsView(c),
+        sent.facts ? [h("h4", {}, "Facts Claude was shown"), factsView(sent.facts)] : null,
+        fold("everything Claude was sent (pictures as frame hashes)", c.ask ? sent : "nothing recorded", `sent:${detail.id}:${c.key}`),
+        fold("Claude's reply and the tool result", c.ask?.replies.length ? h("div", {}, c.ask.replies.map(message)) : "no reply recorded", `reply:${detail.id}:${c.key}`))));
+}
+
+function editsView(c) {
+  const edits = c.doc?.edits ?? [];
+  if (!c.doc) return null;
+  if (!edits.length) return h("p", { class: "m" }, "Claude rewrote none of Jev's words.");
+  const was = c.ask?.sent?.words_jev_reads ?? {};
+  return [
+    h("h4", {}, "Claude's rewrites of the words Jev reads"),
+    edits.map((e) => {
+      const refused = (c.doc.refused ?? []).find((r) => r.startsWith(`${e.target}:`));
+      return h("div", { class: "edit" },
+        h("div", {}, h("code", {}, e.target), h("span", { class: "tag " + (refused ? "no" : "yes") }, refused ? "not applied" : "applied")),
+        was[e.target] != null ? h("div", { class: "was" }, was[e.target]) : null,
+        h("div", { class: "new" }, e.text),
+        h("div", { class: "m" }, "reason: ", e.reason),
+        refused ? h("div", { class: "err small" }, refused.slice(e.target.length + 2)) : null);
+    }),
+  ];
+}
+
+function shot(ref, caption, boxes = []) {
+  if (!ref) return h("div", { class: "m" }, "no frame recorded");
+  const src = `/frames/${ref.sha256}.jpg`;
+  return h("figure", { class: "shot" },
+    h("a", { class: "shot-img", href: src, target: "_blank", title: "open the full frame" },
+      h("img", { src, width: ref.width, height: ref.height, alt: caption ?? ref.cam, loading: "lazy" }),
+      boxes.map((b) => h("div", { class: "ov", style: `left:${b.left * 100}%;top:${b.top * 100}%;width:${(b.right - b.left) * 100}%;height:${(b.bottom - b.top) * 100}%` }))),
+    h("figcaption", {}, caption ? `${caption} · ` : "", ref.cam, ref.width ? ` ${ref.width}×${ref.height}` : "", ` · ${ref.sha256.slice(0, 10)}`));
+}
+
+/** Claude's rewrite that put exactly this text in front of Jev, if one did. */
+const rewriteOf = (target, text) => (library.prompts?.history ?? []).findLast((e) => e.target === target && e.text === text);
+const rewriteTag = (e) => (e ? h("span", { class: "tag claude", title: `${e.reason}${e.run ? ` (run #${e.run}${e.checkpoint ? `, checkpoint ${e.checkpoint}` : ""})` : ""}` }, "Claude's rewrite") : null);
+const amountWords = (instructions) => /^If the next skill is "[\s\S]*?": ([\s\S]*)$/.exec(instructions ?? "")?.[1] ?? null;
+
+function choiceView(t, chosen) {
+  const q = t.questions?.skill, a = t.answers?.skill;
+  if (!q) return h("div", { class: "err" }, "no choice question recorded");
+  const probs = a?.type === "choice" ? a.probabilities : {};
+  const rows = Object.entries(q.criteria).map(([name, says]) => ({ name, says, p: probs[name] ?? 0 })).sort((x, y) => y.p - x.p);
+  const notOffered = library.skills.filter((k) => !(k.name in q.criteria));
+  return h("div", {},
+    h("h4", {}, "What Jev was asked"),
+    h("blockquote", {}, q.instructions, rewriteTag(rewriteOf("choice", q.instructions))),
+    h("div", { class: "opts" }, rows.map((row) => {
+      const aq = t.questions[`amount_${row.name}`], aa = t.answers?.[`amount_${row.name}`];
+      const est = aq && aa?.type === "score" ? levelAt(aq.criteria, aa.score) : null;
+      return h("div", { class: `opt${row.name === chosen ? " chosen" : ""}${ENDS.has(row.name) ? " end" : ""}` },
+        h("div", { class: "opt-top" }, h("code", {}, row.name), rewriteTag(rewriteOf(row.name, row.says)), est ? h("span", { class: "opt-amt", title: `amount score ${fx(aa.score)}` }, "about ", est) : null, h("span", { class: "opt-p" }, fx(row.p))),
+        h("div", { class: "opt-bar" }, h("i", { style: `width:${row.p * 100}%` }), h("s", { style: `left:${config.sure * 100}%` })),
+        h("div", { class: "says" }, row.says));
+    })),
+    h("div", { class: "legend" }, a ? `confidence ${fx(a.confidence)} · ` : "no answer · ", "the", h("s"), `mark is ${config.sure}: below it, or under ${config.margin} ahead of the next choice, Jev is unsure and nothing runs`),
+    notOffered.length ? h("p", { class: "not-offered" }, "Not offered at this step (precondition false): ", notOffered.flatMap((k, j) => [j ? ", " : "", h("code", { title: k.ready ?? "" }, k.name)])) : null);
+}
+
+/** The amount a score stands for, read from level labels such as "About 2 cm.", between levels as brain/task.ts does. */
+function levelAt(labels, score) {
+  const levels = labels.map((l) => /(-?[\d.]+)\s*(cm|degrees|°)?/.exec(l)).map((m) => (m ? { v: Number(m[1]), unit: m[2] === "degrees" ? "°" : m[2] ?? "" } : null));
+  if (levels.some((l) => !l) || score == null) return null;
+  const top = levels.length - 1, s = Math.min(top, Math.max(0, score)), i = Math.min(top - 1, Math.floor(s));
+  const v = levels[i].v + (s - i) * (levels[i + 1].v - levels[i].v);
+  return `${r1(v)}${levels[0].unit === "°" ? "°" : ` ${levels[0].unit}`}`;
+}
+
+function amountView(t, chosen, r) {
+  const q = t.questions?.[`amount_${chosen}`], a = t.answers?.[`amount_${chosen}`];
+  if (!q) return null;
+  const n = q.criteria.length, score = a?.type === "score" ? a.score : null, at = (i) => `left:${(Math.min(n - 1, Math.max(0, i)) / (n - 1)) * 100}%`;
+  return h("div", { class: "amount" },
+    h("h4", {}, "How far: what Jev was asked"),
+    h("blockquote", {}, q.instructions, rewriteTag(rewriteOf(`${chosen}.amount`, amountWords(q.instructions)))),
+    h("div", { class: "scale" },
+      h("div", { class: "scale-track" }),
+      q.criteria.map((_, i) => h("span", { class: "stop", style: at(i) })),
+      q.criteria.map((c, i) => h("span", { class: "lab", style: `${at(i)};transform:translateX(${i === 0 ? 0 : i === n - 1 ? -100 : -50}%)`, title: c }, c.replace(/^About /, "").replace(/\.$/, ""))),
+      score == null ? null : h("span", { class: "marker", style: at(score), title: `score ${fx(score)}` })),
+    h("div", {}, "Jev scored ", h("b", {}, fx(score)), ` on levels 0 to ${n - 1}`, " → ", h("b", {}, r?.amount != null ? `${r.amount} ${r.unit}` : levelAt(q.criteria, score) ?? "–"),
+      a ? h("span", { class: "m" }, ` · confidence ${fx(a.confidence)}`) : null));
+}
+
+function moveLine(m) {
+  const res = m.error ? m.error : m.result?.ok ? "moved" : m.result?.stopped ? `stopped: ${m.result.stopped}` : `refused: ${m.result?.refused ?? "?"}`;
+  return h("li", { class: m.error || (m.result && !m.result.ok) ? "bad" : "" }, h("code", {}, motionText(m.motion)), " → ", res, h("span", { class: "m" }, ` ${(m.ms / 1000).toFixed(1)} s`));
+}
+
+function motionText(mo) {
+  if (!mo) return "?";
+  if (mo.kind === "grip") return `grip ${mo.to}${mo.pct != null ? ` ${mo.pct}%` : ""}`;
+  if (mo.kind === "pose" || mo.kind === "remember") return `${mo.kind} ${mo.name}`;
+  const parts = Object.entries(mo).filter(([k]) => k !== "kind" && k !== "speed_dps").map(([k, v]) => {
+    const cm = k.endsWith("_m"), val = r1(cm ? v * 100 : v);
+    return `${k.replace(/_(m|deg)$/, "")} ${mo.kind === "delta" && val > 0 ? "+" : ""}${val}${cm ? " cm" : "°"}`;
+  });
+  return `${mo.kind === "to" ? "to" : "by"} ${parts.join(", ")}`;
+}
+
+function looksView(s) {
+  if (!s.looks.length) return null;
+  return h("div", { class: "looks" }, h("h4", {}, `Looks the skill asked Jev for (${s.looks.length})`), s.looks.map(lookView));
+}
+
+function lookView(t) {
+  const items = Object.entries(t.questions || {}).map(([id, q]) => {
+    const a = t.answers?.[id];
+    if (q.type === "box") {
+      const ok = a?.type === "box" && a.confidence >= config.locateMin;
+      return { kind: "locate", text: q.instructions, box: a?.box, p: a?.confidence, answer: a ? `confidence ${fx(a.confidence)}${ok ? ": found" : `: below ${config.locateMin}, not found`}` : "no answer" };
+    }
+    if (q.type === "bool") return { kind: "check", text: q.instructions, p: a?.probability, answer: a ? `yes, p ${fx(a.probability)}` : "no answer" };
+    if (q.type === "choice" && a?.type === "choice") return { kind: "choice", text: q.instructions, p: a.probabilities[a.choice], answer: `${a.choice}, p ${fx(a.probabilities[a.choice])}` };
+    return { kind: q.type, text: q.instructions, answer: a ? JSON.stringify(a) : "no answer" };
+  });
+  return h("div", { class: "look" },
+    shot(t.frames?.[0], null, items.filter((x) => x.box).map((x) => x.box)),
+    h("div", {},
+      items.map((x) => h("div", { class: "look-q" }, h("span", { class: "kind" }, x.kind), h("q", {}, x.text),
+        h("div", { class: "look-a" }, x.p != null ? h("span", { class: "pbar" }, h("i", { style: `width:${x.p * 100}%` })) : null, x.answer))),
+      t.error ? h("div", { class: "err" }, t.error) : null,
+      h("div", { class: "m" }, clock(t.t), " · ", t.ms?.model ?? "–", " ms")));
+}
+
+/**
+ * The words Jev reads: brain/skills.ts's cards with Claude's rewrites (runs/prompts.json) in place, what Jev saw at the
+ * shown step where that differs, and every rewrite so far.
+ */
+function libraryPanel(s) {
+  const t = s?.tick, state = t?.state ?? {}, q = t?.questions ?? {}, crit = q.skill?.criteria ?? null;
+  const P = library.prompts ?? { texts: {}, history: [] };
+  const ends = Object.entries(crit ?? {}).filter(([k]) => ENDS.has(k)).map(([name, says]) => ({ name, says, amount: null, ready: null, end: true }));
+  const wording = (target, original, saw) => {
+    const now = P.texts[target] ?? original;
+    const edit = P.texts[target] != null ? (P.history ?? []).findLast((e) => e.target === target) : null;
+    return [
+      h("div", {}, now, rewriteTag(edit)),
+      edit ? h("div", { class: "was", title: "as brain/skills.ts has it" }, original) : null,
+      s && saw != null && saw !== now ? h("div", { class: "sent" }, `Jev saw at step ${s.n}: `, saw, rewriteTag(rewriteOf(target, saw))) : null,
+    ];
+  };
+  const choice = library.defaults?.choice;
+  return h("section", { class: "card library" },
+    h("h3", {}, "What Claude wrote for Jev", h("span", { class: "m" }, `${library.file} with Claude's rewrites from ${(P.file ?? "prompts.json").split("/").slice(-2).join("/")}`, s ? `; offered, and the words Jev saw, from step ${s.n}` : "")),
+    library.error ? h("p", { class: "err" }, library.error) : null,
+    P.error ? h("p", { class: "err" }, P.error) : null,
+    h("div", { class: "lib-goal" },
+      h("div", {}, h("b", {}, "goal"), state.goal ?? detail.run.goal),
+      state.object ? h("div", {}, h("b", {}, "object"), state.object) : null,
+      state.camera ? h("div", { class: "m" }, h("b", {}, "camera"), state.camera) : null),
+    choice ? h("div", { class: "lib-choice" }, h("b", {}, "the question"), h("code", { class: "m" }, " choice"), h("div", {}, wording("choice", choice, q.skill?.instructions))) : null,
+    h("div", { class: "lib" },
+      h("div", { class: "lib-row th" }, h("div", {}, "skill"), h("div", {}, "says (the option Jev reads)"), h("div", {}, "amount question and levels"), h("div", { class: "lib-ready" }, "offered when")),
+      [...library.skills, ...ends].map((k) => {
+        const offered = crit ? k.name in crit : null;
+        const unit = k.amount?.unit === "deg" ? "°" : k.amount ? ` ${k.amount.unit}` : "";
+        return h("div", { class: "lib-row" + (offered === false ? " off" : "") },
+          h("div", { class: "lib-name" }, h("code", {}, k.name), offered === null ? null : h("div", {}, h("span", { class: "tag " + (offered ? "yes" : "no"), title: offered ? `Jev read this option at step ${s.n}, in the words shown (or as noted)` : `its precondition was false at step ${s.n}` }, offered ? "offered" : "not offered"))),
+          h("div", { class: "lib-says" }, k.end ? k.says : wording(k.name, k.says, crit?.[k.name])),
+          h("div", { class: "lib-amount" }, h("span", { class: "lbl" }, "amount "), k.amount ? [wording(`${k.name}.amount`, k.amount.says, amountWords(q[`amount_${k.name}`]?.instructions)), h("div", { class: "levels" }, k.amount.levels.map((v) => h("span", {}, `${v}${unit}`)))] : h("span", { class: "m" }, k.end ? "ends the goal" : "no amount")),
+          h("div", { class: "lib-ready" }, h("span", { class: "lbl" }, "offered when "), k.ready ? h("code", {}, k.ready) : h("span", { class: "m" }, "always")));
+      })),
+    h("h4", { class: "hist-title" }, `Claude's rewrites so far (${P.history?.length ?? 0})`, h("small", {}, " newest first; they apply from the next step and in later runs")),
+    P.history?.length ? [...P.history].reverse().map((e) => h("div", { class: "hist" },
+      h("div", { class: "hist-head" }, h("code", {}, e.target), h("span", { class: "m" }, when(e.at)),
+        e.run ? h("a", { href: `?run=${e.run}`, onclick: (ev) => { ev.preventDefault(); select(e.run); } }, `run #${e.run}`) : null,
+        e.checkpoint ? h("span", { class: "m" }, `checkpoint "${e.checkpoint}"`) : null,
+        e.run === detail.id ? h("span", { class: "tag" }, "this run") : null),
+      e.was != null ? h("div", { class: "was" }, e.was) : null,
+      h("div", { class: "new" }, e.text),
+      h("div", { class: "m" }, "reason: ", e.reason))) : h("p", { class: "m" }, "Claude has not rewritten any of Jev's words yet."));
+}
+
+document.addEventListener("keydown", (e) => {
+  if (!detail || detail.run.kind !== "do" || goalTab !== "steps" || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  const items = detail.goal, i = items.findIndex((x) => x.key === pinned), at = i < 0 ? items.length - 1 : i;
+  const to = e.key === "ArrowLeft" ? items[at - 1] : e.key === "ArrowRight" ? items[at + 1] : null;
+  if (!to) return;
+  e.preventDefault();
+  show(to)();
+});
+
+document.addEventListener("visibilitychange", () => { if (!document.hidden) pollLive(); });
+
+// ---- Any run: the timeline of decisions, planner turns and programs ----
+
+function plannerMarks() {
+  if (detail.llm.length) return detail.llm.map((r, i) => ({ key: "llm:" + r.entry, t: r.t, label: "request " + (i + 1) }));
+  return detail.turns.filter((e) => e.kind === "pi.assistant").map((e) => {
+    const m = e.model[0]; const calls = (m.content || []).filter((c) => c.type === "toolCall").map((c) => c.name);
+    return { key: "turn:" + e.id, t: m.timestamp, label: calls.join(", ") || "answer" };
+  });
+}
+
+function taskSpans() {
+  const spans = [];
+  for (const t of detail.ticks.filter(isMain)) {
+    const last = spans.at(-1);
+    if (last && last.task === t.task) { last.t1 = t.t + (t.ms?.model || 0); last.n++; }
+    else spans.push({ task: t.task, t0: t.t, t1: t.t + (t.ms?.model || 0), n: 1 });
+  }
+  return spans;
+}
+
+// A tick (a raw move) or a step (a skill choice toward a goal); everything else is a look inside a program or skill.
+const isMain = (t) => t.role === "tick" || t.role === "step";
+
+function timeline() {
+  const marks = plannerMarks(), spans = taskSpans(), ticks = detail.ticks;
+  const times = [...marks.map((m) => m.t), ...ticks.map((t) => t.t), ...ticks.map((t) => t.t + (t.ms?.model || 0))].filter(Boolean);
+  if (!times.length) return h("div", { class: "card empty" }, "Nothing recorded yet.");
+  const t0 = Math.min(...times), t1 = Math.max(...times) + 300;
+  const x = (t) => ((t - t0) / (t1 - t0)) * 100 + "%";
+  const w = (a, b) => Math.max(0.15, ((b - a) / (t1 - t0)) * 100) + "%";
+  const on = (k) => (focus && focus.key === k ? " on" : "");
+  const pick = (kind, key) => () => { focus = { kind, key }; render(); };
+  return h("div", { class: "card" },
+    h("div", { class: "lanes" },
+      h("div", { class: "lane" }, h("b", {}, "planner"), h("div", { class: "track" },
+        marks.map((m) => h("div", { class: "blk planner" + on(m.key), style: `left:${x(m.t)};width:${w(m.t, m.t + 400)}`, title: m.label, onclick: pick("planner", m.key) })))),
+      h("div", { class: "lane" }, h("b", {}, "goals"), h("div", { class: "track" },
+        spans.map((s) => h("div", { class: "blk stage" + on("task:" + s.task), style: `left:${x(s.t0)};width:${w(s.t0, s.t1)}`, title: `${taskById(s.task)?.goal ?? s.task}: ${s.n} ticks`, onclick: pick("task", "task:" + s.task) }, s.task)))),
+      h("div", { class: "lane" }, h("b", {}, "ticks"), h("div", { class: "track" },
+        ticks.map((t) => {
+          const action = t.reading?.action;
+          const cls = t.error ? "err" : !isMain(t) ? "ask" : action === "wait" ? "wait" : action === "done" ? "done" : action === "stuck" ? "stuck" : "";
+          return h("div", { class: "blk " + cls + on("tick:" + t.entry), style: `left:${x(t.t)};width:${w(t.t, t.t + (t.ms?.model || 50))}`,
+            title: `${t.role} ${t.task}#${t.tick ?? "-"}: ${t.error ?? action}`, onclick: pick("tick", "tick:" + t.entry) });
+        })))),
+    h("div", { class: "axis" }, h("span", {}, "0 s"), h("span", {}, ((t1 - t0) / 1000).toFixed(1), " s")));
+}
+
+function focusView() {
+  if (!focus) return h("div", { class: "empty" }, "Click a tick, a goal or a planner turn.");
+  if (focus.kind === "tick") return tickView(detail.ticks.find((t) => "tick:" + t.entry === focus.key));
+  if (focus.kind === "task") return taskView(taskById(focus.key.slice(5)));
+  return plannerView(focus.key);
+}
+
+function frameView(ref) {
+  return h("div", { class: "frame" }, h("img", { src: `/frames/${ref.sha256}.jpg`, alt: ref.cam }),
+    h("div", { class: "cap" }, `${ref.cam} · ${ref.width}×${ref.height} · ${ref.sha256.slice(0, 12)}`));
+}
+
+function answersView(questions, answers) {
+  return Object.entries(questions || {}).map(([id, q]) => {
+    const a = answers?.[id];
+    let body;
+    if (!a) body = h("div", { class: "err" }, "no answer");
+    else if (a.type === "choice") {
+      const rows = Object.entries(a.probabilities).sort((x, y) => y[1] - x[1]);
+      body = rows.map(([k, p]) => h("div", { class: "bar" + (k === a.choice ? " top" : ""), title: q.criteria?.[k] || "" },
+        h("span", { class: "n" }, k), h("div", { class: "t" }, h("div", { class: "f", style: `width:${p * 100}%` })), h("span", {}, fx(p))));
+    } else if (a.type === "bool") {
+      body = h("div", { class: "bar top" }, h("span", {}, "yes"), h("div", { class: "t" }, h("div", { class: "f", style: `width:${a.probability * 100}%` })), h("span", {}, fx(a.probability)));
+    } else if (a.type === "score") {
+      const top = (q.criteria?.length || 1) - 1;
+      body = h("div", { class: "bar top", title: q.criteria?.[Math.round(a.score)] || "" }, h("span", {}, "level"), h("div", { class: "t" }, h("div", { class: "f", style: `width:${(a.score / top) * 100}%` })), h("span", {}, fx(a.score)));
+    } else body = json(a);
+    return h("div", { class: "q" }, h("div", {}, h("span", { class: "id" }, id, " · ", q.type, " "), q.instructions), body);
+  });
+}
+
+function poseLine(s) {
+  return s ? `pan ${fx(s.pan_deg, 1)}° reach ${fx(s.reach_m * 100, 1)} cm height ${fx(s.height_m * 100, 1)} cm pitch ${fx(s.pitch_deg, 1)}° gripper ${fx(s.gripper_pct, 0)}% ${s.grip}` : "–";
+}
+
+function tickView(t) {
+  if (!t) return h("div", { class: "empty" }, "That tick is gone.");
+  const motions = detail.motions[t.task + "#" + t.tick] || [];
+  const moved = motions.find((m) => m.motion?.kind !== "remember");
+  const r = moved?.result;
+  return h("div", { class: "card" },
+    h("h3", {}, `${t.role} ${t.task}#${t.tick ?? "-"}`, h("span", { class: "m" }, t.decider, " · ", when(t.t)),
+      t.reading ? h("span", { class: "pill" }, `${t.reading.action}${t.step ? ` ${t.step}` : ""} · p ${fx(t.reading.p)}`) : null,
+      t.error ? h("span", { class: "err" }, t.error) : null),
+    h("div", { class: "cols" },
+      h("div", {}, t.frames.map((f) => frameView(f))),
+      h("div", {},
+        answersView(t.questions, t.answers),
+        h("div", { class: "kv", style: "margin-top:10px" },
+          h("b", {}, "motion"), t.motion ? JSON.stringify(t.motion) : "none",
+          h("b", {}, "result"), moved ? (moved.error ? moved.error : r?.ok ? "moved" : r?.stopped ? "stopped: " + r.stopped : "refused: " + (r?.refused ?? "?")) : "–",
+          h("b", {}, "before"), poseLine(r?.before ?? t.arm),
+          h("b", {}, "reached"), poseLine(r?.after),
+          h("b", {}, "latency"), `frames ${t.ms?.frames ?? "–"} ms · model ${t.ms?.model} ms · motion ${moved ? moved.ms + " ms" : "–"}`,
+          h("b", {}, "usage"), t.usage ? `${t.usage.input} in · ${t.usage.output} out` : "–"),
+        motions.filter((m) => m.motion?.kind === "remember").map((m) => h("div", { class: "meta" }, `remembered pose ${m.motion.name}`)),
+        t.role === "step" ? detail.steps.filter((s) => s.task === t.task && s.step === t.tick).map(stepView) : null,
+        fold("state as sent", t.state), fold("recent outcomes", t.recent), fold("wire request (images as frame hashes)", t.wire?.request), fold("wire response", t.wire?.response))),
+    reaskView(t));
+}
+
+function taskById(id) {
+  return detail.run.tasks.find((t) => t.id === id);
+}
+
+function reaskView(t) {
+  if (!t.answers || t.role === "step") return null;
+  const area = h("textarea", { spellcheck: "false" }, JSON.stringify(taskById(t.task) ?? {}, null, 2));
+  const pick = h("select", {}, config.deciders.map((d) => h("option", { value: d, selected: d === config.decider ? "" : null }, d)));
+  const out = h("div");
+  const go = async () => {
+    out.replaceChildren(h("div", { class: "meta" }, "asking…"));
+    let task;
+    try { task = JSON.parse(area.value); } catch (e) { out.replaceChildren(h("div", { class: "err" }, "task is not JSON: " + e.message)); return; }
+    const res = await fetch("/api/reask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ run: detail.id, entry: t.entry, task, decider: pick.value }) }).then((r) => r.json());
+    if (res.error) { out.replaceChildren(h("div", { class: "err" }, res.error)); return; }
+    const was = t.answers.act?.choice, now = res.answers.act?.choice;
+    out.replaceChildren(
+      h("h3", {}, `re-asked on ${res.decider}`, h("span", { class: "pill" }, `${res.reading.action} · p ${fx(res.reading.p)}`),
+        h("span", { class: "m" }, `act was ${was}, now ${now}${was === now ? " (same)" : " (changed)"}`)),
+      h("div", { class: "cols" },
+        h("div", {}, t.frames.map((f) => frameView(f))),
+        h("div", {}, answersView(res.questions, res.answers), h("div", { class: "kv" }, h("b", {}, "would move"), res.motion ? JSON.stringify(res.motion) : "none"),
+          fold("wire request", res.wire.request), fold("wire response", res.wire.response))));
+  };
+  return h("details", { style: "margin-top:12px" }, h("summary", {}, "Re-ask this tick with an edited goal or another decider (no motion)"),
+    area, h("div", { class: "row" }, "decider", pick, h("button", { onclick: go }, "Re-ask")), out);
+}
+
+function plannerView(key) {
+  if (key.startsWith("llm:")) {
+    const r = detail.llm.find((x) => "llm:" + x.entry === key);
+    const body = r.body || {};
+    const system = body.system ?? body.systemPrompt ?? body.instructions;
+    const msgs = body.messages ?? body.input ?? body.contents ?? [];
+    return h("div", { class: "card" }, h("h3", {}, "planner request", h("span", { class: "m" }, r.model, " · ", r.api, " · ", when(r.t))),
+      system ? h("div", { class: "msg system" }, h("div", { class: "role" }, "system"), blocks(system)) : null,
+      msgs.map(message), reply(r.t), fold("tools and the rest of the body", { ...body, messages: undefined, system: undefined }));
+  }
+  const idx = detail.turns.findIndex((e) => "turn:" + e.id === key);
+  const context = detail.turns.slice(0, idx + 1).flatMap((e) => e.model || []);
+  return h("div", { class: "card" }, h("h3", {}, "planner turn", h("span", { class: "m" }, "the model's context up to this answer (no provider request was recorded for this model)")),
+    context.map(message));
+}
+
+function reply(t) {
+  const next = detail.turns.find((e) => e.kind === "pi.assistant" && e.model[0].timestamp >= t);
+  return next ? h("div", {}, h("div", { class: "meta" }, "its answer:"), message(next.model[0])) : null;
+}
+
+function message(m) {
+  const role = m.role || m.type || "?";
+  const sections = m.sections ? Object.entries(m.sections).map(([k, v]) => fold("section " + k, h("pre", {}, v ?? "(removed)"))) : null;
+  const tools = m.toolsAdded ? fold("tools added: " + m.toolsAdded.map((t) => t.name).join(", "), m.toolsAdded) : null;
+  return h("div", { class: "msg " + role }, h("div", { class: "role" }, role, m.toolName ? " · " + m.toolName : ""), blocks(m.content ?? m.parts ?? m), sections, tools);
+}
+
+function blocks(c) {
+  if (c == null) return null;
+  if (typeof c === "string") return SHA.test(c) ? h("img", { src: `/frames/${c}.jpg` }) : h("pre", {}, c);
+  if (Array.isArray(c)) return c.map(blocks);
+  const t = c.type;
+  if (t === "text" || t === "input_text" || t === "output_text") return h("pre", {}, c.text);
+  if (t === "thinking") return fold("thinking", h("pre", {}, c.thinking || ""));
+  const sha = findSha(c);
+  if (sha && /image/.test(t || "")) return h("img", { src: `/frames/${sha}.jpg`, title: sha });
+  if (t === "toolCall" || t === "tool_use" || t === "function_call") return h("div", {}, h("b", {}, "→ ", c.name), fold("arguments", c.arguments ?? c.input ?? c.args));
+  if (t === "tool_result" || t === "function_call_output") return h("div", {}, h("div", { class: "role" }, "tool result"), blocks(c.content ?? c.output));
+  return json(c);
+}
+
+function findSha(v) {
+  if (typeof v === "string") return SHA.test(v) ? v : null;
+  if (v && typeof v === "object") for (const x of Object.values(v)) { const s = findSha(x); if (s) return s; }
+  return null;
+}
+
+function tasksView() {
+  const programs = detail.run.programs || [];
+  if (!detail.run.tasks.length && !programs.length && !detail.steps.length) return h("div", { class: "card empty" }, "No skill steps, programs or goals in this run.");
+  return h("div", {}, detail.steps.map(stepView), programs.map(programView), detail.run.tasks.map(taskView));
+}
+
+function stepView(s) {
+  return h("div", { class: "card" },
+    h("h3", {}, `step ${s.task}#${s.step}`, h("span", { class: "pill " + (s.ok ? "done" : "failed") }, `${s.skill}${s.amount == null ? "" : ` ${s.amount} ${s.unit}`}`),
+      h("span", { class: "m" }, `${s.p == null ? "run directly" : "p " + fx(s.p)} · ${(s.ms / 1000).toFixed(1)} s`)),
+    h("p", { class: s.ok ? "" : "err" }, s.why),
+    s.log?.length ? h("pre", {}, s.log.join("\n")) : null,
+    h("div", { class: "kv" }, h("b", {}, "held after"), s.held ? JSON.stringify(s.held) : "nothing"),
+    s.result ? fold("skill result", s.result) : null);
+}
+
+function programView(p) {
+  return h("div", { class: "card" }, h("h3", {}, `program ${p.id}`, h("span", { class: "pill" }, p.ok ? "ran" : "error"), h("span", { class: "m" }, `${(p.ms / 1000).toFixed(1)} s`)),
+    h("pre", {}, p.code), p.error ? h("div", { class: "err" }, p.error) : null, h("pre", {}, (p.log || []).join("\n")),
+    p.frames?.wrist ? h("img", { src: `/frames/${p.frames.wrist}.jpg`, style: "max-width:100%" }) : null);
+}
+
+function taskView(task) {
+  if (!task) return h("div", { class: "empty" }, "That goal is gone.");
+  return h("div", { class: "card" }, h("h3", {}, `goal ${task.id}`, h("span", { class: "m" }, `${task.seconds} s`)), h("p", {}, task.goal), task.notes ? h("p", { class: "meta" }, task.notes) : null);
+}
+
+async function refreshLibrary() {
+  const lib = await get("/api/skills").catch(() => null);
+  if (!lib || JSON.stringify(lib) === JSON.stringify(library)) return;
+  library = lib;
+  if (detail?.run.kind === "do") render();
+}
+
+(async () => {
+  config = { ...config, ...(await get("/api/config").catch(() => ({}))) };
+  await refreshLibrary();
+  await refreshList();
+  if (selected && !detail) refreshRun();
+  setInterval(() => refreshList().catch(() => {}), 3000);
+  setInterval(() => refreshLibrary(), 10000);
+  // A running run is re-read about once a second; the activity line ticks between records.
+  setInterval(() => { if (detail?.run.status === "running") refreshRun().catch(() => {}); fillLive(); }, 1000);
+  pollLive();
+})();
+</script>
+</body>
+</html>

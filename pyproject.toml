@@ -1,28 +1,29 @@
 [project]
 name = "valet"
-version = "0.1.0"
-description = "A robot harness: code runs the task, Jev checks each step, and a coding model or a person decides when Jev is unsure."
+version = "0.2.0"
+description = "armd, the SO-101 arm server for valet: Jev drives the arm, Claude plans."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
+# LeRobot (with placo) drives the real arm. It is installed by hand from a checkout and imported
+# only on the hardware path; `uv sync` and plain `uv run` uninstall it, so use `--no-sync`.
 dependencies = [
     "numpy>=2",
     "pillow>=11",
-    "typesafe-sdk>=0.7.5",
 ]
 
 [project.optional-dependencies]
-# Escalation to Claude. LeRobot (for the SO-101) is installed from a checkout; see README.
-claude = ["anthropic>=2.11"]
+# `uv pip install -e '.[sim]'` (not `uv sync`, which drops the hand-installed LeRobot)
+sim = ["mujoco>=3.3"]
+# SAM 3 for POST /segment, through mlx-vlm on Apple silicon. mlx-vlm's own requirements pull in
+# opencv-python over LeRobot's opencv-python-headless (and a web server, datasets, mlx-audio), none
+# of which SAM 3 needs, so into the LeRobot venv install only what it imports:
+#   uv pip install --no-deps 'mlx-vlm==0.8.0' 'mlx==0.32.4' 'mlx-metal==0.32.4' 'transformers==5.23.0' \
+#     'tokenizers==0.23.3' regex sentencepiece
+sam = ["mlx-vlm>=0.8,<0.9; sys_platform == 'darwin'"]
 
 [project.scripts]
-valet = "valet.cli:main"
-
-[dependency-groups]
-dev = ["pytest>=8"]
+valet-armd = "valet.armd.__main__:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

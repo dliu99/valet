@@ -1,0 +1,518 @@
+{
+ "texts": {
+  "descend": "Lower the open jaws straight down beside the object. Use it right after approach when the object is in the opening right of the fixed jaw, even if the bottom edge cuts it off; the position gets checked and corrected once the jaws are down.",
+  "nudge_right": "Move the jaws toward image right. Use this only when the object is already right of the fixed jaw but too far from it, or when the fixed jaw is over another item; never when the object is left of the fixed jaw.",
+  "nudge_left": "Move the jaws toward image left. Use this when the object is left of the fixed jaw or under it; it carries the fixed jaw past the object so the object ends up in the opening to the jaw's right.",
+  "close": "Close the jaws on the object. Only do this when the object sits alongside the fixed jaw's right side, level with or below its tip, even if it fills the picture. If close just closed on nothing, don't close again: run find_object.",
+  "open": "Open the jaws and let go: to set the held object down, after lift shows the jaws missed the object, or when the gripper is jammed with both jaws in view and nothing held. If close stopped part way on something, lift to check before opening.",
+  "nudge_in": "Move the jaws a little toward the base (toward image down). Only while the jaws are still high, when the bottom edge of the picture cuts the object off; once line_up has put the object in the opening, don't nudge_in, because a cut-off bottom edge is fine there.",
+  "raise": "Raise the open jaws straight up, only when they are down low around the object and it is not in the opening right of the fixed jaw. If raise just stopped as blocked, do not run it again; use find_object instead.",
+  "line_up": "Ask Claude to move the open jaws sideways or out a little until the object sits in the opening right of the fixed jaw. It never lowers the jaws: once the object touches or nearly touches the fixed jaw's right side with its middle level with the tip, use descend instead.",
+  "approach": "Open the jaws and move them above the object, pointing steeply down just to its left. Run it once find_object has located the object, even if the object is not in the current picture; if approach just failed as out of reach while the object looks near, run find_object again.",
+  "find_object": "Look for the object and work out where it stands on the desk. Run this first when the object hasn't been located yet, even if it is clearly in the picture.",
+  "descend.amount": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Bottle or can lying on its side: about half its thickness. Upright object: about half its height, judged against its top's width; a squat jar may be only 5 cm tall, so stop lower after a close on nothing at that height.",
+  "lower": "Lower the held object straight down until it stands on the desk. If lower or a carry just stopped as blocked, first carry it a few cm back toward open desk, away from the clutter, then lower again."
+ },
+ "history": [
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down around the object. Only do this when the object is just right of the fixed jaw with clear desk between them, and no other item is under or beside the fixed jaw.",
+   "reason": "The jaws came down on the box next to the bottle and gripped it instead.",
+   "run": 2899,
+   "checkpoint": "handback",
+   "at": 1795218785400,
+   "was": "Lower the open jaws straight down around the object, when the object is just right of the fixed jaw with room in between."
+  },
+  {
+   "target": "nudge_right",
+   "text": "Move the jaws a little toward image right (the arm's right), to line the object up just right of the fixed jaw and to move the fixed jaw off any other item it is over.",
+   "reason": "Jev was unsure about nudging when the fixed jaw was over the neighbouring box. Saying that a nudge also clears other items should help it decide.",
+   "run": 2899,
+   "checkpoint": "handback",
+   "at": 1795218785400,
+   "was": "Move the jaws a little toward image right (the arm's right), to line the object up between them."
+  },
+  {
+   "target": "nudge_left",
+   "text": "Move the jaws toward image left. Use this when the object is left of the fixed jaw or under it; it carries the fixed jaw past the object so the object ends up in the opening to the jaw's right.",
+   "reason": "The bottle was left of and under the fixed jaw, but Jev nudged right five times and then hesitated on nudge_left.",
+   "run": 2954,
+   "checkpoint": "handback",
+   "at": 1795219177532,
+   "was": "Move the jaws a little toward image left (the arm's left), to line the object up between them."
+  },
+  {
+   "target": "nudge_right",
+   "text": "Move the jaws toward image right. Use this only when the object is already right of the fixed jaw but too far from it, or when the fixed jaw is over another item; never when the object is left of the fixed jaw.",
+   "reason": "Jev nudged right while the bottle was left of the fixed jaw, which pushed the bottle further out of the opening.",
+   "run": 2954,
+   "checkpoint": "handback",
+   "at": 1795219177532,
+   "was": "Move the jaws a little toward image right (the arm's right), to line the object up just right of the fixed jaw and to move the fixed jaw off any other item it is over."
+  },
+  {
+   "target": "close",
+   "text": "Close the jaws on the object. Do this when the object sits in the opening just right of the fixed jaw, with the jaws lowered beside it.",
+   "reason": "Jev was unsure about closing even though the bottle sat right beside the fixed jaw in the opening.",
+   "run": 3034,
+   "checkpoint": "handback",
+   "at": 1795219541602,
+   "was": "Close the jaws on the object."
+  },
+  {
+   "target": "open",
+   "text": "Open the jaws and let go: to set the held object down, or after lift shows the jaws missed the object. If close stopped part way on something, lift to check before opening.",
+   "reason": "Jev opened twice right after closes that stopped on something, without lifting to check what it had gripped.",
+   "run": 3034,
+   "checkpoint": "handback",
+   "at": 1795219541602,
+   "was": "Open the jaws and let go: to set the held object down on the desk, or to let go of a grip that missed it."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down around the object. Only do this when the whole object is in view just right of the fixed jaw's tip, level with it; if the object sits at the bottom edge or is cut off by it, nudge_in first.",
+   "reason": "Jev kept descending while the bottle sat at the bottom edge, below the jaw tips, and close missed every time.",
+   "run": 3169,
+   "checkpoint": "handback",
+   "at": 1795219724378,
+   "was": "Lower the open jaws straight down around the object. Only do this when the object is just right of the fixed jaw with clear desk between them, and no other item is under or beside the fixed jaw."
+  },
+  {
+   "target": "nudge_in",
+   "text": "Move the jaws a little toward the base (toward image down). Use this when the object sits low in the picture, at or cut off by the bottom edge, below the fixed jaw's tip.",
+   "reason": "This is the fix for the repeated misses, but nothing in Jev's words pointed to it.",
+   "run": 3169,
+   "checkpoint": "handback",
+   "at": 1795219724378,
+   "was": "Move the jaws a little toward the base (toward image down)."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down around the object. Only do this when the whole object is in view, touching or nearly touching the fixed jaw's right side, with its middle level with the jaw tip. If the bottom edge cuts it off, or there's a clear gap to the jaw, nudge first.",
+   "reason": "Jev descended with the bottle cut off at the bottom edge and a wide gap from the fixed jaw, so it ended up beside the bottle out of reach.",
+   "run": 3324,
+   "checkpoint": "aligned",
+   "at": 1795219825181,
+   "was": "Lower the open jaws straight down around the object. Only do this when the whole object is in view just right of the fixed jaw's tip, level with it; if the object sits at the bottom edge or is cut off by it, nudge_in first."
+  },
+  {
+   "target": "close",
+   "text": "Close the jaws on the object. Do this when the jaws are lowered and the object sits right against the fixed jaw's right side, even if it is close enough to fill much of the picture or run past the bottom edge.",
+   "reason": "Jev hesitated at this close-up view, with the bottle filling the opening and running off the bottom, instead of recognising it as ready to close.",
+   "run": 3324,
+   "checkpoint": "handback",
+   "at": 1795219937856,
+   "was": "Close the jaws on the object. Do this when the object sits in the opening just right of the fixed jaw, with the jaws lowered beside it."
+  },
+  {
+   "target": "close",
+   "text": "Close the jaws on the object. Only do this when the object sits alongside the fixed jaw's right side, level with or below its tip, even if it fills the picture. If the object stands above the tip in the picture and only touches it, it is beyond the jaws: line_up first.",
+   "reason": "My earlier wording let Jev close three times while the bottle stood beyond the jaw tip, and each close missed and pushed it away.",
+   "run": 3324,
+   "checkpoint": "handback",
+   "at": 1795219956943,
+   "was": "Close the jaws on the object. Do this when the jaws are lowered and the object sits right against the fixed jaw's right side, even if it is close enough to fill much of the picture or run past the bottom edge."
+  },
+  {
+   "target": "nudge_in",
+   "text": "Move the jaws a little toward the base (toward image down). Only when the bottom edge of the picture cuts the object off.",
+   "reason": "offline eval: acted right 86->93, acted wrong 27->11, top-1 72%->82% on 144 labelled steps (Jev, current 5 passes, this 2)",
+   "at": 1795220169004,
+   "was": "Move the jaws a little toward the base (toward image down). Use this when the object sits low in the picture, at or cut off by the bottom edge, below the fixed jaw's tip."
+  },
+  {
+   "target": "raise",
+   "text": "Raise the open jaws straight up, to line up again from above: when the jaws are down but the object is not in the opening right of the fixed jaw (it stands beyond the jaw tips, or the fixed jaw is against it).",
+   "reason": "offline eval: acted right 86->93, acted wrong 27->11, top-1 72%->82% on 144 labelled steps (Jev, current 5 passes, this 2)",
+   "at": 1795220169004,
+   "was": "Raise the open jaws straight up above the object, to line up again from above."
+  },
+  {
+   "target": "line_up",
+   "text": "Ask Claude to look and move the open jaws a little, until the object sits in the jaw opening ready to close on. Use it when the whole object is in view right of the fixed jaw but with a clear gap to it, or sitting above its tip.",
+   "reason": "Jev hesitated on descend twice with the bottle clearly in view but a gap from the jaw; it did not see line_up as the fix for that case.",
+   "run": 3720,
+   "checkpoint": "handback",
+   "at": 1795220226034,
+   "was": "Ask Claude to look and move the open jaws a little, until the object sits in the jaw opening ready to close on."
+  },
+  {
+   "target": "open",
+   "text": "Open the jaws and let go: to set the held object down, after lift shows the jaws missed the object, or when the gripper is jammed with both jaws in view and nothing held. If close stopped part way on something, lift to check before opening.",
+   "reason": "The gripper jammed on the bottle cap and Jev hesitated between options; it needs a clear rule that a jam means open first.",
+   "run": 3888,
+   "checkpoint": "handback",
+   "at": 1795220411817,
+   "was": "Open the jaws and let go: to set the held object down, or after lift shows the jaws missed the object. If close stopped part way on something, lift to check before opening."
+  },
+  {
+   "target": "line_up",
+   "text": "Ask Claude to move the open jaws sideways or out a little until the object sits in the opening right of the fixed jaw. It never lowers the jaws: once the object touches or nearly touches the fixed jaw's right side with its middle level with the tip, use descend instead.",
+   "reason": "Jev kept choosing line_up while the jaws were about 16 cm up and the bottle was already beside the fixed jaw. line_up only moves sideways and can't lower the jaws, so the arm was stuck.",
+   "run": 4061,
+   "checkpoint": "aligned",
+   "at": 1795220625272,
+   "was": "Ask Claude to look and move the open jaws a little, until the object sits in the jaw opening ready to close on. Use it when the whole object is in view right of the fixed jaw but with a clear gap to it, or sitting above its tip."
+  },
+  {
+   "target": "approach",
+   "text": "Open the jaws and move them above the object, pointing down as steeply as the arm can, just to its left, ready to come straight down around it. If approach just failed as out of reach while the object looks near in the picture, run find_object again first instead of repeating approach.",
+   "reason": "Jev repeated approach three times with the same out-of-reach failure, although the picture shows the bottle right beside the jaw. The saved location was likely stale and needed a fresh find_object.",
+   "run": 4061,
+   "checkpoint": "handback",
+   "at": 1795220664030,
+   "was": "Open the jaws and move them above the object, pointing down as steeply as the arm can, just to its left, ready to come straight down around it."
+  },
+  {
+   "target": "raise",
+   "text": "Raise the open jaws straight up to line up again from above. Use it when the jaws are down but the object is not in the opening right of the fixed jaw: it stands beyond the jaw tips, the fixed jaw is against it, or close just found nothing.",
+   "reason": "After a missed close, with the fixed jaw pressed against the bottle, Jev was unsure about raise (p 0.32) and stopped. Saying that a failed close means raise should make the choice clear.",
+   "run": 4061,
+   "checkpoint": "handback",
+   "at": 1795220832002,
+   "was": "Raise the open jaws straight up, to line up again from above: when the jaws are down but the object is not in the opening right of the fixed jaw (it stands beyond the jaw tips, or the fixed jaw is against it)."
+  },
+  {
+   "target": "raise",
+   "text": "Raise the open jaws straight up, only when they are down low around the object and it is not in the opening right of the fixed jaw. If raise just stopped as blocked, do not run it again; use find_object instead.",
+   "reason": "Jev ran raise 3 times while the jaws were already high and raise was blocked, apparently because the bottle appeared just past the jaw tip.",
+   "run": 4411,
+   "checkpoint": "handback",
+   "at": 1795220889411,
+   "was": "Raise the open jaws straight up to line up again from above. Use it when the jaws are down but the object is not in the opening right of the fixed jaw: it stands beyond the jaw tips, the fixed jaw is against it, or close just found nothing."
+  },
+  {
+   "target": "find_object",
+   "text": "Look for the object and work out where it stands on the desk. Run this first when the object hasn't been located yet, even if it is clearly in the picture.",
+   "reason": "Jev saw the bottle in the picture but never located it, so it skipped find_object and approach.",
+   "run": 4411,
+   "checkpoint": "handback",
+   "at": 1795220889411,
+   "was": "Look for the object and work out where it stands on the desk."
+  },
+  {
+   "target": "approach",
+   "text": "Open the jaws and move them above the object, pointing steeply down just to its left. Run it once find_object has located the object, even if the object is not in the current picture; if approach just failed as out of reach while the object looks near, run find_object again.",
+   "reason": "Jev stopped, unsure about approach, because the located bottle wasn't in the wrist picture after find_object.",
+   "run": 4411,
+   "checkpoint": "handback",
+   "at": 1795221099319,
+   "was": "Open the jaws and move them above the object, pointing down as steeply as the arm can, just to its left, ready to come straight down around it. If approach just failed as out of reach while the object looks near in the picture, run find_object again first instead of repeating approach."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Pick a height clearly below the object's top, about two-thirds of its height, so the jaws close on its sides and not above it.",
+   "reason": "Close shut on nothing at 8.3 cm, and the box's top face looks very close to the camera. The jaw tips were probably at or above the box's top, so the height question should steer below the top.",
+   "run": 4943,
+   "checkpoint": "aligned",
+   "at": 1795221883790,
+   "was": "How high above the desk should the jaw tips stop? Above the object's middle keeps it upright when lifted."
+  },
+  {
+   "target": "lower",
+   "text": "Lower the held object straight down until it stands on the desk. If lower or a carry just stopped as blocked, first carry it a few cm back toward open desk, away from the clutter, then lower again.",
+   "reason": "Jev retried the blocked carry, then stalled unsure after lower was blocked. It needs to know the way out is to set the box down a little short, on clear desk.",
+   "run": 4943,
+   "checkpoint": "handback",
+   "at": 1795221954151,
+   "was": "Lower the held object straight down until it stands on the desk."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down around the object. Only when the whole object is in view, touching or nearly touching the fixed jaw's right side, its middle level with the jaw tip; if there's a clear gap to the jaw or the object is cut off, use line_up first.",
+   "reason": "Jev hesitated on descend with a visible gap between the jaw and the box. The old text said 'nudge first', but nudge_right is not available here, so this points Jev to line_up instead.",
+   "run": 5791,
+   "checkpoint": "handback",
+   "at": 1795222749670,
+   "was": "Lower the open jaws straight down around the object. Only do this when the whole object is in view, touching or nearly touching the fixed jaw's right side, with its middle level with the jaw tip. If the bottom edge cuts it off, or there's a clear gap to the jaw, nudge first."
+  },
+  {
+   "target": "nudge_in",
+   "text": "Move the jaws a little toward the base (toward image down). Only while the jaws are still high, when the bottom edge of the picture cuts the object off; once line_up has put the object in the opening, don't nudge_in, because a cut-off bottom edge is fine there.",
+   "reason": "Jev ran nudge_in right after line_up had confirmed alignment, because the object was cut off at the bottom edge. That broke the alignment just before the misses.",
+   "run": 6280,
+   "checkpoint": "handback",
+   "at": 1795223303748,
+   "was": "Move the jaws a little toward the base (toward image down). Only when the bottom edge of the picture cuts the object off."
+  },
+  {
+   "target": "close",
+   "text": "Close the jaws on the object. Only do this when the object sits alongside the fixed jaw's right side, level with or below its tip, even if it fills the picture. If close just closed on nothing, don't close again: run find_object.",
+   "reason": "Jev ran close three times in a row on nothing, even though each miss said to find the object again.",
+   "run": 6280,
+   "checkpoint": "handback",
+   "at": 1795223303748,
+   "was": "Close the jaws on the object. Only do this when the object sits alongside the fixed jaw's right side, level with or below its tip, even if it fills the picture. If the object stands above the tip in the picture and only touches it, it is beyond the jaws: line_up first."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? A box lying flat is only a few cm tall, so pick about 1.5 cm for a flat box. Pick about two-thirds of the height for a tall object, so the jaws close on its sides and not above it.",
+   "reason": "Jev chose 5.3 cm twice for a flat-lying box, and both closes passed over it without touching it.",
+   "run": 6659,
+   "checkpoint": "found",
+   "at": 1795223826516,
+   "was": "How high above the desk should the jaw tips stop? Pick a height clearly below the object's top, about two-thirds of its height, so the jaws close on its sides and not above it."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down beside the object. Use it right after approach when the object is in the opening right of the fixed jaw, even if the bottom edge cuts it off; the position gets checked and corrected once the jaws are down.",
+   "reason": "The old text forbade descending when the object was cut off and sent Jev to line_up, which can't run while the jaws are high, so Jev stalled after approach.",
+   "run": 6659,
+   "checkpoint": "handback",
+   "at": 1795223843893,
+   "was": "Lower the open jaws straight down around the object. Only when the whole object is in view, touching or nearly touching the fixed jaw's right side, its middle level with the jaw tip; if there's a clear gap to the jaw or the object is cut off, use line_up first."
+  },
+  {
+   "target": "find_object",
+   "text": "Look for the object and work out where it stands on the desk. Check that its colour and look match the name in the goal: a clear jar with a silver lid is not a white bottle. Run this first when the object hasn't been located yet, even if it is clearly in the picture.",
+   "reason": "find_object settled on a clear jar with a metal lid when the goal names a white supplement bottle.",
+   "run": 7296,
+   "checkpoint": "found",
+   "at": 1795224482870,
+   "was": "Look for the object and work out where it stands on the desk. Run this first when the object hasn't been located yet, even if it is clearly in the picture."
+  },
+  {
+   "target": "find_object",
+   "text": "Look for the object and work out where it stands on the desk. Run this first when the object hasn't been located yet, even if it is clearly in the picture.",
+   "reason": "Putting back the original wording: my earlier edit wrongly ruled out this bottle, which seems to be the object meant.",
+   "run": 7296,
+   "checkpoint": "found",
+   "at": 1795224492797,
+   "was": "Look for the object and work out where it stands on the desk. Check that its colour and look match the name in the goal: a clear jar with a silver lid is not a white bottle. Run this first when the object hasn't been located yet, even if it is clearly in the picture."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Pick about 1.5 cm for a flat box, and about half its thickness for a bottle or can lying on its side. For an upright tall object pick about two-thirds of its height, so the jaws close on its sides and not above it.",
+   "reason": "The bottle was knocked onto its side. Without a rule for lying objects, Jev may stop the jaws as high as for the upright bottle (about 4.5 cm), which would be above the lying bottle.",
+   "run": 8515,
+   "checkpoint": "found",
+   "at": 1795225999795,
+   "was": "How high above the desk should the jaw tips stop? A box lying flat is only a few cm tall, so pick about 1.5 cm for a flat box. Pick about two-thirds of the height for a tall object, so the jaws close on its sides and not above it."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Bottle or can lying on its side: about half its thickness. Upright object: about half its height, so the jaws close on its body below any cap or rim, never on the cap.",
+   "reason": "On this short capped bottle, jaw tips at about 5 cm (two-thirds of its height) gave one grip that dropped on lifting and two closes on nothing. The jaws seem to be meeting the rounded cap, so a lower grip on the body should hold better.",
+   "run": 8785,
+   "checkpoint": "found",
+   "at": 1795226235738,
+   "was": "How high above the desk should the jaw tips stop? Pick about 1.5 cm for a flat box, and about half its thickness for a bottle or can lying on its side. For an upright tall object pick about two-thirds of its height, so the jaws close on its sides and not above it."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Bottle or can lying on its side: about half its thickness. Upright object: about half its height, judged against its top's width; a squat jar may be only 5 cm tall, so stop lower after a close on nothing at that height.",
+   "reason": "Jev keeps choosing jaw tips at 4.6–5 cm for this squat jar. The closes have gripped nothing or slipped off the cap, so Jev seems to overestimate how tall the jar is.",
+   "run": 8785,
+   "checkpoint": "found",
+   "at": 1795226290546,
+   "was": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Bottle or can lying on its side: about half its thickness. Upright object: about half its height, so the jaws close on its body below any cap or rim, never on the cap."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Lying bottle or can: about half its thickness. Upright object: about half its height. A small jar is often only 4–5 cm tall: stop at about 2 cm, and if a close at some height just closed on nothing, go at least 1.5 cm lower than that height.",
+   "reason": "Two closes on this squat jar missed with the tips at 4.3 and 4.1 cm, probably at or above its top. Jev only went 0.5 cm lower after the first miss, so the words need to give a clearly lower height.",
+   "run": 9044,
+   "checkpoint": "found",
+   "at": 1795226576848,
+   "was": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Bottle or can lying on its side: about half its thickness. Upright object: about half its height, judged against its top's width; a squat jar may be only 5 cm tall, so stop lower after a close on nothing at that height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Lying bottle or can: about half its thickness. Small jar or pill bottle: stop at 1.5–2 cm, never above 2.5 cm. Other upright objects: about half their height.",
+   "reason": "Three closes on this squat jar missed with the tips at 4.3, 4.1 and 3.4 cm, even after the last one sat only 50 px from the jar. The jaws are closing above a short jar. Jev chose 3.6 cm despite being told about 2 cm, so the words need a firm ceiling.",
+   "run": 9044,
+   "checkpoint": "found",
+   "at": 1795226629231,
+   "was": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Lying bottle or can: about half its thickness. Upright object: about half its height. A small jar is often only 4–5 cm tall: stop at about 2 cm, and if a close at some height just closed on nothing, go at least 1.5 cm lower than that height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Small jar or pill bottle: 2 cm, never more than 2.5 cm. Flat box: 1.5 cm. Lying bottle or can: half its thickness. Other upright objects: half their height.",
+   "reason": "Jev asked descend to stop at 4 cm for the pill jar, which the old wording ruled out. The close then missed. Putting the jar case first with a single number should stop this.",
+   "run": 9271,
+   "checkpoint": "found",
+   "at": 1795226767232,
+   "was": "How high above the desk should the jaw tips stop? Flat box: about 1.5 cm. Lying bottle or can: about half its thickness. Small jar or pill bottle: stop at 1.5–2 cm, never above 2.5 cm. Other upright objects: about half their height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? Pill jar or bottle, standing or lying: 1.5 cm, never more than 2, so the tips sit below its middle. Flat box: 1 cm. Other objects: a little under half their height.",
+   "reason": "Jev has asked for 3.4–3.5 cm on every descend, which leaves the tips above the middle of the lying glass jar, and four closes have missed as it squeezed out.",
+   "run": 9401,
+   "checkpoint": "aligned",
+   "at": 1795227095263,
+   "was": "How high above the desk should the jaw tips stop? Small jar or pill bottle: 2 cm, never more than 2.5 cm. Flat box: 1.5 cm. Lying bottle or can: half its thickness. Other upright objects: half their height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "How high above the desk should the jaw tips stop? For any jar or bottle, standing or lying, answer 1.5 cm, never more than 2. Flat box: 1 cm. Other objects: a little under half their height.",
+   "reason": "Even after the last rewrite, Jev asked for 3.2 cm for the pill jar, so the tips stayed above its middle and the close missed a fifth time.",
+   "run": 9401,
+   "checkpoint": "found",
+   "at": 1795227126606,
+   "was": "How high above the desk should the jaw tips stop? Pill jar or bottle, standing or lying: 1.5 cm, never more than 2, so the tips sit below its middle. Flat box: 1 cm. Other objects: a little under half their height."
+  },
+  {
+   "target": "close",
+   "text": "Close the jaws on the object. Only do this when the object sits alongside the fixed jaw's right side, level with or below its tip. If the last close closed on nothing, never close again: run find_object.",
+   "reason": "Jev ran close a second time right after a close that closed on nothing.",
+   "run": 9401,
+   "checkpoint": "found",
+   "at": 1795227126606,
+   "was": "Close the jaws on the object. Only do this when the object sits alongside the fixed jaw's right side, level with or below its tip, even if it fills the picture. If close just closed on nothing, don't close again: run find_object."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down beside the object once it is in the opening right of the fixed jaw, even if the bottom edge cuts it off. For a jar or bottle, bring the tips down to 1.5 cm: tips near 3 cm let a round jar squeeze out.",
+   "reason": "Jev keeps asking for 3.2–3.3 cm despite the rewritten amount question, and every close at ~3 cm has missed the lying glass jar.",
+   "run": 9401,
+   "checkpoint": "found",
+   "at": 1795227168881,
+   "was": "Lower the open jaws straight down beside the object. Use it right after approach when the object is in the opening right of the fixed jaw, even if the bottom edge cuts it off; the position gets checked and corrected once the jaws are down."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Give the jaw-tip stop height in cm. Jar or bottle (standing or lying): 1.5. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev answered 3.8 for this jar even though the old text said 1.5. The tips stopped at 3.4 cm and the close then missed. A shorter text that leads with the number may get the right answer.",
+   "run": 9744,
+   "checkpoint": "found",
+   "at": 1795227312985,
+   "was": "How high above the desk should the jaw tips stop? For any jar or bottle, standing or lying, answer 1.5 cm, never more than 2. Flat box: 1 cm. Other objects: a little under half their height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Jar or bottle, standing or lying: answer exactly 1.5, never 3 or more, however tall it looks. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Even after the first rewrite Jev answered 3.2 for this jar (the tips stopped at 2.9 cm, and at 3.4 cm the time before), well above the 1.5 cm that keeps a round jar from squeezing out.",
+   "run": 9744,
+   "checkpoint": "aligned",
+   "at": 1795227347811,
+   "was": "Give the jaw-tip stop height in cm. Jar or bottle (standing or lying): 1.5. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "For this jar answer 1.5. Any jar or bottle: 1.5. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev answered 3.0 even though the text said 1.5 and never 3 or more. There have now been two misses with the tips at 2.5–3.4 cm, so the text should just give the number.",
+   "run": 9744,
+   "checkpoint": "found",
+   "at": 1795227375069,
+   "was": "Jar or bottle, standing or lying: answer exactly 1.5, never 3 or more, however tall it looks. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down beside the object once it is in the opening right of the fixed jaw, even if the bottom edge cuts it off. For a jar or bottle the tips must stop low, at 1.5 cm.",
+   "reason": "Jev keeps answering 3–4 cm for this jar (3.8, 3.2, 3.0, 4.0) and all three closes missed. The '3 cm' in the old description may be what it latches onto, so the only number left is 1.5.",
+   "run": 9744,
+   "checkpoint": "found",
+   "at": 1795227460337,
+   "was": "Lower the open jaws straight down beside the object once it is in the opening right of the fixed jaw, even if the bottom edge cuts it off. For a jar or bottle, bring the tips down to 1.5 cm: tips near 3 cm let a round jar squeeze out."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Answer 1.5 for any jar or bottle, whatever its size in the picture. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev's answers stay at 3–4 cm despite the earlier rewrites, so the instruction now leads with the number and ties it to no visual judgement.",
+   "run": 9744,
+   "checkpoint": "found",
+   "at": 1795227460337,
+   "was": "For this jar answer 1.5. Any jar or bottle: 1.5. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down beside the object once it is in the opening right of the fixed jaw, even if the bottom edge cuts it off. If descend just ran and the tips are already down beside the object, close instead of descending again.",
+   "reason": "Jev ran descend at 3.4 twice in a row and the tips stayed at about 3.1 cm, so the arm is stuck in a loop instead of closing.",
+   "run": 9744,
+   "checkpoint": "aligned",
+   "at": 1795227513356,
+   "was": "Lower the open jaws straight down beside the object once it is in the opening right of the fixed jaw, even if the bottom edge cuts it off. For a jar or bottle the tips must stop low, at 1.5 cm."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Stop height of the jaw tips above the desk, in cm. Jar or bottle: 1.5. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev keeps answering 3.4–4 for this jar. This states plainly what the number means, in case Jev is reading it as something else.",
+   "run": 9744,
+   "checkpoint": "aligned",
+   "at": 1795227513356,
+   "was": "Answer 1.5 for any jar or bottle, whatever its size in the picture. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Target stop height for the jaw tips, not the current height: for a jar or bottle answer 1.5 even when the tips are now at 3–4 cm. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev's answers keep matching the current tip height in facts (3.3–4.0 cm), not the 1.5 the text asks for. Five closes at about 3–4 cm all missed with the jar barely moving, which fits a round jar squeezing out when gripped too high.",
+   "run": 9744,
+   "checkpoint": "aligned",
+   "at": 1795227599539,
+   "was": "Stop height of the jaw tips above the desk, in cm. Jar or bottle: 1.5. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Give the stop height for the jaw tips. For any jar or bottle the answer is always 1.5, never 3 or 4. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev answered 4 for this jar even though the words said 1.5. The tips stopped at 3.7 cm, and the close then missed the jar.",
+   "run": 10112,
+   "checkpoint": "found",
+   "at": 1795227735471,
+   "was": "Target stop height for the jaw tips, not the current height: for a jar or bottle answer 1.5 even when the tips are now at 3–4 cm. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Stop height for the jaw tips in cm. Jar or bottle: answer exactly 1.5. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev answered 3.5 for the jar even after the rewrite. The tips stopped at 3.1 cm and the close missed again, the second miss with the tips too high.",
+   "run": 10112,
+   "checkpoint": "found",
+   "at": 1795227816490,
+   "was": "Give the stop height for the jaw tips. For any jar or bottle the answer is always 1.5, never 3 or 4. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down once the object is right of the fixed jaw, even with a gap or cut off by the bottom edge; right after approach this is the normal view, and the alignment gets fixed down low. If the tips are already down beside the object, close instead.",
+   "reason": "Jev was unsure about descend in the normal after-approach view, where the jar sits up and right of the jaw with a gap.",
+   "run": 10112,
+   "checkpoint": "handback",
+   "at": 1795227834248,
+   "was": "Lower the open jaws straight down beside the object once it is in the opening right of the fixed jaw, even if the bottom edge cuts it off. If descend just ran and the tips are already down beside the object, close instead of descending again."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Stop height for the jaw tips in cm. Any jar, bottle or can, standing or lying: 1.5 (at 3 to 4 cm the jaws close over it and miss). Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev answered 4 again and the tips stopped at 3.7 cm. That is the third close to miss with the tips at 3–4 cm.",
+   "run": 10112,
+   "checkpoint": "found",
+   "at": 1795227954438,
+   "was": "Stop height for the jaw tips in cm. Jar or bottle: answer exactly 1.5. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Jar or bottle (standing or lying): 1.5. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev still answered 3.6, which left the tips at 3.2 cm and caused the fourth miss in a row with the tips high. The numbers 3 and 4 in the old text may have been priming it, so the text now gives only the answers.",
+   "run": 10112,
+   "checkpoint": "found",
+   "at": 1795228006973,
+   "was": "Stop height for the jaw tips in cm. Any jar, bottle or can, standing or lying: 1.5 (at 3 to 4 cm the jaws close over it and miss). Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend",
+   "text": "Lower the open jaws straight down once the object is right of the fixed jaw, even with a gap or cut off by the bottom edge; right after approach this is the normal view. For a jar or bottle go down to 1.5 cm, since closing any higher has missed every time. If the tips are already down beside the object, close instead.",
+   "reason": "Jev answered 4.8 even though the amount text says 1.5. That is the fifth miss in a row with the tips at 3–5 cm, so the low target now goes in the skill description too.",
+   "run": 10112,
+   "checkpoint": "found",
+   "at": 1795228058036,
+   "was": "Lower the open jaws straight down once the object is right of the fixed jaw, even with a gap or cut off by the bottom edge; right after approach this is the normal view, and the alignment gets fixed down low. If the tips are already down beside the object, close instead."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Target height for the jaw tips above the desk, well below where they are now. Any jar, bottle or pill container: 1.5, never more. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev's answers keep rising (4.8, then 6.1), so the tips stopped at 4.6 and 5.7 cm and every close missed. Jev seems to be answering near the current height instead of a low target.",
+   "run": 10112,
+   "checkpoint": "found",
+   "at": 1795228121252,
+   "was": "Jar or bottle (standing or lying): 1.5. Flat box: 1. Anything else: a little under half its height."
+  },
+  {
+   "target": "descend.amount",
+   "text": "Target height for the jaw tips above the desk, not their current height. Any jar, bottle or pill container, even lying down: 1.5. Flat box: 1. Anything else: a little under half its height.",
+   "reason": "Jev answered about the current tip height (3.6, 4.8, 6.1), so the jaws kept closing over the lying jar without touching it.",
+   "run": 10112,
+   "checkpoint": "handback",
+   "at": 1795228132447,
+   "was": "Target height for the jaw tips above the desk, well below where they are now. Any jar, bottle or pill container: 1.5, never more. Flat box: 1. Anything else: a little under half its height."
+  }
+ ]
+}

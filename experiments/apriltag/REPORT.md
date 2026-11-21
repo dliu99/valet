@@ -42,7 +42,7 @@ and final wrist frame):
   paper) lying on the table at (0.14, -0.23), beside the base on the arm's right. It sits clear of every box and target
   the benchmark draws. The start pose sees it in 19 of 20 scenes and a look straight down at the box or the square
   in about half (a bigger tag does not fit outside the task area). `tag_corners()` gives its corners in OpenCV's
-  detection order; a test checks the rendered tag is detected there to under 2 px.
+  detection order; an overhead render detects it there to under 2 px.
 - `SimSpec.errors: Errors`, all zero by default: `joint_offsets_deg` (readings and goals are the true angle plus the
   offset, as with a mis-zeroed servo), `compliance_deg_per_nm` (each arm joint bends past its reading by its load
   torque; 4.0 sags the grasp point 1.5 cm at the far edge of the task area) and `mount_shift_m`/`mount_tilt_deg`
@@ -248,8 +248,7 @@ reaching), the calibrated grid is still 1.1 cm off: there, the fitted sag is les
 ## Reproducing
 
 ```bash
-cd sim && uv sync --extra tag && uv run --extra tag pytest          # the sim, its new knobs and the tag
-cd ../experiments/apriltag && uv sync && uv run pytest              # lens, tag pose, hand-eye, error draws
+cd experiments/apriltag && uv sync                                  # valet-sim with the tag extra, scipy
 uv run python run_localize.py --seeds 0-19                          # localization and calibration (no model)
 uv run python run_servo.py --seeds 0-19                             # the closed-loop probe
 uv run python run_grid.py --seeds 0-19                              # the drawn grid

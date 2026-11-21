@@ -1,0 +1,29 @@
+{
+  "name": "valet",
+  "version": "0.3.0",
+  "private": true,
+  "description": "The brain of valet: Jev picks every move of an SO-101 arm, Claude writes Jev's cards, armd owns the hardware.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "bin": {
+    "valet": "brain/cli.ts"
+  },
+  "scripts": {
+    "valet": "node brain/cli.ts",
+    "eval": "node brain/eval.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@earendil-works/chord": "1.5.2",
+    "@earendil-works/pi-ai": "1.5.2",
+    "@earendil-works/pi-durable": "1.5.2",
+    "@earendil-works/pi-schema": "1.5.2",
+    "smol-toml": "^1.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -5,7 +5,6 @@ valet's control experiments: every approach runs here first, on the same seeded 
 
 ```bash
 cd sim && uv sync
-uv run pytest
 uv run python -m valet_sim.expert          # the scripted reference on the 20 benchmark seeds
 uv run valet-sim --port 8770 --seed 0      # the HTTP API, in real time
 ```

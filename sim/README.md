@@ -46,11 +46,33 @@ HTTP, real time, for harnesses in any language: see the routes at the top of `sr
 - Reference: `python -m valet_sim.expert` reads the true box pose and places 13/20 (lifted 15/20). It proves the
   scenes are solvable and can generate demonstrations; it is a floor to beat, not a ceiling.
 
+## Opt-in: a table tag and the real arm's errors
+
+Both are off by default, so results stay comparable across teams; switch them on per experiment.
+
+```python
+from valet_sim.scene import SceneSpec, TagSpec, tag_corners
+from valet_sim.sim import Errors, Sim, SimSpec
+
+spec = SimSpec(scene=SceneSpec(tag=TagSpec()),                         # a 5 cm AprilTag 36h11 beside the base
+               errors=Errors(joint_offsets_deg=(4, -5, 3, -4, 5, 0),   # readings and goals = true angle + offset
+                             compliance_deg_per_nm=4.0,                # ~1.5 cm of sag at the far edge
+                             mount_shift_m=(0.004, 0, 0), mount_tilt_deg=(0, 2, 0)))  # camera off its `Look` pose
+```
+
+- `TagSpec` places the tag clear of every box and target the benchmark draws; `tag_corners` gives its corners in the
+  world in OpenCV's detection order. Building a scene with a tag needs OpenCV: `uv sync --extra tag`.
+- With `Errors`, `state()`, `joints()` and `grasp_point()` report what the arm believes (forward kinematics of its
+  readings); `truth()` adds the true joints, grasp point and wrist camera pose, for measuring error.
+- With a mount error, `sim.model` holds the true camera pose, because it renders the frames. Build a policy's camera
+  model from `build(SceneSpec())`, or the policy is handed the very calibration the error takes away.
+- `experiments/apriltag/REPORT.md` measures what the tag is worth under these errors.
+
 ## How close it is to the real arm
 
 | | Matched to the real SO-101 | Not matched |
 |---|---|---|
-| Kinematics | Menagerie's model; joints are LeRobot calibrated degrees, same convention as `so101_new_calib.urdf` | the real joint zeros are about 5 degrees off |
+| Kinematics | Menagerie's model; joints are LeRobot calibrated degrees, same convention as `so101_new_calib.urdf` | the real joint zeros are about 5 degrees off and the arm sags ~1.5 cm (opt-in: `Errors`) |
 | Servos | kp 80 instead of Menagerie's 998: 0.4 A at 30 deg/s, against 0.1-0.25 A measured at 8-25 deg/s; goals slew at 60 deg/s | backlash, overload latching, encoder glitches |
 | Gripper | jaws stall on the box and hold it by friction; 0-100 taken as degrees of the jaw joint | the real 0-100 may be a normalised range |
 | Wrist camera | fitted to the real fixed jaw's outline (IoU 0.16 -> 0.64), level at roll -90, ~84 deg vertical FOV, barrel distortion, noise, blur, vignette | lens model is approximate; fitted from two real frames |

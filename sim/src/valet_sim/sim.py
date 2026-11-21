@@ -47,10 +47,31 @@ class Optics:
 
 
 @dataclass(frozen=True)
+class Errors:
+    """What the real arm gets wrong that its model does not. All off by default, so the sim's kinematics and camera
+    are exact unless an experiment asks otherwise.
+
+    - `joint_offsets_deg` (one per motor): a mis-zeroed servo. Readings are the true angle plus the offset, and goals
+      are taken the same way, so the arm agrees with itself but not with the world. The real arm's are about 5 deg.
+    - `compliance_deg_per_nm`: each arm joint (not the gripper) bends past where its encoder reads by its load
+      torque times this (gear backlash and link flex, which a servo cannot see). 4.0 sags the grasp point ~1.5 cm
+      at the far edge of the task area, as the real arm does.
+    - `mount_shift_m`, `mount_tilt_deg`: the wrist camera sits this far off the pose in `Look`, in the camera's own
+      frame (x right, y up, z back out of the lens); the tilt is a rotation vector in degrees. `Sim.model` then holds
+      the true mount (it renders the frames), so a policy must take its camera model from `build(SceneSpec())`."""
+
+    joint_offsets_deg: tuple[float, ...] = (0.0,) * len(MOTORS)
+    compliance_deg_per_nm: float = 0.0
+    mount_shift_m: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    mount_tilt_deg: tuple[float, float, float] = (0.0, 0.0, 0.0)
+
+
+@dataclass(frozen=True)
 class SimSpec:
     scene: SceneSpec = field(default_factory=SceneSpec)
     servo: ServoModel = field(default_factory=ServoModel)
     optics: Optics = field(default_factory=Optics)
+    errors: Errors = field(default_factory=Errors)
     start: dict[str, float] = field(default_factory=lambda: dict(START_JOINTS))
     image_size: tuple[int, int] = (640, 360)
     seed: int = 0
@@ -79,6 +100,11 @@ class Sim:
         self.box_geom = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "box")
         self.box_qadr = m.jnt_qposadr[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, "box")]
         self.target_geom = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "target")
+        self.camera = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, WRIST_CAMERA)
+        self.offset = np.radians(np.asarray(spec.errors.joint_offsets_deg, float))
+        self.compliance = np.radians(spec.errors.compliance_deg_per_nm) * (np.arange(len(MOTORS)) < MOTORS.index("gripper"))
+        _shift_camera(m, self.camera, spec.errors)
+        self.kin = mujoco.MjData(m)
         self.jaws = {mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, b) for b in ("gripper", "moving_jaw_so101_v1")}
         self.rng = np.random.default_rng(spec.seed)
         self.renderer = _RenderThread(self, spec.image_size)
@@ -95,9 +121,10 @@ class Sim:
             if target_xy is not None and self.target_geom >= 0:
                 m.geom_pos[self.target_geom][:2] = target_xy
             start = np.radians([self.spec.start[j] for j in MOTORS])
-            d.qpos[self.qadr] = start
-            d.ctrl[self.act] = start
+            d.qpos[self.qadr] = start - self.offset
+            d.ctrl[self.act] = start - self.offset
             self.goal = start.copy()
+            self.bend = np.zeros(len(MOTORS))
             self.box = box
             self.torque_avg = np.zeros(len(MOTORS))
             self.lifted_m = 0.0
@@ -130,8 +157,8 @@ class Sim:
         with self.lock:
             self.sync()
             if on:
-                self.goal = self.data.qpos[self.qadr].copy()
-                self.data.ctrl[self.act] = self.goal
+                self.goal = self._reading()
+                self.data.ctrl[self.act] = self.goal - self.offset - self.bend
                 self.model.opt.disableflags &= ~int(mujoco.mjtDisableBit.mjDSBL_ACTUATION)
             else:
                 self.model.opt.disableflags |= int(mujoco.mjtDisableBit.mjDSBL_ACTUATION)
@@ -139,7 +166,7 @@ class Sim:
     def joints(self) -> dict[str, float]:
         with self.lock:
             self.sync()
-            return dict(zip(MOTORS, (float(v) for v in np.degrees(self.data.qpos[self.qadr]))))
+            return dict(zip(MOTORS, (float(v) for v in np.degrees(self._reading()))))
 
     def state(self) -> dict:
         with self.lock:
@@ -149,11 +176,11 @@ class Sim:
             amps = self.spec.servo.idle_amps + self.spec.servo.amps_per_nm * self.torque_avg if torque_on else np.zeros(len(MOTORS))
             return {
                 "t": round(float(d.time), 3),
-                "joints": {j: round(float(v), 2) for j, v in zip(MOTORS, np.degrees(d.qpos[self.qadr]))},
+                "joints": {j: round(float(v), 2) for j, v in zip(MOTORS, np.degrees(self._reading()))},
                 "goals": {j: round(float(v), 2) for j, v in zip(MOTORS, np.degrees(self.goal))},
                 "amps": {j: round(float(a), 3) for j, a in zip(MOTORS, amps)},
                 "torque": torque_on,
-                "grasp_point": [round(float(v), 4) for v in d.site_xpos[self.site]],
+                "grasp_point": [round(float(v), 4) for v in self._grasp_point()],
             }
 
     def truth(self) -> dict:
@@ -173,6 +200,9 @@ class Sim:
                 "touching_jaws": bool(self.jaws & touching),
                 "lifted_m": round(self.lifted_m, 4),
                 "target": None if target is None else [round(float(v), 4) for v in target],
+                "joints": {j: round(float(v), 3) for j, v in zip(MOTORS, np.degrees(d.qpos[self.qadr]))},
+                "grasp_point": [round(float(v), 5) for v in d.site_xpos[self.site]],
+                "wrist_camera": {"pos": d.cam_xpos[self.camera].tolist(), "xmat": d.cam_xmat[self.camera].tolist()},
             }
 
     def frame(self, cam: str = "wrist") -> Image.Image:
@@ -181,9 +211,20 @@ class Sim:
         return develop(image, self.spec.optics, self.rng) if cam == "wrist" else image
 
     def grasp_point(self) -> np.ndarray:
+        """Where the arm believes its grasp point is: forward kinematics of its readings (exact without `Errors`)."""
         with self.lock:
             self.sync()
+            return self._grasp_point()
+
+    def _reading(self) -> np.ndarray:
+        return self.data.qpos[self.qadr] + self.bend + self.offset
+
+    def _grasp_point(self) -> np.ndarray:
+        if not self.offset.any() and not self.compliance.any():
             return self.data.site_xpos[self.site].copy()
+        self.kin.qpos[self.qadr] = self._reading()
+        mujoco.mj_kinematics(self.model, self.kin)
+        return self.kin.site_xpos[self.site].copy()
 
     def _run_until(self, t: float) -> None:
         m, d, servo = self.model, self.data, self.spec.servo
@@ -191,8 +232,12 @@ class Sim:
         max_step = np.radians(servo.max_speed_dps) * dt
         alpha = dt / CURRENT_FILTER_S
         while d.time < t:
-            ctrl = d.ctrl[self.act]
-            d.ctrl[self.act] = ctrl + np.clip(self.goal - ctrl, -max_step, max_step)
+            # ctrl is where the servo drives the joint: its goal less its zero error, less the bend under load
+            motor = d.ctrl[self.act] + self.bend
+            motor += np.clip(self.goal - self.offset - motor, -max_step, max_step)
+            if self.compliance.any():
+                self.bend += alpha * (self.compliance * d.actuator_force[self.act] - self.bend)
+            d.ctrl[self.act] = motor - self.bend
             mujoco.mj_step(m, d)
             self.torque_avg += alpha * (np.abs(d.actuator_force[self.act]) - self.torque_avg)
             if self.jaws <= self._box_touches():
@@ -257,6 +302,19 @@ def develop(image: Image.Image, optics: Optics, rng: np.random.Generator) -> Ima
         a = a + rng.normal(0, optics.noise_sd, a.shape).astype(np.float32)
     out = Image.fromarray((np.clip(a, 0, 1) * 255).astype(np.uint8))
     return out.filter(ImageFilter.GaussianBlur(optics.blur_px)) if optics.blur_px else out
+
+
+def _shift_camera(m: mujoco.MjModel, cam: int, errors: Errors) -> None:
+    shift, tilt = np.asarray(errors.mount_shift_m, float), np.radians(np.asarray(errors.mount_tilt_deg, float))
+    if not shift.any() and not tilt.any():
+        return
+    rot = np.zeros(9)
+    mujoco.mju_quat2Mat(rot, m.cam_quat[cam])
+    m.cam_pos[cam] += rot.reshape(3, 3) @ shift
+    turn, out = np.zeros(4), np.zeros(4)
+    mujoco.mju_axisAngle2Quat(turn, tilt / (np.linalg.norm(tilt) or 1.0), float(np.linalg.norm(tilt)))
+    mujoco.mju_mulQuat(out, m.cam_quat[cam], turn)
+    m.cam_quat[cam] = out
 
 
 def realtime(spec: SimSpec = SimSpec()) -> Sim:

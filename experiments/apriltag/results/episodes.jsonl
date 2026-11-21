@@ -1,0 +1,140 @@
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 0, "placed": true, "lifted": true, "seconds": 18.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 1, "placed": true, "lifted": true, "seconds": 17.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 2, "placed": true, "lifted": true, "seconds": 14.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 3, "placed": true, "lifted": true, "seconds": 10.3, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 4, "placed": true, "lifted": true, "seconds": 17.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 5, "placed": true, "lifted": true, "seconds": 14.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 6, "placed": true, "lifted": true, "seconds": 20.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 7, "placed": true, "lifted": true, "seconds": 17.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 8, "placed": false, "lifted": true, "seconds": 39.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 9, "placed": true, "lifted": true, "seconds": 14.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 10, "placed": true, "lifted": true, "seconds": 16.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 11, "placed": true, "lifted": true, "seconds": 12.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 12, "placed": true, "lifted": true, "seconds": 17.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 13, "placed": true, "lifted": true, "seconds": 15.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 14, "placed": true, "lifted": true, "seconds": 17.3, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 15, "placed": false, "lifted": true, "seconds": 17.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 16, "placed": true, "lifted": true, "seconds": 17.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 17, "placed": true, "lifted": true, "seconds": 16.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 18, "placed": true, "lifted": true, "seconds": 18.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/no-errors", "seed": 19, "placed": true, "lifted": true, "seconds": 14.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 0, "placed": false, "lifted": false, "seconds": 16.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 1, "placed": true, "lifted": true, "seconds": 14.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 2, "placed": false, "lifted": true, "seconds": 16.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 3, "placed": true, "lifted": true, "seconds": 12.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 4, "placed": false, "lifted": true, "seconds": 42.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 5, "placed": false, "lifted": true, "seconds": 36.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 6, "placed": true, "lifted": false, "seconds": 23.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 7, "placed": false, "lifted": false, "seconds": 23.3, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 8, "placed": false, "lifted": false, "seconds": 19.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 9, "placed": true, "lifted": true, "seconds": 12.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 10, "placed": false, "lifted": false, "seconds": 26.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 11, "placed": true, "lifted": true, "seconds": 12.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 12, "placed": false, "lifted": true, "seconds": 15.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 13, "placed": true, "lifted": true, "seconds": 12.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 14, "placed": true, "lifted": true, "seconds": 13.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 15, "placed": true, "lifted": true, "seconds": 20.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 16, "placed": false, "lifted": false, "seconds": 22.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 17, "placed": true, "lifted": true, "seconds": 17.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 18, "placed": false, "lifted": false, "seconds": 16.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/no-tag", "seed": 19, "placed": false, "lifted": false, "seconds": 19.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 0, "placed": false, "lifted": false, "seconds": 21.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 1, "placed": false, "lifted": false, "seconds": 15.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 2, "placed": false, "lifted": false, "seconds": 17.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 3, "placed": true, "lifted": true, "seconds": 12.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 4, "placed": true, "lifted": false, "seconds": 17.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 5, "placed": true, "lifted": true, "seconds": 20.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 6, "placed": false, "lifted": false, "seconds": 14.3, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 7, "placed": false, "lifted": false, "seconds": 16.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 8, "placed": false, "lifted": false, "seconds": 21.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 9, "placed": true, "lifted": true, "seconds": 12.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 10, "placed": false, "lifted": false, "seconds": 26.4, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 11, "placed": false, "lifted": true, "seconds": 12.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 12, "placed": false, "lifted": false, "seconds": 18.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 13, "placed": false, "lifted": true, "seconds": 12.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 14, "placed": false, "lifted": false, "seconds": 22.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 15, "placed": false, "lifted": true, "seconds": 28.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 16, "placed": false, "lifted": false, "seconds": 22.5, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 17, "placed": true, "lifted": true, "seconds": 11.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 18, "placed": false, "lifted": false, "seconds": 14.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-runtime", "seed": 19, "placed": true, "lifted": true, "seconds": 10.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 0, "placed": true, "lifted": true, "seconds": 36.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 1, "placed": true, "lifted": true, "seconds": 18.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 2, "placed": false, "lifted": true, "seconds": 11.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 3, "placed": true, "lifted": true, "seconds": 14.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 4, "placed": true, "lifted": true, "seconds": 16.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 5, "placed": true, "lifted": true, "seconds": 13.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 6, "placed": false, "lifted": false, "seconds": 23.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 7, "placed": true, "lifted": true, "seconds": 23.2, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 8, "placed": true, "lifted": true, "seconds": 21.8, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 9, "placed": true, "lifted": true, "seconds": 19.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 10, "placed": true, "lifted": true, "seconds": 14.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 11, "placed": true, "lifted": true, "seconds": 21.0, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 12, "placed": true, "lifted": true, "seconds": 36.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 13, "placed": true, "lifted": true, "seconds": 22.1, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 14, "placed": true, "lifted": true, "seconds": 19.6, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 15, "placed": true, "lifted": true, "seconds": 14.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 16, "placed": true, "lifted": true, "seconds": 15.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 17, "placed": true, "lifted": true, "seconds": 13.3, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 18, "placed": true, "lifted": true, "seconds": 11.7, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "own-policy/errors/tag-calibrated", "seed": 19, "placed": true, "lifted": true, "seconds": 10.9, "slow_calls": 0, "fast_calls": 0, "usd": 0.0, "calls": {}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 0, "placed": false, "lifted": false, "seconds": 16.2, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 1, "placed": false, "lifted": false, "seconds": 16.5, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 2, "placed": false, "lifted": false, "seconds": 19.6, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 3, "placed": true, "lifted": true, "seconds": 9.2, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 4, "placed": false, "lifted": false, "seconds": 15.1, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 5, "placed": false, "lifted": false, "seconds": 9.2, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 6, "placed": false, "lifted": true, "seconds": 9.1, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 7, "placed": false, "lifted": true, "seconds": 12.6, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 8, "placed": true, "lifted": true, "seconds": 10.1, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 9, "placed": false, "lifted": true, "seconds": 10.1, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 10, "placed": false, "lifted": true, "seconds": 10.3, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 11, "placed": false, "lifted": true, "seconds": 9.0, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 12, "placed": false, "lifted": false, "seconds": 15.0, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 13, "placed": false, "lifted": true, "seconds": 11.3, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 14, "placed": true, "lifted": true, "seconds": 9.1, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 15, "placed": true, "lifted": true, "seconds": 10.8, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 16, "placed": false, "lifted": false, "seconds": 14.9, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 17, "placed": false, "lifted": false, "seconds": 18.1, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 18, "placed": true, "lifted": true, "seconds": 11.2, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/no-tag", "seed": 19, "placed": false, "lifted": false, "seconds": 14.9, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 0, "placed": false, "lifted": false, "seconds": 16.6, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 1, "placed": false, "lifted": false, "seconds": 15.2, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 2, "placed": true, "lifted": true, "seconds": 11.5, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 3, "placed": false, "lifted": false, "seconds": 17.4, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 4, "placed": false, "lifted": false, "seconds": 15.9, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 5, "placed": false, "lifted": true, "seconds": 12.1, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 6, "placed": false, "lifted": false, "seconds": 14.1, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 7, "placed": false, "lifted": true, "seconds": 21.9, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 8, "placed": false, "lifted": false, "seconds": 17.7, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 9, "placed": false, "lifted": true, "seconds": 9.9, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 10, "placed": false, "lifted": true, "seconds": 10.3, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 11, "placed": false, "lifted": true, "seconds": 9.0, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 12, "placed": false, "lifted": true, "seconds": 12.2, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 13, "placed": false, "lifted": false, "seconds": 17.6, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 14, "placed": false, "lifted": false, "seconds": 14.1, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 15, "placed": false, "lifted": false, "seconds": 20.5, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 16, "placed": false, "lifted": false, "seconds": 15.2, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 17, "placed": false, "lifted": false, "seconds": 17.7, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 18, "placed": true, "lifted": true, "seconds": 10.7, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-runtime", "seed": 19, "placed": false, "lifted": false, "seconds": 15.0, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 0, "placed": true, "lifted": true, "seconds": 8.7, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 1, "placed": true, "lifted": true, "seconds": 10.4, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 2, "placed": true, "lifted": true, "seconds": 17.7, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 3, "placed": false, "lifted": false, "seconds": 19.4, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 4, "placed": false, "lifted": false, "seconds": 15.5, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 5, "placed": true, "lifted": true, "seconds": 11.2, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 6, "placed": true, "lifted": true, "seconds": 9.2, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 7, "placed": false, "lifted": false, "seconds": 15.8, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 8, "placed": true, "lifted": true, "seconds": 11.4, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 9, "placed": false, "lifted": false, "seconds": 18.5, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 10, "placed": true, "lifted": true, "seconds": 10.6, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 11, "placed": true, "lifted": true, "seconds": 18.0, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 12, "placed": true, "lifted": true, "seconds": 18.7, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 13, "placed": true, "lifted": true, "seconds": 12.5, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 14, "placed": false, "lifted": false, "seconds": 18.0, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 15, "placed": true, "lifted": true, "seconds": 9.4, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 16, "placed": true, "lifted": true, "seconds": 11.2, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 17, "placed": false, "lifted": false, "seconds": 16.3, "slow_calls": 0, "fast_calls": 5, "usd": 0.0, "calls": {"localize:h2o": 5}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 18, "placed": true, "lifted": true, "seconds": 8.8, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}
+{"experiment": "apriltag", "config": "aspire-final/errors/tag-calibrated", "seed": 19, "placed": true, "lifted": true, "seconds": 10.7, "slow_calls": 0, "fast_calls": 4, "usd": 0.0, "calls": {"localize:h2o": 4}}

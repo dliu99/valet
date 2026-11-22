@@ -8,6 +8,14 @@ grasps from was within 0.10 cm of the truth in every episode, and the square wit
 after a good estimate: the jaws closed on a yawed box's corners. Worth running on the real arm, once the camera pose
 is calibrated (section 4).
 
+**Against main** (section 5, rebased on main of 2026-11-21, in main's own `armd` sim, on main's task):
+- Locating, on the same frames: the two-view mask fit puts the box centre 0.03 cm off (median; 0.09 cm p90). Main's
+  `samAxis` is 1.1-1.3 cm off per view with a 7-14 cm tail, and its `find` is 0.9 cm off on the 12 of 30 poses
+  where two views agree.
+- On main's "move the box 10 cm left" goal, this policy places 7/10 with no LLM. Main's brain with Jev and no Claude
+  places 0/10. There, main's grasp fails before locating matters: armd's 0.9 A gripper stop trips at first touch in
+  its sim.
+
 ## 1. Running SAM 3 locally
 
 - `facebook/sam3` is gated on Hugging Face and this account is not on its list (403). `mlx-community/sam3-bf16` is
@@ -153,9 +161,11 @@ Yes, as the perception layer, with three conditions.
   halves the time for slightly wider error (0.16 cm median against 0.14). SAM 3.1 gives the same accuracy.
 - **The precision comes from geometry, so the geometry has to be right on the real arm.** The fit is exact only if
   the camera pose from the joints is. The sim README says the real joint zeros are about 5 degrees off. At 25 cm, 5
-  degrees is about 2 cm on the table, far more than SAM 3's error. Calibrate the camera pose and lens first, for
-  example with the AprilTag team's anchor, or by fitting the camera pose to SAM 3 masks of the square at known arm
-  poses. Then check the fit on a few real frames against a ruler before trusting it.
+  degrees is about 2 cm on the table, far more than SAM 3's error. Main now has that calibration: `tools/calib.py`
+  fitted the real wrist camera's mount, field of view and barrel (`REAL_CAMERA` in `src/valet/armd/locate.py`) so
+  table features seen from seven poses land within 0.6 cm of each other. That 0.6 cm, not SAM 3, sets the floor on
+  the real arm. Load it into `sam3p/camera.py`'s `Lens` and mount, then check the fit on a few real frames against a
+  ruler before trusting it.
 - **Real images help SAM 3, and lighting is the risk.** SAM 3 is trained on real photos, so the sim's flat-shaded
   faces are if anything harder than a real box. The two failure modes found here, shaded faces and the arm's shadow,
   are lighting effects, and both have fixes in place: the two-view fit and the fallback wording. A white box on a
@@ -166,6 +176,103 @@ Yes, as the perception layer, with three conditions.
 Also measured: Jev box questions at 0.11 s each give 0.9 cm median and a 3.1 cm p90 on the box. That is enough to
 centre a look, not to grasp.
 
+## 5. Against main's approach, in main's sim
+
+Rebased on main of 2026-11-21 (dliu99/valet#13-#15). On main, `armd` has its own MuJoCo backend (`valet.armd.sim`)
+and already runs SAM 3 (`armd/segment.py`). The brain (`brain/skills.ts`) puts the mask on the table its own way,
+and Jev picks every skill. Main's sim shares valet_sim's arm model, wrist camera pose, field of view, barrel
+distortion and optics: the camera pose matches exactly at random joints. So this experiment's code runs there
+unchanged. Harness `sam3p/versus.py`, results in `results/versus/` (`summary.md`, per-episode JSONL, main's logs).
+
+### Locating the box on the same frames
+
+30 box poses: the 6×6×9 cm white box at a random place and yaw (seed 1). Each pose gets two wrist frames, from the
+poses main's `find` uses: the start pose, then `lookAt` its first answer, or main's first scan pose where that is
+out of reach. One SAM 3 pass per frame at 504 px feeds both methods.
+
+- **main**: `samAxis` on armd's `describe()` of the best "white box" mask.
+  - Looking steeply down, it takes the mask's centroid on a plane 5 cm up.
+  - Otherwise it takes the mask's lowest pixel on the table, plus a 3.2 cm radius away from the arm.
+  - `find` keeps two views that agree within 2 cm.
+- **this**: the jaw-filtered mask with the "white cube" fallback, and an upright box fitted to it through the camera
+  model.
+
+| method | views | positions | centre error cm, median / p90 / max |
+|---|---|---|---|
+| main `samAxis`, start view | 30 | 23 | 1.34 / 10.59 / 13.79 |
+| main `samAxis`, `lookAt` view | 30 | 25 | 1.12 / 6.75 / 7.87 |
+| main `find`: both views, agreeing within 2 cm | 30 | 12 | 0.94 / 1.18 / 1.33 |
+| mask fit, start view | 30 | 30 | 0.28 / 1.63 / 3.34 |
+| mask fit, `lookAt` view (size from the start view) | 30 | 30 | 0.23 / 1.81 / 2.64 |
+| **mask fit, both views together** | 30 | 30 | **0.03 / 0.09 / 0.32** |
+
+- **Main's large misses (7-14 cm, a fifth of the start views) are all oblique "foot" readings of boxes on the arm's
+  left.** `samAxis` assumes the mask's lowest pixel is the base's near edge. For a 9 cm box seen from beside
+  through the wide lens, the lowest pixel is a top corner instead. On pose 3 it sits 70 px outside the projected base
+  corners and lands 11-14 cm away on the table.
+  - The mask itself was good. On these views the top "white box" instance was the box; the jaw's own instance
+    scored 0.1-0.3.
+  - The fit models the whole box, so it is not fooled.
+- Main's agreement check rejects those misses, so `find` was within 1.3 cm whenever two views agreed (12 of 30).
+  Otherwise it goes on looking, up to 4 views.
+- In 11 of 60 views main had no position because no mask scored 0.5, its cut. The fit takes the best mask over 0.1
+  that is not on the jaw, and asks "white cube" when "white box" finds nothing.
+
+### The task
+
+Main's own goal from `tools/batchbox.sh`: "Pick up the white box, move it about 10 cm to the left, and set it down
+standing upright."
+- 10 box poses (seed 0), the same for every run, all at yaw 0 because `/fake/reset` cannot turn the box.
+- Graded from the sim's truth. **Placed**: upright, released, and within 2 cm of the spot 10 cm to the arm's left of
+  where the box stood (main's `sideways`). **Lifted**: the box rose 1 cm.
+
+How each side runs:
+- **This policy** runs in-process on main's armd app, through its Guard and Mover (the code behind `POST /act`), on
+  a clock that runs as fast as the physics computes.
+  - It takes the target spot from its own fit.
+  - It closes with its own rule, until the jaw stops moving. armd's close stopped at first touch here too, and lifted
+    nothing in a smoke test.
+- **Main's brain** runs as it ships: `valet do --no-claude` against `valet-armd serve --sim` on port 8771.
+  - Jev picks every skill.
+  - Claude's line-up and checkpoints are off, to keep Claude spend at $0.
+
+| | placed | lifted | LLM calls / ep | Jev calls / ep | SAM 3 frames / ep | arm time / ep (median) |
+|---|---|---|---|---|---|---|
+| **this policy** | **7/10** | **9/10** | 0 | 0 | 3 | 22 s simulated (3 s wall) |
+| main as it ships | 0/10 | 1/10 | 0 | 14 | - | 36 s (sim runs in real time) |
+| main, armd's gripper stop raised from 0.9 A to 1.5 A | 0/10 | 5/10 | 0 | 16 | - | 49 s |
+
+Where each fails:
+- **Main as it ships: the close.** 21 closes over 10 episodes "stopped part way".
+  - armd's grip stops at 0.9 A of gripper current. In the sim the jaw draws 0.78 A just moving.
+  - At main's 60° tilt, the moving jaw touches the box at 74 % open and reads 0.94 A, before it has pushed the box
+    onto the fixed jaw. This was replayed in-process from main's own recorded joints.
+  - `holds()` then passed two of these empty grips (the box shifted 0.057 against a 0.06 limit, and scaled 0.86
+    against 0.85). The arm carried nothing and Jev chose done.
+  - Jev also chose `line_up` 18 times, which does nothing without Claude.
+- **Main with a 1.5 A stop: the grip and the carry.** Closes went further (to 59 % open in the replay), and 5 boxes
+  left the table, but none arrived at the spot.
+  - Four ended 6.9-9.9 cm from the spot.
+  - One landed on its side 1.9 cm from the spot.
+  - With no current stop at all, the replayed close clamps the box. But the soft sim servos (kp 80) let the arm ride
+    up 4 cm and tilt 11° as the jaws close on the box at 60°.
+- **This policy: three misses, each with a box estimate within 0.02 cm of the truth.** All three boxes were 19-24°
+  to the side of the arm's line, where yaw 0 on the table turns the box that much against the jaws. That is the
+  setup of section 3's corner grips; this harness did not log the gripper readings that would confirm it.
+  - One was not lifted.
+  - One fell out in the carry.
+  - One was set down 2.7 cm off.
+
+What this says for main:
+- **Locating.** The mask fit is a drop-in gain for `find`: 0.03 cm from two views, against main's 0.9-1.3 cm when its
+  views agree, and no 7-14 cm single-view misses. Section 2 shows the same against Jev's box answers.
+- **Grasping, at least in its sim, fails before locating matters.**
+  - The 0.9 A stop is probably right on the real arm, where moving joints read 0.1-0.25 A (the comment on
+    `armd/sim.py`'s `ServoModel`). It is the sim's gripper that draws too much current.
+  - So the sim's gripper current needs to come down before the sim can judge main's grasps.
+- **Main's design leans on Claude** to line up the jaws and confirm the grip. This run turned that off, so main with
+  Claude is untested here.
+
 ## Reproduce
 
 ```bash
@@ -175,5 +282,12 @@ uv run python -m sam3p.measure --seeds 20-39 --sam 3.1 --res 504 1008 --no-truth
 uv run python -m sam3p.tables                            # the compact tables above
 uv run python -m sam3p.bench --seeds 0-19 --config twoview --fallback "white cube" --record
 uv run python -m sam3p.bench --seeds 0-19 --oracle       # same policy, true masks
+# section 5, against main (armd's code is imported from ../../src)
+PYTHONPATH=.:../../src uv run python -m sam3p.versus frames --poses 30 --seed 1
+PYTHONPATH=.:../../src uv run python -m sam3p.versus task --episodes 10 --seed 0
+# main's brain: serve armd's sim on a spare port (never 8750), then drive it from the repo root's `npm run valet`
+(cd ../.. && PYTHONPATH=src experiments/sam3/.venv/bin/python -m valet.armd serve --sim --allow-motion --config <toml with [armd] url = "http://127.0.0.1:8771">)
+PYTHONPATH=.:../../src uv run python -m sam3p.versus main --episodes 10 --seed 0 --armd http://127.0.0.1:8771
+PYTHONPATH=.:../../src uv run python -m sam3p.versus summary
 ```
 On the shared Mac, wrap anything that loads SAM 3 in `python3 ~/.valet/slot.py --name <team> --heavy --`.

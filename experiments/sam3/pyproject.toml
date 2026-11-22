@@ -18,12 +18,5 @@ sam = ["mlx-vlm>=0.4.3"]
 [tool.uv.sources]
 valet-sim = { path = "../../sim", editable = true }
 
-[dependency-groups]
-dev = ["pytest>=8"]
-
 [tool.uv]
 package = false
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]

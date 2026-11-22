@@ -170,7 +170,6 @@ centre a look, not to grasp.
 
 ```bash
 cd experiments/sam3 && uv sync --extra sam
-uv run pytest                                            # camera model and fits, no SAM 3
 uv run python -m sam3p.measure --seeds 20-39 --jev       # the perception table (needs TYPESAFE_API_KEY for Jev)
 uv run python -m sam3p.measure --seeds 20-39 --sam 3.1 --res 504 1008 --no-truth --out results/perception_sam31.jsonl
 uv run python -m sam3p.tables                            # the compact tables above

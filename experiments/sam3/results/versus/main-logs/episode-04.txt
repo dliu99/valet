@@ -1,0 +1,23 @@
+run #235: Pick up the white box, move it about 10 cm to the left, and set it down standing upright.
+object white box, decider jev, armd http://127.0.0.1:8771
+  step do#1 find_object (p 0.99)  [3192 ms]
+  -> find_object: ok: two views agree within 2 cm  [7.6 s]
+  step do#2 approach (p 0.51)  [142 ms]
+  -> approach: ok: jaws open 12 cm up, above and left of the object at {"pan_deg":16.7,"reach_cm":19.1,"height_cm":0}, tilted 60°  [3.8 s]
+  step do#3 descend 5 cm (p 0.83)  [126 ms]
+  ask do.3#2 check  [91 ms]
+  -> descend 5 cm: ok: jaw tips at 4.8 cm: moved  [2.5 s]
+  step do#4 close (p 0.73)  [80 ms]
+  -> close: ok: the jaws stopped part way: something is between them  [0.7 s]
+  step do#5 lift (p 0.54)  [85 ms]
+  ask do.5#3 box:0, box:1, box:2  [101 ms]
+  ask do.5#5 box:0, box:1, box:2  [89 ms]
+  ask do.5#6 check  [79 ms]
+  -> lift: not ok: the jaws hold something, but not the object (box moved 0.050 and scaled 0.78x when the arm rose 3 cm; held between the jaws by eye p 0.45)  [5.9 s]
+  step do#6 open (p 0.57)  [74 ms]
+  -> open: ok: lowered back to where the jaws closed, then opened (moved)  [3.8 s]
+  step do#7 line_up (p 0.26)  [119 ms]
+  -> line_up: not ok: unsure; ran nothing  [0.0 s]
+  step do#8 line_up (p 0.25)  [73 ms]
+  -> line_up: not ok: unsure; ran nothing  [0.0 s]
+run #235: unsure: Jev was unsure 2 steps in a row (last: line_up at p 0.25)

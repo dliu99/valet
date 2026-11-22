@@ -1,0 +1,152 @@
+{
+ "seed": 4,
+ "placed": true,
+ "lifted": true,
+ "off_target_m": 0.0044,
+ "tilt_deg": 0.0,
+ "resting": true,
+ "released": true,
+ "outcome": "done",
+ "sim_s": 12.3,
+ "wall_s": 1.6,
+ "looks": 4,
+ "sam_calls": 4,
+ "sam_s_median": 0.0,
+ "graded": [
+  {
+   "tag": "survey",
+   "box_cm": 1.21,
+   "square_cm": 0.01
+  },
+  {
+   "tag": "survey-aside",
+   "box_cm": 0.1,
+   "square_cm": 0.02
+  },
+  {
+   "tag": "above-box-0",
+   "box_cm": 0.08,
+   "square_cm": 0.07
+  },
+  {
+   "tag": "after-place",
+   "box_cm": 0.01,
+   "square_cm": 0.04
+  }
+ ],
+ "truth": {
+  "x": 0.2698,
+  "y": -0.0242,
+  "z": 0.039,
+  "tilt_deg": 0.0,
+  "w": 0.05414584158358551,
+  "d": 0.05414584158358551,
+  "h": 0.07822067495985088
+ },
+ "events": [
+  {
+   "t": 0.0,
+   "what": "look",
+   "tag": "survey",
+   "box": [
+    0.2213,
+    0.1572,
+    -30.0,
+    0.0475,
+    0.075,
+    0.0
+   ],
+   "square": [
+    0.266,
+    -0.0222,
+    0.976
+   ],
+   "box_frac": 0.084,
+   "s": {
+    "segment": 0.015,
+    "fit": 0.179
+   }
+  },
+  {
+   "t": 0.66,
+   "what": "look",
+   "tag": "survey-aside",
+   "box": [
+    0.2245,
+    0.1465,
+    -25.0,
+    0.0548,
+    0.0735,
+    0.981
+   ],
+   "square": [
+    0.266,
+    -0.0219,
+    0.961
+   ],
+   "box_frac": 0.021,
+   "s": {
+    "segment": 0.014,
+    "fit": 0.288
+   }
+  },
+  {
+   "t": 0.86,
+   "what": "look",
+   "tag": "above-box-0",
+   "box": [
+    0.2238,
+    0.1449,
+    -25.6,
+    0.0534,
+    0.0777,
+    0.985
+   ],
+   "square": [
+    0.2652,
+    -0.0223,
+    0.966
+   ],
+   "box_frac": 0.025,
+   "s": {
+    "segment": 0.011,
+    "fit": 0.281
+   }
+  },
+  {
+   "t": 4.89,
+   "what": "closed",
+   "gripper": 34.5
+  },
+  {
+   "t": 11.77,
+   "what": "look",
+   "tag": "after-place",
+   "box": [
+    0.2698,
+    -0.0243,
+    -4.6,
+    0.0534,
+    0.0777,
+    0.984
+   ],
+   "square": [
+    0.2662,
+    -0.0224,
+    0.948
+   ],
+   "box_frac": 0.025,
+   "s": {
+    "segment": 0.008,
+    "fit": 0.226
+   }
+  },
+  {
+   "t": 11.77,
+   "what": "placed?",
+   "off_cm": 0.51,
+   "iou": 0.984,
+   "upright": true
+  }
+ ]
+}
